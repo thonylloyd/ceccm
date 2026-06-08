@@ -23,7 +23,7 @@ export function Hero({ banner }: { banner: Banner }) {
         <img
           src={bg}
           alt=""
-          className="h-full w-full object-cover animate-[ken-burns_20s_ease-in-out_infinite_alternate]"
+          className="h-full w-full object-cover animate-kenburns"
         />
         <div
           className="absolute inset-0"
