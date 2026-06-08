@@ -37,14 +37,14 @@ export function Hero({ banner }: { banner: Banner }) {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-10 pt-32 pb-24 w-full">
         <div className="max-w-3xl">
           {banner.eyebrow && (
-            <div className="inline-flex items-center gap-3 mb-6 animate-[fade-up_0.7s_ease-out]">
+            <div className="inline-flex items-center gap-3 mb-6 animate-fade-up">
               <span className="h-px w-12 bg-gold" />
               <span className="text-xs uppercase tracking-[0.32em] text-gold font-medium">
                 {banner.eyebrow}
               </span>
             </div>
           )}
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] tracking-tight animate-[fade-up_0.8s_ease-out_0.1s_both]">
+          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] tracking-tight animate-fade-up">
             {banner.heading.split("\n").map((line, i) => (
               <span key={i} className="block">
                 {i === 1 ? <span className="text-gold italic font-light">{line}</span> : line}
@@ -52,11 +52,11 @@ export function Hero({ banner }: { banner: Banner }) {
             ))}
           </h1>
           {banner.subheading && (
-            <p className="mt-8 text-lg sm:text-xl text-white/85 max-w-2xl leading-relaxed animate-[fade-up_0.9s_ease-out_0.2s_both]">
+            <p className="mt-8 text-lg sm:text-xl text-white/85 max-w-2xl leading-relaxed animate-fade-up">
               {banner.subheading}
             </p>
           )}
-          <div className="mt-10 flex flex-wrap gap-4 animate-[fade-up_1s_ease-out_0.3s_both]">
+          <div className="mt-10 flex flex-wrap gap-4 animate-fade-up">
             {banner.primary_cta_label && (
               <a
                 href={banner.primary_cta_url ?? "#"}
