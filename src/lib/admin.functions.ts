@@ -110,7 +110,7 @@ export const adminReorder = createServerFn({ method: "POST" })
     if (!isAdmin.data) throw new Error("Forbidden");
     await Promise.all(
       data.ids.map((id, i) =>
-        supabaseAdmin.from(data.table).update({ display_order: i }).eq("id", id),
+        (supabaseAdmin.from(data.table) as any).update({ display_order: i }).eq("id", id),
       ),
     );
     return { ok: true };
