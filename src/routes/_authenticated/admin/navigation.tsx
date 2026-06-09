@@ -51,8 +51,8 @@ function NavAdmin() {
               children={items.filter((c: any) => c.parent_id === item.id).sort((a: any, b: any) => a.display_order - b.display_order)}
               expanded={open === item.id}
               onToggle={() => setOpen(open === item.id ? null : item.id)}
-              onSave={(r) => save.mutate(r)}
-              onDelete={(id) => { if (confirm("Delete?")) remove.mutate(id); }}
+              onSave={(r: any) => save.mutate(r)}
+              onDelete={(id: string) => { if (confirm("Delete?")) remove.mutate(id); }}
               onAddChild={() => save.mutate({ label: "Sub-item", url: "/", parent_id: item.id, display_order: items.filter((c: any) => c.parent_id === item.id).length, is_active: true, is_external: false })}
             />
           ))}
