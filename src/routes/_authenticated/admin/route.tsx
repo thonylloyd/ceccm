@@ -13,7 +13,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
 });
 
-const NAV = [
+type NavLink = { to: string; label: string; icon: any; end?: boolean };
+const NAV: NavLink[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/homepage", label: "Homepage", icon: Home },
   { to: "/admin/about", label: "About", icon: Info },
@@ -23,7 +24,7 @@ const NAV = [
   { to: "/admin/media", label: "Media Library", icon: ImageIcon },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 function AdminLayout() {
   const navigate = useNavigate();
