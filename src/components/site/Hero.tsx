@@ -1,4 +1,5 @@
 import heroFallback from "@/assets/hero-cathedral.jpg";
+import { useState, useEffect } from "react";
 
 type Banner = {
   id: string;
@@ -13,72 +14,72 @@ type Banner = {
   secondary_cta_url?: string | null;
 };
 
-export function Hero({ banner }: { banner: Banner }) {
-  const bg = banner.background_image_url || heroFallback;
-  const overlay = banner.overlay_opacity ?? 0.55;
+export function Hero({ banners }: { banners: Banner[] }) {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (banners.length < 2) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % banners.length), 7000);
+    return () => clearInterval(t);
+  }, [banners.length]);
+
+  if (!banners.length) return null;
+  const b = banners[idx];
+  const bg = b.background_image_url || heroFallback;
+  const overlay = b.overlay_opacity ?? 0.55;
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden flex items-center">
-      <div className="absolute inset-0">
-        <img
-          src={bg}
-          alt=""
-          className="h-full w-full object-cover animate-kenburns"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, color-mix(in oklab, var(--navy-deep) ${overlay * 100}%, transparent) 0%, color-mix(in oklab, var(--navy-deep) ${Math.min(overlay + 0.25, 1) * 100}%, transparent) 100%)`,
-          }}
-        />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-navy-deep" />
-      </div>
+    <section className="bg-light pt-6 pb-2">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="relative overflow-hidden rounded-md min-h-[480px] lg:min-h-[560px] flex items-center">
+          <img src={bg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(110deg, rgba(4,30,74,${Math.min(overlay + 0.25, 0.95)}) 0%, rgba(4,30,74,${overlay * 0.4}) 75%, rgba(4,30,74,${overlay * 0.2}) 100%)`,
+            }}
+          />
+          <div className="relative w-full px-8 sm:px-14 lg:px-20 py-16">
+            {b.eyebrow && (
+              <p className="text-white/85 text-sm mb-3">{b.eyebrow}</p>
+            )}
+            <h1 className="font-display text-white font-bold leading-[0.95] tracking-tight text-4xl sm:text-5xl lg:text-6xl xl:text-7xl uppercase max-w-2xl">
+              {b.heading}
+            </h1>
+            {b.subheading && (
+              <p className="mt-5 text-white/90 text-base sm:text-lg max-w-xl">{b.subheading}</p>
+            )}
+            <div className="mt-8 flex flex-wrap gap-3">
+              {b.primary_cta_label && (
+                <a
+                  href={b.primary_cta_url ?? "#"}
+                  className="inline-flex items-center rounded-sm bg-gold px-8 py-3 text-[12px] font-bold uppercase tracking-[0.18em] text-white hover:bg-gold-soft transition-colors"
+                >
+                  {b.primary_cta_label}
+                </a>
+              )}
+              {b.secondary_cta_label && (
+                <a
+                  href={b.secondary_cta_url ?? "#"}
+                  className="inline-flex items-center rounded-sm border border-white px-8 py-3 text-[12px] font-bold uppercase tracking-[0.18em] text-white hover:bg-white hover:text-navy-deep transition-colors"
+                >
+                  {b.secondary_cta_label}
+                </a>
+              )}
+            </div>
+          </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10 pt-32 pb-24 w-full">
-        <div className="max-w-3xl">
-          {banner.eyebrow && (
-            <div className="inline-flex items-center gap-3 mb-6 animate-fade-up">
-              <span className="h-px w-12 bg-gold" />
-              <span className="text-xs uppercase tracking-[0.32em] text-gold font-medium">
-                {banner.eyebrow}
-              </span>
+          {banners.length > 1 && (
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+              {banners.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setIdx(i)}
+                  className={`h-1.5 rounded-full transition-all ${i === idx ? "w-8 bg-gold" : "w-1.5 bg-white/50"}`}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
             </div>
           )}
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] tracking-tight animate-fade-up">
-            {banner.heading.split("\n").map((line, i) => (
-              <span key={i} className="block">
-                {i === 1 ? <span className="text-gold italic font-light">{line}</span> : line}
-              </span>
-            ))}
-          </h1>
-          {banner.subheading && (
-            <p className="mt-8 text-lg sm:text-xl text-white/85 max-w-2xl leading-relaxed animate-fade-up">
-              {banner.subheading}
-            </p>
-          )}
-          <div className="mt-10 flex flex-wrap gap-4 animate-fade-up">
-            {banner.primary_cta_label && (
-              <a
-                href={banner.primary_cta_url ?? "#"}
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-gold to-gold-soft px-9 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-navy-deep shadow-2xl shadow-gold/30 hover:shadow-gold/50 hover:-translate-y-0.5 transition-all"
-              >
-                {banner.primary_cta_label}
-              </a>
-            )}
-            {banner.secondary_cta_label && (
-              <a
-                href={banner.secondary_cta_url ?? "#"}
-                className="inline-flex items-center justify-center rounded-full border border-white/40 backdrop-blur-md bg-white/5 px-9 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white hover:bg-white hover:text-navy-deep transition-colors"
-              >
-                {banner.secondary_cta_label}
-              </a>
-            )}
-          </div>
-        </div>
-
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60">
-          <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-          <span className="h-10 w-px bg-gradient-to-b from-gold to-transparent" />
         </div>
       </div>
     </section>

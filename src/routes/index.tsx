@@ -23,10 +23,10 @@ export const Route = createFileRoute("/")({
     ],
   }),
   errorComponent: ({ error }) => (
-    <div className="min-h-screen flex items-center justify-center bg-navy-deep text-white p-6">
+    <div className="min-h-screen flex items-center justify-center bg-light p-6">
       <div className="text-center">
-        <h1 className="font-display text-3xl text-gold mb-2">Something went wrong</h1>
-        <p className="text-white/70 text-sm">{error.message}</p>
+        <h1 className="font-display text-3xl text-navy-deep mb-2">Something went wrong</h1>
+        <p className="text-charcoal/70 text-sm">{error.message}</p>
       </div>
     </div>
   ),
@@ -36,24 +36,36 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { data } = useSuspenseQuery(homepageQuery());
-  const banner = data.heroes[0];
   const brand = data.settings.brand ?? {};
   const contact = data.settings.contact ?? {};
   const footer = data.settings.footer ?? {};
   const social = data.settings.social ?? {};
-  const nav = data.nav.filter((n) => !n.parent_id);
+  const livestream = data.settings.livestream ?? {};
+  const homepage = data.settings.homepage ?? {};
+  const nav = data.nav.filter((n: any) => !n.parent_id);
 
   return (
-    <div className="bg-navy-deep min-h-screen">
-      <SiteHeader nav={nav} brandName={brand.name ?? "Church Consolidation Mission"} />
+    <div className="bg-light min-h-screen">
+      <SiteHeader
+        nav={nav}
+        brandName={brand.name ?? "Church Consolidation Mission"}
+        livestream={livestream}
+        logoUrl={brand.logo_url}
+      />
       <main>
-        {banner && <Hero banner={banner} />}
-        <MissionSection cards={data.mission} />
+        <Hero banners={data.heroes} />
+        <MissionSection cards={data.mission} title={homepage.mission_title ?? "Our Mission"} />
         <StatsSection stats={data.stats} />
-        <ProgramsSection programs={data.programs} />
+        <ProgramsSection programs={data.programs} intro={homepage.programs_intro ?? "Join our global initiatives and transform lives."} />
         <ResourcesSection cards={data.resources} />
       </main>
-      <SiteFooter nav={nav} brand={brand} contact={contact} footer={footer} social={social} />
+      <SiteFooter
+        brand={brand}
+        contact={contact}
+        footer={footer}
+        social={social}
+        logoUrl={brand.logo_url}
+      />
     </div>
   );
 }
