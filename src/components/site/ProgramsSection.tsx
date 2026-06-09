@@ -1,5 +1,6 @@
+import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import programFallback from "@/assets/program-summit.jpg";
-import { Calendar, ArrowRight } from "lucide-react";
 
 type Program = {
   id: string;
@@ -12,62 +13,88 @@ type Program = {
   registration_url?: string | null;
 };
 
-export function ProgramsSection({ programs }: { programs: Program[] }) {
+export function ProgramsSection({ programs, intro }: { programs: Program[]; intro?: string }) {
+  const [idx, setIdx] = useState(0);
   if (!programs.length) return null;
+  const p = programs[idx];
+  const date = p.event_date ? new Date(p.event_date) : null;
+  const day = date ? date.getDate().toString().padStart(2, "0") : "";
+  const mo = date
+    ? `${date.toLocaleString("en-US", { month: "short" }).toUpperCase()} ${date.getFullYear()}`
+    : "";
+
+  const prev = () => setIdx((i) => (i - 1 + programs.length) % programs.length);
+  const next = () => setIdx((i) => (i + 1) % programs.length);
+
   return (
-    <section className="bg-light py-28 lg:py-36">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10">
-        <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
+    <section className="bg-light py-20 lg:py-24">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
           <div>
-            <div className="inline-flex items-center gap-3 mb-5">
-              <span className="h-px w-10 bg-gold" />
-              <span className="text-xs uppercase tracking-[0.32em] text-gold font-semibold">Upcoming</span>
-            </div>
-            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl text-navy-deep leading-tight">
-              Programs &amp; <span className="italic text-gold font-light">Gatherings</span>
-            </h2>
+            <h2 className="font-display text-3xl sm:text-4xl text-navy-deep">Upcoming Programs</h2>
+            {intro && <p className="text-sm text-charcoal/70 mt-1">{intro}</p>}
           </div>
-          <a href="/programs" className="text-sm uppercase tracking-[0.18em] text-navy hover:text-gold font-semibold inline-flex items-center gap-2">
-            View all <ArrowRight className="h-4 w-4" />
+          <a href="/programs" className="text-sm font-semibold text-navy-deep hover:text-gold inline-flex items-center gap-1">
+            View All Programs <ChevronRight className="h-4 w-4" />
           </a>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {programs.map((p) => (
-            <article key={p.id} className="group relative overflow-hidden rounded-3xl bg-navy-deep text-white shadow-xl shadow-navy/10 hover:shadow-2xl transition-all">
-              <div className="relative aspect-[16/10] overflow-hidden">
-                <img
-                  src={p.image_url || programFallback}
-                  alt={p.title}
-                  className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/40 to-transparent" />
-                {p.event_type && (
-                  <div className="absolute top-5 left-5 inline-flex items-center rounded-full bg-gold/95 text-navy-deep px-4 py-1.5 text-[10px] uppercase tracking-[0.22em] font-bold">
-                    {p.event_type}
-                  </div>
-                )}
+        <div className="relative">
+          {programs.length > 1 && (
+            <>
+              <button
+                onClick={prev}
+                aria-label="Previous"
+                className="absolute -left-2 lg:-left-10 top-1/2 -translate-y-1/2 z-10 p-2 text-charcoal/60 hover:text-navy-deep"
+              >
+                <ChevronLeft className="h-7 w-7" />
+              </button>
+              <button
+                onClick={next}
+                aria-label="Next"
+                className="absolute -right-2 lg:-right-10 top-1/2 -translate-y-1/2 z-10 p-2 text-charcoal/60 hover:text-navy-deep"
+              >
+                <ChevronRight className="h-7 w-7" />
+              </button>
+            </>
+          )}
+
+          <div className="mx-auto max-w-3xl">
+            <div className="grid grid-cols-[140px_1fr] bg-white shadow-card">
+              <div className="bg-navy-deep text-white flex flex-col items-center justify-center px-4 py-8 text-center">
+                <div className="font-display text-4xl">{day}</div>
+                <div className="text-[10px] tracking-[0.2em] mt-1 text-white/80">{mo}</div>
               </div>
-              <div className="p-8">
-                {p.event_date && (
-                  <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-gold/90 mb-3">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {new Date(p.event_date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-                  </div>
+              <div className="p-6">
+                {p.event_type && (
+                  <span className="inline-block bg-silver/60 text-charcoal text-[10px] uppercase tracking-[0.18em] px-2 py-1 mb-3">
+                    {p.event_type}
+                  </span>
                 )}
-                <h3 className="font-display text-2xl sm:text-3xl mb-3 leading-snug">{p.title}</h3>
-                {p.description && <p className="text-white/70 leading-relaxed mb-6">{p.description}</p>}
+                <h3 className="font-display text-xl text-navy-deep mb-2">{p.title}</h3>
+                {p.description && (
+                  <p className="text-sm text-charcoal/70 leading-relaxed mb-3 line-clamp-2">{p.description}</p>
+                )}
                 {p.cta_label && (
                   <a
                     href={p.registration_url ?? "#"}
-                    className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-gold-soft text-navy-deep px-7 py-3 text-xs font-semibold uppercase tracking-[0.18em] hover:shadow-lg hover:shadow-gold/40 transition-shadow"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.18em] text-gold hover:text-navy-deep"
                   >
-                    {p.cta_label} <ArrowRight className="h-4 w-4" />
+                    {p.cta_label} <ChevronRight className="h-3 w-3" />
                   </a>
                 )}
               </div>
-            </article>
-          ))}
+            </div>
+            {p.image_url || programFallback ? (
+              <div className="mt-0 aspect-[16/9] overflow-hidden bg-navy-deep">
+                <img
+                  src={p.image_url || programFallback}
+                  alt={p.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </section>
