@@ -71,10 +71,6 @@ function useCrud(table: string, invalidates: string[] = []) {
 }
 
 function VideosList() {
-  const cats = useQuery({
-    queryKey: ["a", "video_categories"],
-    queryFn: useServerFn(adminList).bind(null) as any,
-  });
   const listFn = useServerFn(adminList);
   const catsQ = useQuery({ queryKey: ["a", "video_categories"], queryFn: () => listFn({ data: { table: "video_categories" } }) as any });
   const { q, save, remove } = useCrud("videos", ["videos", "videos/library"]);
