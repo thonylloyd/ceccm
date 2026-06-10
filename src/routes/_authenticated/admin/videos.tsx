@@ -101,7 +101,7 @@ function VideosList() {
               cats={catsQ.data ?? []}
               expanded={open === v.id}
               onToggle={() => setOpen(open === v.id ? null : v.id)}
-              onSave={(row) => {
+              onSave={(row: any) => {
                 if (!row.slug || row.slug.startsWith("video-")) row.slug = slugify(row.title);
                 save.mutate(row);
               }}
@@ -186,7 +186,7 @@ function CategoriesList() {
       <div className="flex justify-end mb-4"><Button onClick={add}><Plus className="h-3.5 w-3.5" /> Add Category</Button></div>
       <div className="space-y-2">
         {(q.data ?? []).map((c: any) => (
-          <CategoryRow key={c.id} c={c} onSave={(r) => save.mutate(r)} onDelete={() => confirm("Delete?") && remove.mutate(c.id)} />
+          <CategoryRow key={c.id} c={c} onSave={(r: any) => save.mutate(r)} onDelete={() => confirm("Delete?") && remove.mutate(c.id)} />
         ))}
       </div>
     </div>
@@ -219,7 +219,7 @@ function CtaEditor() {
       <Button onClick={add}><Plus className="h-3.5 w-3.5" /> Create CTA</Button>
     </div>
   );
-  return <CtaForm item={item} onSave={(r) => save.mutate(r)} onDelete={() => confirm("Delete CTA?") && remove.mutate(item.id)} />;
+  return <CtaForm item={item} onSave={(r: any) => save.mutate(r)} onDelete={() => confirm("Delete CTA?") && remove.mutate(item.id)} />;
 }
 
 function CtaForm({ item, onSave, onDelete }: any) {
