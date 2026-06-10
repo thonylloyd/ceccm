@@ -216,6 +216,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          location: string | null
           registration_url: string | null
           title: string
           updated_at: string
@@ -230,6 +231,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          location?: string | null
           registration_url?: string | null
           title: string
           updated_at?: string
@@ -244,6 +246,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          location?: string | null
           registration_url?: string | null
           title?: string
           updated_at?: string
@@ -360,6 +363,167 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      video_categories: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      video_cta: {
+        Row: {
+          background_color: string | null
+          button_text: string | null
+          button_url: string | null
+          created_at: string
+          description: string | null
+          display_order: number
+          end_date: string | null
+          icon: string | null
+          id: string
+          is_visible: boolean
+          open_new_tab: boolean
+          start_date: string | null
+          text_color: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          background_color?: string | null
+          button_text?: string | null
+          button_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          end_date?: string | null
+          icon?: string | null
+          id?: string
+          is_visible?: boolean
+          open_new_tab?: boolean
+          start_date?: string | null
+          text_color?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          background_color?: string | null
+          button_text?: string | null
+          button_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          end_date?: string | null
+          icon?: string | null
+          id?: string
+          is_visible?: boolean
+          open_new_tab?: boolean
+          start_date?: string | null
+          text_color?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      videos: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          description: string | null
+          display_order: number
+          duration: string | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          publish_date: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          speaker: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+          view_count: number
+          vimeo_url: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          duration?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          publish_date?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          speaker?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+          view_count?: number
+          vimeo_url?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          duration?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          publish_date?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          speaker?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+          view_count?: number
+          vimeo_url?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "videos_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "video_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
