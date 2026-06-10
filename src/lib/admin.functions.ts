@@ -40,6 +40,9 @@ const TableSchema = z.enum([
   "resource_cards",
   "navigation_items",
   "media_assets",
+  "videos",
+  "video_categories",
+  "video_cta",
 ]);
 
 // Generic admin list — returns all rows including inactive
