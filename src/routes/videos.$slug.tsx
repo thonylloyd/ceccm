@@ -92,7 +92,7 @@ function VideoDetail() {
             {v.description && <p className="text-charcoal/80 leading-relaxed whitespace-pre-line mb-6">{v.description}</p>}
             {(v.tags ?? []).length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {v.tags.map((t: string) => <span key={t} className="text-[11px] uppercase tracking-wider bg-white border border-black/10 px-3 py-1 rounded-full">{t}</span>)}
+                {(v.tags ?? []).map((t: string) => <span key={t} className="text-[11px] uppercase tracking-wider bg-white border border-black/10 px-3 py-1 rounded-full">{t}</span>)}
               </div>
             )}
           </div>
