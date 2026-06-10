@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { Icon } from "./Icon";
 
 type Card = { id: string; icon: string; title: string; description: string };
@@ -28,7 +30,17 @@ export function MissionSection({ cards, title = "Our Mission" }: { cards: Card[]
             </article>
           ))}
         </div>
+
+        <div className="text-center mt-12">
+          <Link
+            to="/about"
+            className="inline-flex items-center gap-2 px-7 py-3 bg-navy-deep text-white text-xs font-semibold uppercase tracking-[0.18em] hover:bg-gold transition-colors"
+          >
+            Learn More <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
+

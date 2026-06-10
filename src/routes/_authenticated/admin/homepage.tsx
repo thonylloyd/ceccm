@@ -44,6 +44,7 @@ const PROGRAM_FIELDS: FieldDef[] = [
   { key: "description", label: "Description", type: "textarea" },
   { key: "event_date", label: "Date", type: "date" },
   { key: "event_type", label: "Event Type", type: "text", placeholder: "Virtual Event" },
+  { key: "location", label: "Location", type: "text", placeholder: "Lagos, Nigeria or Online" },
   { key: "image_url", label: "Event Image", type: "image" },
   { key: "cta_label", label: "CTA Label", type: "text" },
   { key: "registration_url", label: "Registration URL", type: "url" },

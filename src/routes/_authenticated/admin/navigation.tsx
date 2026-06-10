@@ -17,11 +17,14 @@ function NavAdmin() {
   const upsert = useServerFn(adminUpsert);
   const del = useServerFn(adminDelete);
   const q = useQuery({ queryKey: ["a", "navigation_items"], queryFn: () => list({ data: { table: "navigation_items" } }) as any });
-  const [open, setOpen] = useState<string | null>(null);
+  const [openIds, setOpenIds] = useState<Record<string, boolean>>({});
+
+  const toggle = (id: string) => setOpenIds((s) => ({ ...s, [id]: !s[id] }));
 
   const save = useMutation({
     mutationFn: (row: any) => upsert({ data: { table: "navigation_items", row } }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["a", "navigation_items"] }); qc.invalidateQueries({ queryKey: ["homepage"] }); toast.success("Saved"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["a", "navigation_items"] }); qc.invalidateQueries({ queryKey: ["homepage"] }); qc.invalidateQueries({ queryKey: ["site-chrome"] }); toast.success("Saved"); },
+    onError: (e: any) => toast.error(e.message ?? "Save failed"),
   });
   const remove = useMutation({
     mutationFn: (id: string) => del({ data: { table: "navigation_items", id } }),
@@ -48,9 +51,9 @@ function NavAdmin() {
             <NavItemRow
               key={item.id}
               item={item}
-              children={items.filter((c: any) => c.parent_id === item.id).sort((a: any, b: any) => a.display_order - b.display_order)}
-              expanded={open === item.id}
-              onToggle={() => setOpen(open === item.id ? null : item.id)}
+              childItems={items.filter((c: any) => c.parent_id === item.id).sort((a: any, b: any) => a.display_order - b.display_order)}
+              openIds={openIds}
+              onToggle={toggle}
               onSave={(r: any) => save.mutate(r)}
               onDelete={(id: string) => { if (confirm("Delete?")) remove.mutate(id); }}
               onAddChild={() => save.mutate({ label: "Sub-item", url: "/", parent_id: item.id, display_order: items.filter((c: any) => c.parent_id === item.id).length, is_active: true, is_external: false })}
@@ -62,14 +65,15 @@ function NavAdmin() {
   );
 }
 
-function NavItemRow({ item, children, expanded, onToggle, onSave, onDelete, onAddChild }: any) {
+function NavItemRow({ item, childItems, openIds, onToggle, onSave, onDelete, onAddChild }: any) {
   const [local, setLocal] = useState(item);
   const set = (k: string, v: any) => setLocal((s: any) => ({ ...s, [k]: v }));
+  const expanded = !!openIds[item.id];
 
   return (
     <Card className="!p-0">
       <div className="flex items-center px-4 py-3">
-        <button onClick={onToggle} className="flex-1 text-left flex items-center gap-3">
+        <button onClick={() => onToggle(item.id)} className="flex-1 text-left flex items-center gap-3">
           {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           <span className="font-medium text-sm text-navy-deep">{local.label}</span>
           <span className="text-xs text-charcoal/50">{local.url}</span>
@@ -96,10 +100,19 @@ function NavItemRow({ item, children, expanded, onToggle, onSave, onDelete, onAd
             <Button onClick={() => onSave(local)}>Save</Button>
             {!item.parent_id && <Button variant="outline" onClick={onAddChild}><Plus className="h-3 w-3" /> Sub-item</Button>}
           </div>
-          {children?.length > 0 && (
+          {childItems?.length > 0 && (
             <div className="pl-4 border-l-2 border-gold/30 space-y-2 mt-3">
-              {children.map((c: any) => (
-                <NavItemRow key={c.id} item={c} children={[]} expanded={false} onToggle={() => {}} onSave={onSave} onDelete={onDelete} onAddChild={() => {}} />
+              {childItems.map((c: any) => (
+                <NavItemRow
+                  key={c.id}
+                  item={c}
+                  childItems={[]}
+                  openIds={openIds}
+                  onToggle={onToggle}
+                  onSave={onSave}
+                  onDelete={onDelete}
+                  onAddChild={() => {}}
+                />
               ))}
             </div>
           )}

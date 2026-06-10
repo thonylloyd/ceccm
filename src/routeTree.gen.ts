@@ -9,11 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VideosRouteImport } from './routes/videos'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VideosSlugRouteImport } from './routes/videos.$slug'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminProgramsRouteImport } from './routes/_authenticated/admin/programs'
@@ -23,6 +26,11 @@ import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminContactRouteImport } from './routes/_authenticated/admin/contact'
 import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin/about'
 
+const VideosRoute = VideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -37,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VideosSlugRoute = VideosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => VideosRoute,
+} as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -47,6 +60,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminVideosRoute =
+  AuthenticatedAdminVideosRouteImport.update({
+    id: '/videos',
+    path: '/videos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -96,7 +115,9 @@ const AuthenticatedAdminAboutRoute = AuthenticatedAdminAboutRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/videos': typeof VideosRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/videos/$slug': typeof VideosSlugRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -105,11 +126,14 @@ export interface FileRoutesByFullPath {
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/videos': typeof VideosRouteWithChildren
+  '/videos/$slug': typeof VideosSlugRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -118,6 +142,7 @@ export interface FileRoutesByTo {
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -125,7 +150,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/videos': typeof VideosRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/videos/$slug': typeof VideosSlugRoute
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/contact': typeof AuthenticatedAdminContactRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -134,6 +161,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/programs': typeof AuthenticatedAdminProgramsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -141,7 +169,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/videos'
     | '/admin'
+    | '/videos/$slug'
     | '/admin/about'
     | '/admin/contact'
     | '/admin/homepage'
@@ -150,11 +180,14 @@ export interface FileRouteTypes {
     | '/admin/programs'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/videos'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/videos'
+    | '/videos/$slug'
     | '/admin/about'
     | '/admin/contact'
     | '/admin/homepage'
@@ -163,13 +196,16 @@ export interface FileRouteTypes {
     | '/admin/programs'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/videos'
     | '/admin'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/videos'
     | '/_authenticated/admin'
+    | '/videos/$slug'
     | '/_authenticated/admin/about'
     | '/_authenticated/admin/contact'
     | '/_authenticated/admin/homepage'
@@ -178,6 +214,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/programs'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/users'
+    | '/_authenticated/admin/videos'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -185,10 +222,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  VideosRoute: typeof VideosRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/videos': {
+      id: '/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -210,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/videos/$slug': {
+      id: '/videos/$slug'
+      path: '/$slug'
+      fullPath: '/videos/$slug'
+      preLoaderRoute: typeof VideosSlugRouteImport
+      parentRoute: typeof VideosRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -222,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/videos': {
+      id: '/_authenticated/admin/videos'
+      path: '/videos'
+      fullPath: '/admin/videos'
+      preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/users': {
@@ -292,6 +351,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminProgramsRoute: typeof AuthenticatedAdminProgramsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminVideosRoute: typeof AuthenticatedAdminVideosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -305,6 +365,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminProgramsRoute: AuthenticatedAdminProgramsRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
     AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+    AuthenticatedAdminVideosRoute: AuthenticatedAdminVideosRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
@@ -324,21 +385,23 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface VideosRouteChildren {
+  VideosSlugRoute: typeof VideosSlugRoute
+}
+
+const VideosRouteChildren: VideosRouteChildren = {
+  VideosSlugRoute: VideosSlugRoute,
+}
+
+const VideosRouteWithChildren =
+  VideosRoute._addFileChildren(VideosRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  VideosRoute: VideosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
