@@ -69,11 +69,10 @@ export function SiteHeader({
                 {item.label}
               </a>
             ))}
-            {livestream?.url && (
-              <a href={livestream.url} className="mt-2 inline-flex justify-center rounded-md bg-navy-deep px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white">
-                {livestream.label || "Livestream"}
-              </a>
-            )}
+            <a href={livestream?.url || "/live"} className="mt-2 inline-flex justify-center rounded-md bg-navy-deep px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white">
+              {livestream?.label || "Livestream"}
+            </a>
+
           </nav>
         </div>
       )}
