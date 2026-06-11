@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminProgramsRouteImport } from './routes/_authenticated/admin/programs'
 import { Route as AuthenticatedAdminNavigationRouteImport } from './routes/_authenticated/admin/navigation'
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin/media'
+import { Route as AuthenticatedAdminLivestreamRouteImport } from './routes/_authenticated/admin/livestream'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminContactRouteImport } from './routes/_authenticated/admin/contact'
 import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin/about'
@@ -100,6 +101,12 @@ const AuthenticatedAdminMediaRoute = AuthenticatedAdminMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminLivestreamRoute =
+  AuthenticatedAdminLivestreamRouteImport.update({
+    id: '/livestream',
+    path: '/livestream',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminHomepageRoute =
   AuthenticatedAdminHomepageRouteImport.update({
     id: '/homepage',
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
@@ -165,6 +174,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/contact': typeof AuthenticatedAdminContactRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/_authenticated/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
   '/_authenticated/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/_authenticated/admin/programs': typeof AuthenticatedAdminProgramsRoute
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin/about'
     | '/admin/contact'
     | '/admin/homepage'
+    | '/admin/livestream'
     | '/admin/media'
     | '/admin/navigation'
     | '/admin/programs'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/admin/about'
     | '/admin/contact'
     | '/admin/homepage'
+    | '/admin/livestream'
     | '/admin/media'
     | '/admin/navigation'
     | '/admin/programs'
@@ -221,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/about'
     | '/_authenticated/admin/contact'
     | '/_authenticated/admin/homepage'
+    | '/_authenticated/admin/livestream'
     | '/_authenticated/admin/media'
     | '/_authenticated/admin/navigation'
     | '/_authenticated/admin/programs'
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMediaRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/livestream': {
+      id: '/_authenticated/admin/livestream'
+      path: '/livestream'
+      fullPath: '/admin/livestream'
+      preLoaderRoute: typeof AuthenticatedAdminLivestreamRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/homepage': {
       id: '/_authenticated/admin/homepage'
       path: '/homepage'
@@ -366,6 +386,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAboutRoute: typeof AuthenticatedAdminAboutRoute
   AuthenticatedAdminContactRoute: typeof AuthenticatedAdminContactRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
+  AuthenticatedAdminLivestreamRoute: typeof AuthenticatedAdminLivestreamRoute
   AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
   AuthenticatedAdminNavigationRoute: typeof AuthenticatedAdminNavigationRoute
   AuthenticatedAdminProgramsRoute: typeof AuthenticatedAdminProgramsRoute
@@ -380,6 +401,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAboutRoute: AuthenticatedAdminAboutRoute,
     AuthenticatedAdminContactRoute: AuthenticatedAdminContactRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
+    AuthenticatedAdminLivestreamRoute: AuthenticatedAdminLivestreamRoute,
     AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
     AuthenticatedAdminNavigationRoute: AuthenticatedAdminNavigationRoute,
     AuthenticatedAdminProgramsRoute: AuthenticatedAdminProgramsRoute,
@@ -426,3 +448,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
