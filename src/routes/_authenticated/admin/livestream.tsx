@@ -154,7 +154,7 @@ function BroadcastList({ kind, title, hint }: { kind: "live" | "upcoming" | "rep
               key={b.id} row={b}
               expanded={open === b.id}
               onToggle={() => setOpen(open === b.id ? null : b.id)}
-              onSave={(r) => save.mutate(r)} onDelete={() => { if (confirm("Delete?")) remove.mutate(b.id); }}
+              onSave={(r: any) => save.mutate(r)} onDelete={() => { if (confirm("Delete?")) remove.mutate(b.id); }}
               saving={save.isPending}
             />
           ))}
@@ -246,7 +246,7 @@ function ChannelsAdmin() {
       </div>
       <div className="space-y-3">
         {items.map((c: any) => (
-          <ChannelRow key={c.id} row={c} expanded={open === c.id} onToggle={() => setOpen(open === c.id ? null : c.id)} onSave={(r) => save.mutate(r)} onDelete={() => { if (confirm("Delete?")) remove.mutate(c.id); }} />
+          <ChannelRow key={c.id} row={c} expanded={open === c.id} onToggle={() => setOpen(open === c.id ? null : c.id)} onSave={(r: any) => save.mutate(r)} onDelete={() => { if (confirm("Delete?")) remove.mutate(c.id); }} />
         ))}
         {!items.length && <div className="text-center text-sm text-charcoal/50 py-10 bg-white rounded-lg border border-black/5">No channels.</div>}
       </div>
@@ -297,7 +297,7 @@ function StatsAdmin() {
         <Button onClick={() => save.mutate({ label: "New stat", value: 0, is_published: true, display_order: items.length })}><Plus className="h-3.5 w-3.5" /> Add</Button>
       </div>
       <div className="space-y-3">
-        {items.map((row: any) => <StatRow key={row.id} row={row} onSave={(r) => save.mutate(r)} onDelete={() => { if (confirm("Delete?")) remove.mutate(row.id); }} />)}
+        {items.map((row: any) => <StatRow key={row.id} row={row} onSave={(r: any) => save.mutate(r)} onDelete={() => { if (confirm("Delete?")) remove.mutate(row.id); }} />)}
       </div>
     </div>
   );
