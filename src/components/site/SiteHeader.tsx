@@ -47,15 +47,14 @@ export function SiteHeader({
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
-          {livestream?.url && (
-            <a
-              href={livestream.url}
-              className="inline-flex items-center rounded-md bg-navy-deep px-7 py-3 text-[12px] font-bold uppercase tracking-[0.18em] text-white hover:bg-navy transition-colors"
-            >
-              {livestream.label || "Livestream"}
-            </a>
-          )}
+          <a
+            href={livestream?.url || "/live"}
+            className="inline-flex items-center rounded-md bg-navy-deep px-7 py-3 text-[12px] font-bold uppercase tracking-[0.18em] text-white hover:bg-navy transition-colors"
+          >
+            {livestream?.label || "Livestream"}
+          </a>
         </div>
+
 
         <button onClick={() => setOpen((v) => !v)} className="lg:hidden text-navy-deep p-2" aria-label="Menu">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
