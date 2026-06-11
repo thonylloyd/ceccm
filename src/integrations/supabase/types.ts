@@ -14,6 +14,189 @@ export type Database = {
   }
   public: {
     Tables: {
+      broadcast_channels: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_published: boolean | null
+          logo_url: string | null
+          name: string
+          updated_at: string
+          watch_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+          watch_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+          watch_url?: string | null
+        }
+        Relationships: []
+      }
+      broadcast_stats: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_published: boolean | null
+          label: string
+          suffix: string | null
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean | null
+          label: string
+          suffix?: string | null
+          updated_at?: string
+          value?: number
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean | null
+          label?: string
+          suffix?: string | null
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      broadcast_subscribers: {
+        Row: {
+          country: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          preferences: string[] | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          preferences?: string[] | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          preferences?: string[] | null
+        }
+        Relationships: []
+      }
+      broadcasts: {
+        Row: {
+          category: string | null
+          chat_enabled: boolean | null
+          chat_url: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          duration_seconds: number | null
+          id: string
+          is_featured: boolean | null
+          is_live: boolean | null
+          is_published: boolean | null
+          kind: string
+          registration_url: string | null
+          reminder_url: string | null
+          scheduled_end: string | null
+          scheduled_start: string | null
+          slug: string | null
+          speaker: string | null
+          stream_type: string | null
+          stream_url: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          viewer_count: number | null
+        }
+        Insert: {
+          category?: string | null
+          chat_enabled?: boolean | null
+          chat_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          duration_seconds?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_live?: boolean | null
+          is_published?: boolean | null
+          kind?: string
+          registration_url?: string | null
+          reminder_url?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          slug?: string | null
+          speaker?: string | null
+          stream_type?: string | null
+          stream_url?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          viewer_count?: number | null
+        }
+        Update: {
+          category?: string | null
+          chat_enabled?: boolean | null
+          chat_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          duration_seconds?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_live?: boolean | null
+          is_published?: boolean | null
+          kind?: string
+          registration_url?: string | null
+          reminder_url?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          slug?: string | null
+          speaker?: string | null
+          stream_type?: string | null
+          stream_url?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          viewer_count?: number | null
+        }
+        Relationships: []
+      }
       hero_banners: {
         Row: {
           background_image_url: string | null
