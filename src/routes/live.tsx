@@ -91,8 +91,8 @@ function LivePage() {
         social={chrome.settings.social ?? {}}
         footer={chrome.settings.footer ?? {}}
         contact={chrome.settings.contact ?? {}}
-        nav={chrome.nav}
       />
+
     </div>
   );
 }
