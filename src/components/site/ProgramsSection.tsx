@@ -69,8 +69,8 @@ function ProgramCard({ p }: { p: Program }) {
 export function ProgramsSection({ programs, intro }: { programs: Program[]; intro?: string }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
+  const dragState = useRef<{ startX: number; startScroll: number; pid: number } | null>(null);
 
-  // Loop the list so auto-scroll is seamless
   const loop = programs.length > 2 ? [...programs, ...programs] : programs;
 
   useEffect(() => {
@@ -79,17 +79,36 @@ export function ProgramsSection({ programs, intro }: { programs: Program[]; intr
     if (!el) return;
     let raf: number;
     const tick = () => {
-      if (!paused && el) {
+      if (!paused && el && !dragState.current) {
         el.scrollLeft += 0.6;
-        if (el.scrollLeft >= el.scrollWidth / 2) {
-          el.scrollLeft = 0;
-        }
+        if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0;
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [paused, programs.length]);
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.setPointerCapture(e.pointerId);
+    dragState.current = { startX: e.clientX, startScroll: el.scrollLeft, pid: e.pointerId };
+    setPaused(true);
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = scrollerRef.current;
+    if (!el || !dragState.current) return;
+    el.scrollLeft = dragState.current.startScroll - (e.clientX - dragState.current.startX);
+  };
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = scrollerRef.current;
+    if (el && dragState.current && el.hasPointerCapture(dragState.current.pid)) {
+      el.releasePointerCapture(dragState.current.pid);
+    }
+    dragState.current = null;
+    setPaused(false);
+  };
 
   if (!programs.length) return null;
 
@@ -112,7 +131,11 @@ export function ProgramsSection({ programs, intro }: { programs: Program[]; intr
           ref={scrollerRef}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
-          className="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          className="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar cursor-grab active:cursor-grabbing select-none touch-pan-y"
           style={{ scrollbarWidth: "none" }}
         >
           {loop.map((p, i) => (
@@ -129,3 +152,4 @@ export function ProgramsSection({ programs, intro }: { programs: Program[]; intr
     </section>
   );
 }
+

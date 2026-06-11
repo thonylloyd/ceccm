@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
+import { Route as LiveRouteImport } from './routes/live'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +23,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminProgramsRouteImport } from './routes/_authenticated/admin/programs'
 import { Route as AuthenticatedAdminNavigationRouteImport } from './routes/_authenticated/admin/navigation'
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin/media'
+import { Route as AuthenticatedAdminLivestreamRouteImport } from './routes/_authenticated/admin/livestream'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminContactRouteImport } from './routes/_authenticated/admin/contact'
 import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin/about'
@@ -29,6 +31,11 @@ import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authentic
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
   path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveRoute = LiveRouteImport.update({
+  id: '/live',
+  path: '/live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -94,6 +101,12 @@ const AuthenticatedAdminMediaRoute = AuthenticatedAdminMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminLivestreamRoute =
+  AuthenticatedAdminLivestreamRouteImport.update({
+    id: '/livestream',
+    path: '/livestream',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminHomepageRoute =
   AuthenticatedAdminHomepageRouteImport.update({
     id: '/homepage',
@@ -115,12 +128,14 @@ const AuthenticatedAdminAboutRoute = AuthenticatedAdminAboutRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/live': typeof LiveRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
@@ -132,11 +147,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/live': typeof LiveRoute
   '/videos': typeof VideosRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
@@ -150,12 +167,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/live': typeof LiveRoute
   '/videos': typeof VideosRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/contact': typeof AuthenticatedAdminContactRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/_authenticated/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
   '/_authenticated/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/_authenticated/admin/programs': typeof AuthenticatedAdminProgramsRoute
@@ -169,12 +188,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/live'
     | '/videos'
     | '/admin'
     | '/videos/$slug'
     | '/admin/about'
     | '/admin/contact'
     | '/admin/homepage'
+    | '/admin/livestream'
     | '/admin/media'
     | '/admin/navigation'
     | '/admin/programs'
@@ -186,11 +207,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/live'
     | '/videos'
     | '/videos/$slug'
     | '/admin/about'
     | '/admin/contact'
     | '/admin/homepage'
+    | '/admin/livestream'
     | '/admin/media'
     | '/admin/navigation'
     | '/admin/programs'
@@ -203,12 +226,14 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/live'
     | '/videos'
     | '/_authenticated/admin'
     | '/videos/$slug'
     | '/_authenticated/admin/about'
     | '/_authenticated/admin/contact'
     | '/_authenticated/admin/homepage'
+    | '/_authenticated/admin/livestream'
     | '/_authenticated/admin/media'
     | '/_authenticated/admin/navigation'
     | '/_authenticated/admin/programs'
@@ -222,6 +247,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LiveRoute: typeof LiveRoute
   VideosRoute: typeof VideosRouteWithChildren
 }
 
@@ -232,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/videos'
       fullPath: '/videos'
       preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live': {
+      id: '/live'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -318,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMediaRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/livestream': {
+      id: '/_authenticated/admin/livestream'
+      path: '/livestream'
+      fullPath: '/admin/livestream'
+      preLoaderRoute: typeof AuthenticatedAdminLivestreamRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/homepage': {
       id: '/_authenticated/admin/homepage'
       path: '/homepage'
@@ -346,6 +386,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAboutRoute: typeof AuthenticatedAdminAboutRoute
   AuthenticatedAdminContactRoute: typeof AuthenticatedAdminContactRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
+  AuthenticatedAdminLivestreamRoute: typeof AuthenticatedAdminLivestreamRoute
   AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
   AuthenticatedAdminNavigationRoute: typeof AuthenticatedAdminNavigationRoute
   AuthenticatedAdminProgramsRoute: typeof AuthenticatedAdminProgramsRoute
@@ -360,6 +401,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAboutRoute: AuthenticatedAdminAboutRoute,
     AuthenticatedAdminContactRoute: AuthenticatedAdminContactRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
+    AuthenticatedAdminLivestreamRoute: AuthenticatedAdminLivestreamRoute,
     AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
     AuthenticatedAdminNavigationRoute: AuthenticatedAdminNavigationRoute,
     AuthenticatedAdminProgramsRoute: AuthenticatedAdminProgramsRoute,
@@ -400,6 +442,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  LiveRoute: LiveRoute,
   VideosRoute: VideosRouteWithChildren,
 }
 export const routeTree = rootRouteImport

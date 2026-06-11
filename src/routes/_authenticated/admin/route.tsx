@@ -5,7 +5,7 @@ import { getIsAdmin, bootstrapAdminIfNone } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Home, Info, Calendar, Mail, Menu as MenuIcon,
-  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video,
+  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -19,6 +19,7 @@ const NAV: NavLink[] = [
   { to: "/admin/homepage", label: "Homepage", icon: Home },
   { to: "/admin/about", label: "About", icon: Info },
   { to: "/admin/programs", label: "Programs", icon: Calendar },
+  { to: "/admin/livestream", label: "Livestream", icon: Radio },
   { to: "/admin/contact", label: "Contact", icon: Mail },
   { to: "/admin/navigation", label: "Navigation", icon: MenuIcon },
   { to: "/admin/media", label: "Media Library", icon: ImageIcon },
@@ -26,6 +27,7 @@ const NAV: NavLink[] = [
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
+
 
 function AdminLayout() {
   const navigate = useNavigate();

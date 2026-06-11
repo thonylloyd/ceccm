@@ -43,7 +43,11 @@ const TableSchema = z.enum([
   "videos",
   "video_categories",
   "video_cta",
+  "broadcasts",
+  "broadcast_channels",
+  "broadcast_stats",
 ]);
+
 
 // Generic admin list — returns all rows including inactive
 export const adminList = createServerFn({ method: "POST" })
