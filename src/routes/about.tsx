@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { aboutQuery } from "@/lib/about.functions";
 import { siteChromeQuery } from "@/lib/cms.functions";
