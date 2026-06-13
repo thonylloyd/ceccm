@@ -43,6 +43,7 @@ function HomePage() {
   const social = data.settings.social ?? {};
   const livestream = data.settings.livestream ?? {};
   const homepage = data.settings.homepage ?? {};
+  const homepageMission = data.settings.homepage_mission ?? {};
   const nav = data.nav.filter((n: any) => !n.parent_id);
 
   return (
@@ -55,9 +56,14 @@ function HomePage() {
       />
       <main>
         <Hero banners={data.heroes} />
-        <MissionSection cards={data.mission} title={homepage.mission_title ?? "Our Mission"} />
+        <MissionSection
+          cards={data.mission}
+          title={homepageMission.title ?? homepage.mission_title ?? "Our Mission"}
+          statement={homepageMission.statement ?? "Church Consolidation Mission exists to help every member become an effective and relevant part of the Church, strengthening and equipping the brethren for impactful service in the race for the last lost soul."}
+        />
         <StatsSection stats={data.stats} />
         <ProgramsSection programs={data.programs} intro={homepage.programs_intro ?? "Join our global initiatives and transform lives."} />
+        <PraiseReports reports={(data as any).praise ?? []} title={homepage.praise_title ?? "Praise Reports"} intro={homepage.praise_intro} />
         <ResourcesSection cards={data.resources} />
       </main>
       <SiteFooter
