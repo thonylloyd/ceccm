@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/admin/livestream")({
 
 const TABS = [
   { id: "settings", label: "Settings" },
+  { id: "cta", label: "CTA Button" },
+  { id: "camera", label: "Browser Camera" },
   { id: "current", label: "Current Broadcast" },
   { id: "upcoming", label: "Upcoming" },
   { id: "replays", label: "Replays" },
@@ -38,6 +40,8 @@ function LivestreamAdmin() {
         ))}
       </div>
       {tab === "settings" && <HeroSettings />}
+      {tab === "cta" && <CtaSettings />}
+      {tab === "camera" && <BrowserCameraPanel />}
       {tab === "alert" && <AlertSettings />}
       {tab === "current" && <BroadcastList kind="live" title="Current Broadcast" hint="Toggle 'Is Live' on the broadcast you're currently airing." />}
       {tab === "upcoming" && <BroadcastList kind="upcoming" title="Upcoming Broadcasts" />}
