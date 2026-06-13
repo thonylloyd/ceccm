@@ -223,9 +223,9 @@ function AboutPage() {
               <a href={cta.primary_url} className="inline-flex items-center gap-2 bg-navy-deep text-white px-7 py-3.5 text-xs font-bold uppercase tracking-[0.18em] hover:bg-gold transition-colors">
                 {cta.primary_label} <ArrowRight className="h-3.5 w-3.5" />
               </a>
-              <Link to="/contact" className="inline-flex items-center gap-2 border border-navy-deep text-navy-deep px-7 py-3.5 text-xs font-bold uppercase tracking-[0.18em] hover:bg-navy-deep hover:text-white transition-colors">
+              <a href={cta.secondary_url} className="inline-flex items-center gap-2 border border-navy-deep text-navy-deep px-7 py-3.5 text-xs font-bold uppercase tracking-[0.18em] hover:bg-navy-deep hover:text-white transition-colors">
                 {cta.secondary_label}
-              </Link>
+              </a>
             </div>
           </div>
         </section>
