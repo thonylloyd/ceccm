@@ -8,6 +8,7 @@ import { MissionSection } from "@/components/site/MissionSection";
 import { StatsSection } from "@/components/site/StatsSection";
 import { ProgramsSection } from "@/components/site/ProgramsSection";
 import { ResourcesSection } from "@/components/site/ResourcesSection";
+import { PraiseReports } from "@/components/site/PraiseReports";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
