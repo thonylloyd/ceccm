@@ -46,6 +46,8 @@ const TableSchema = z.enum([
   "broadcasts",
   "broadcast_channels",
   "broadcast_stats",
+  "praise_reports",
+  "leadership",
 ]);
 
 

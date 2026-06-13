@@ -6,7 +6,7 @@ import { queryOptions } from "@tanstack/react-query";
 export const getHomepageContent = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const [heroes, mission, stats, programs, resources, nav, settings] = await Promise.all([
+  const [heroes, mission, stats, programs, resources, nav, settings, praise] = await Promise.all([
     supabaseAdmin.from("hero_banners").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("mission_cards").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("statistics").select("*").eq("is_active", true).order("display_order"),
@@ -14,6 +14,7 @@ export const getHomepageContent = createServerFn({ method: "GET" }).handler(asyn
     supabaseAdmin.from("resource_cards").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("navigation_items").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("site_settings").select("*"),
+    supabaseAdmin.from("praise_reports").select("*").eq("is_active", true).order("display_order"),
   ]);
 
   const settingsMap: Record<string, any> = {};
@@ -27,6 +28,7 @@ export const getHomepageContent = createServerFn({ method: "GET" }).handler(asyn
     resources: resources.data ?? [],
     nav: nav.data ?? [],
     settings: settingsMap,
+    praise: praise.data ?? [],
   };
 });
 

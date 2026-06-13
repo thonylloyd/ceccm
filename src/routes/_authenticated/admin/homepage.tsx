@@ -1,7 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { PageHeader } from "@/components/admin/ui";
+import { useEffect, useState } from "react";
+import { PageHeader, Card, Field, Input, Textarea, Button } from "@/components/admin/ui";
 import { SectionEditor, FieldDef } from "@/components/admin/SectionEditor";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { adminGetSetting, adminSetSetting } from "@/lib/admin.functions";
+import { Loader2, Save } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/homepage")({
   component: HomepageAdmin,
@@ -9,9 +14,11 @@ export const Route = createFileRoute("/_authenticated/admin/homepage")({
 
 const TABS = [
   { id: "hero", label: "Hero" },
-  { id: "mission", label: "Mission" },
+  { id: "mission_statement", label: "Mission Statement" },
+  { id: "mission", label: "Mission Cards" },
   { id: "stats", label: "Statistics" },
   { id: "programs", label: "Programs" },
+  { id: "praise", label: "Praise Reports" },
   { id: "resources", label: "Resources" },
 ] as const;
 
@@ -58,18 +65,24 @@ const RESOURCE_FIELDS: FieldDef[] = [
   { key: "cta_url", label: "CTA URL", type: "url" },
 ];
 
+const PRAISE_FIELDS: FieldDef[] = [
+  { key: "quote", label: "Quote", type: "textarea" },
+  { key: "author", label: "Author", type: "text" },
+  { key: "role", label: "Role / Title", type: "text" },
+];
+
 function HomepageAdmin() {
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("hero");
 
   return (
     <div className="p-8 max-w-5xl">
       <PageHeader title="Homepage" description="Manage all homepage sections." />
-      <div className="flex gap-1 border-b border-black/10 mb-6">
+      <div className="flex gap-1 border-b border-black/10 mb-6 overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] border-b-2 -mb-px transition-colors ${
+            className={`px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] border-b-2 -mb-px transition-colors whitespace-nowrap ${
               tab === t.id ? "border-gold text-navy-deep" : "border-transparent text-charcoal/60 hover:text-navy-deep"
             }`}
           >
@@ -88,6 +101,7 @@ function HomepageAdmin() {
           titleKey="heading"
         />
       )}
+      {tab === "mission_statement" && <MissionStatementEditor />}
       {tab === "mission" && (
         <SectionEditor
           title="Mission Cards"
@@ -114,6 +128,16 @@ function HomepageAdmin() {
           defaults={{ title: "New Program", cta_label: "Register Now" }}
         />
       )}
+      {tab === "praise" && (
+        <SectionEditor
+          title="Praise Reports"
+          description="Testimonials displayed on the homepage."
+          table="praise_reports"
+          fields={PRAISE_FIELDS}
+          defaults={{ quote: "Share a testimony...", author: "", role: "" }}
+          titleKey="author"
+        />
+      )}
       {tab === "resources" && (
         <SectionEditor
           title="Resource Cards"
@@ -123,5 +147,36 @@ function HomepageAdmin() {
         />
       )}
     </div>
+  );
+}
+
+function MissionStatementEditor() {
+  const qc = useQueryClient();
+  const getFn = useServerFn(adminGetSetting);
+  const setFn = useServerFn(adminSetSetting);
+  const q = useQuery({ queryKey: ["s", "homepage_mission"], queryFn: () => getFn({ data: { key: "homepage_mission" } }) as any });
+  const [v, setV] = useState<any>({
+    title: "Our Mission",
+    statement: "Church Consolidation Mission exists to help every member become an effective and relevant part of the Church, strengthening and equipping the brethren for impactful service in the race for the last lost soul.",
+  });
+  useEffect(() => { if (q.data?.value) setV({ ...v, ...q.data.value }); /* eslint-disable-next-line */ }, [q.data]);
+  const m = useMutation({
+    mutationFn: () => setFn({ data: { key: "homepage_mission", value: v } }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["s", "homepage_mission"] }); qc.invalidateQueries({ queryKey: ["homepage"] }); toast.success("Saved"); },
+  });
+  if (q.isLoading) return <Loader2 className="h-5 w-5 animate-spin text-navy-deep" />;
+  return (
+    <Card>
+      <h2 className="font-display text-lg text-navy-deep mb-4">Mission Section Header</h2>
+      <div className="space-y-3">
+        <Field label="Section Title"><Input value={v.title ?? ""} onChange={(e) => setV({ ...v, title: e.target.value })} /></Field>
+        <Field label="Mission Statement (shown above the cards)">
+          <Textarea rows={5} value={v.statement ?? ""} onChange={(e) => setV({ ...v, statement: e.target.value })} />
+        </Field>
+        <Button onClick={() => m.mutate()} disabled={m.isPending}>
+          {m.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><Save className="h-3.5 w-3.5" />Save</>}
+        </Button>
+      </div>
+    </Card>
   );
 }

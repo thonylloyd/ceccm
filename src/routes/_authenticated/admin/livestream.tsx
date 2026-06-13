@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { adminList, adminUpsert, adminDelete, adminGetSetting, adminSetSetting } from "@/lib/admin.functions";
 import { Field, Input, Textarea, Button, Card } from "@/components/admin/ui";
 import { MediaPicker } from "@/components/admin/MediaPicker";
@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/admin/livestream")({
 
 const TABS = [
   { id: "settings", label: "Settings" },
+  { id: "cta", label: "CTA Button" },
+  { id: "camera", label: "Browser Camera" },
   { id: "current", label: "Current Broadcast" },
   { id: "upcoming", label: "Upcoming" },
   { id: "replays", label: "Replays" },
@@ -38,6 +40,8 @@ function LivestreamAdmin() {
         ))}
       </div>
       {tab === "settings" && <HeroSettings />}
+      {tab === "cta" && <CtaSettings />}
+      {tab === "camera" && <BrowserCameraPanel />}
       {tab === "alert" && <AlertSettings />}
       {tab === "current" && <BroadcastList kind="live" title="Current Broadcast" hint="Toggle 'Is Live' on the broadcast you're currently airing." />}
       {tab === "upcoming" && <BroadcastList kind="upcoming" title="Upcoming Broadcasts" />}
@@ -317,6 +321,71 @@ function StatRow({ row, onSave, onDelete }: any) {
           <Button onClick={() => onSave(l)}>Save</Button>
           <Button variant="ghost" onClick={onDelete}><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button>
         </div>
+      </div>
+    </Card>
+  );
+}
+
+function CtaSettings() {
+  const { val, setVal, save } = useSetting("livestream_cta", {
+    visible: false, label: "Watch Live Now", url: "/live",
+    background_color: "#E6B341", text_color: "#0a1733",
+    icon: "radio", open_new_tab: false, start_date: "", end_date: "",
+  });
+  return (
+    <Card>
+      <h2 className="font-display text-lg text-navy-deep mb-4">Livestream CTA Button</h2>
+      <p className="text-xs text-charcoal/60 mb-4">Floating call-to-action displayed in the site header and the /live page hero.</p>
+      <div className="space-y-3">
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={!!val.visible} onChange={(e) => setVal({ ...val, visible: e.target.checked })} />
+          Visible
+        </label>
+        <Field label="Button Text"><Input value={val.label ?? ""} onChange={(e) => setVal({ ...val, label: e.target.value })} /></Field>
+        <Field label="Button URL"><Input value={val.url ?? ""} onChange={(e) => setVal({ ...val, url: e.target.value })} /></Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Background Color"><Input type="color" value={val.background_color ?? "#E6B341"} onChange={(e) => setVal({ ...val, background_color: e.target.value })} /></Field>
+          <Field label="Text Color"><Input type="color" value={val.text_color ?? "#0a1733"} onChange={(e) => setVal({ ...val, text_color: e.target.value })} /></Field>
+        </div>
+        <Field label="Icon">
+          <select value={val.icon ?? "radio"} onChange={(e) => setVal({ ...val, icon: e.target.value })} className="w-full px-3 py-2 rounded-md border border-black/10 text-sm bg-white">
+            {["radio", "play", "tv", "sparkles", "bell"].map((x) => <option key={x}>{x}</option>)}
+          </select>
+        </Field>
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={!!val.open_new_tab} onChange={(e) => setVal({ ...val, open_new_tab: e.target.checked })} />
+          Open in New Tab
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Start Date"><Input type="datetime-local" value={val.start_date ?? ""} onChange={(e) => setVal({ ...val, start_date: e.target.value })} /></Field>
+          <Field label="End Date"><Input type="datetime-local" value={val.end_date ?? ""} onChange={(e) => setVal({ ...val, end_date: e.target.value })} /></Field>
+        </div>
+        <Button onClick={() => save.mutate(val)} disabled={save.isPending}><Save className="h-3.5 w-3.5" /> Save</Button>
+      </div>
+    </Card>
+  );
+}
+
+function BrowserCameraPanel() {
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const start = async () => {
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setStream(s);
+      if (videoRef.current) videoRef.current.srcObject = s;
+    } catch (e: any) { toast.error(e.message ?? "Camera blocked"); }
+  };
+  const stop = () => { stream?.getTracks().forEach((t) => t.stop()); setStream(null); };
+  return (
+    <Card>
+      <h2 className="font-display text-lg text-navy-deep mb-2">Broadcast from Browser</h2>
+      <p className="text-xs text-charcoal/60 mb-4">Preview your camera and microphone. For distribution, paste the resulting embed/HLS URL into the Current Broadcast's Stream URL field.</p>
+      <div className="aspect-video bg-black overflow-hidden rounded-md mb-3">
+        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+      </div>
+      <div className="flex gap-2">
+        {!stream ? <Button onClick={start}>Start Camera</Button> : <Button variant="ghost" onClick={stop}>Stop</Button>}
       </div>
     </Card>
   );
