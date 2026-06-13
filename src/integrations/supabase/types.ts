@@ -113,8 +113,39 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcast_unlocks: {
+        Row: {
+          broadcast_id: string
+          created_at: string
+          method: string
+          user_id: string
+        }
+        Insert: {
+          broadcast_id: string
+          created_at?: string
+          method?: string
+          user_id: string
+        }
+        Update: {
+          broadcast_id?: string
+          created_at?: string
+          method?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broadcast_unlocks_broadcast_id_fkey"
+            columns: ["broadcast_id"]
+            isOneToOne: false
+            referencedRelation: "broadcasts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       broadcasts: {
         Row: {
+          access_mode: string
+          access_password_hash: string | null
           category: string | null
           chat_enabled: boolean | null
           chat_url: string | null
@@ -127,6 +158,7 @@ export type Database = {
           is_live: boolean | null
           is_published: boolean | null
           kind: string
+          price_espees: number | null
           registration_url: string | null
           reminder_url: string | null
           scheduled_end: string | null
@@ -142,6 +174,8 @@ export type Database = {
           viewer_count: number | null
         }
         Insert: {
+          access_mode?: string
+          access_password_hash?: string | null
           category?: string | null
           chat_enabled?: boolean | null
           chat_url?: string | null
@@ -154,6 +188,7 @@ export type Database = {
           is_live?: boolean | null
           is_published?: boolean | null
           kind?: string
+          price_espees?: number | null
           registration_url?: string | null
           reminder_url?: string | null
           scheduled_end?: string | null
@@ -169,6 +204,8 @@ export type Database = {
           viewer_count?: number | null
         }
         Update: {
+          access_mode?: string
+          access_password_hash?: string | null
           category?: string | null
           chat_enabled?: boolean | null
           chat_url?: string | null
@@ -181,6 +218,7 @@ export type Database = {
           is_live?: boolean | null
           is_published?: boolean | null
           kind?: string
+          price_espees?: number | null
           registration_url?: string | null
           reminder_url?: string | null
           scheduled_end?: string | null
@@ -244,6 +282,45 @@ export type Database = {
           secondary_cta_label?: string | null
           secondary_cta_url?: string | null
           subheading?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leadership: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          message: string | null
+          name: string
+          photo_url: string | null
+          position: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          message?: string | null
+          name: string
+          photo_url?: string | null
+          position?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          message?: string | null
+          name?: string
+          photo_url?: string | null
+          position?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -360,6 +437,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      praise_reports: {
+        Row: {
+          author: string | null
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          quote: string
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          quote: string
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          quote?: string
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -628,8 +738,39 @@ export type Database = {
         }
         Relationships: []
       }
+      video_unlocks: {
+        Row: {
+          created_at: string
+          method: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          method?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          method?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_unlocks_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       videos: {
         Row: {
+          access_mode: string
+          access_password_hash: string | null
           category_id: string | null
           created_at: string
           description: string | null
@@ -638,6 +779,7 @@ export type Database = {
           id: string
           is_featured: boolean
           is_published: boolean
+          price_espees: number | null
           publish_date: string | null
           seo_description: string | null
           seo_title: string | null
@@ -653,6 +795,8 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          access_mode?: string
+          access_password_hash?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
@@ -661,6 +805,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           is_published?: boolean
+          price_espees?: number | null
           publish_date?: string | null
           seo_description?: string | null
           seo_title?: string | null
@@ -676,6 +821,8 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          access_mode?: string
+          access_password_hash?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
@@ -684,6 +831,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           is_published?: boolean
+          price_espees?: number | null
           publish_date?: string | null
           seo_description?: string | null
           seo_title?: string | null
