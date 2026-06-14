@@ -5,10 +5,12 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Hero } from "@/components/site/Hero";
 import { MissionSection } from "@/components/site/MissionSection";
-import { StatsSection } from "@/components/site/StatsSection";
+import { OurImpact } from "@/components/site/OurImpact";
 import { ProgramsSection } from "@/components/site/ProgramsSection";
-import { ResourcesSection } from "@/components/site/ResourcesSection";
+import { FeaturedTeachings } from "@/components/site/FeaturedTeachings";
 import { PraiseReports } from "@/components/site/PraiseReports";
+import { ResourcesSection } from "@/components/site/ResourcesSection";
+import { EquipCTA } from "@/components/site/EquipCTA";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
@@ -59,12 +61,15 @@ function HomePage() {
         <MissionSection
           cards={data.mission}
           title={homepageMission.title ?? homepage.mission_title ?? "Our Mission"}
+          subtitle={homepageMission.subtitle ?? "Discover what drives us — the convictions and callings that shape every program, gathering and resource we build."}
           statement={homepageMission.statement ?? "Church Consolidation Mission exists to help every member become an effective and relevant part of the Church, strengthening and equipping the brethren for impactful service in the race for the last lost soul."}
         />
-        <StatsSection stats={data.stats} />
+        <OurImpact />
         <ProgramsSection programs={data.programs} intro={homepage.programs_intro ?? "Join our global initiatives and transform lives."} />
+        <FeaturedTeachings videos={(data as any).featuredVideos ?? []} />
         <PraiseReports reports={(data as any).praise ?? []} title={homepage.praise_title ?? "Praise Reports"} intro={homepage.praise_intro} />
         <ResourcesSection cards={data.resources} />
+        <EquipCTA />
       </main>
       <SiteFooter
         brand={brand}

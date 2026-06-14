@@ -12,10 +12,30 @@ export const getLivestreamPage = createServerFn({ method: "GET" }).handler(async
   ]);
   const settingsMap: Record<string, any> = {};
   for (const row of settings.data ?? []) settingsMap[row.key] = row.value;
+
+  const now = Date.now();
   const all = (broadcasts.data ?? []) as any[];
+
+  // Auto-promote upcoming broadcasts whose start time has arrived (and end hasn't passed)
+  // to the "current" slot, so admins don't have to flip is_live manually.
+  const isLiveByTime = (b: any) => {
+    if (!b.scheduled_start) return false;
+    const start = new Date(b.scheduled_start).getTime();
+    if (start > now) return false;
+    if (b.scheduled_end) {
+      const end = new Date(b.scheduled_end).getTime();
+      if (end < now) return false;
+    }
+    return true;
+  };
+
+  const activeUpcoming = all.find((b) => b.kind === "upcoming" && isLiveByTime(b));
+  const manualLive = all.find((b) => b.kind === "live" && b.is_live);
+  const current = manualLive ?? activeUpcoming ?? null;
+
   return {
-    current: all.find((b) => b.kind === "live" && b.is_live) ?? null,
-    upcoming: all.filter((b) => b.kind === "upcoming"),
+    current,
+    upcoming: all.filter((b) => b.kind === "upcoming" && b.id !== activeUpcoming?.id),
     replays: all.filter((b) => b.kind === "replay"),
     featured: all.filter((b) => b.is_featured),
     channels: channels.data ?? [],
