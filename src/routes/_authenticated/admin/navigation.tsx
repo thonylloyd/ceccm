@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { adminList, adminUpsert, adminDelete } from "@/lib/admin.functions";
+import { adminList, adminUpsert, adminDelete, adminGetSetting, adminSetSetting } from "@/lib/admin.functions";
 import { PageHeader, Field, Input, Button, Card } from "@/components/admin/ui";
-import { Plus, Trash2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/navigation")({
@@ -35,7 +35,8 @@ function NavAdmin() {
   const roots = items.filter((i: any) => !i.parent_id).sort((a: any, b: any) => a.display_order - b.display_order);
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-8 max-w-3xl space-y-8">
+      <LivestreamButtonSettings />
       <PageHeader
         title="Navigation"
         description="Manage menu items, sub-menus, and ordering."
