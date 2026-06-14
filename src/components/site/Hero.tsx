@@ -25,62 +25,72 @@ export function Hero({ banners }: { banners: Banner[] }) {
   if (!banners.length) return null;
   const b = banners[idx];
   const bg = b.background_image_url || heroFallback;
-  const overlay = b.overlay_opacity ?? 0.55;
+  const overlay = b.overlay_opacity ?? 0.6;
 
   return (
-    <section className="bg-light pt-6 pb-2">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="relative overflow-hidden rounded-md min-h-[480px] lg:min-h-[560px] flex items-center">
-          <img src={bg} alt="" className="absolute inset-0 h-full w-full object-cover" />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(110deg, rgba(4,30,74,${Math.min(overlay + 0.25, 0.95)}) 0%, rgba(4,30,74,${overlay * 0.4}) 75%, rgba(4,30,74,${overlay * 0.2}) 100%)`,
-            }}
-          />
-          <div className="relative w-full px-8 sm:px-14 lg:px-20 py-16">
+    <section className="relative bg-light">
+      <div className="relative overflow-hidden min-h-[600px] lg:min-h-[720px] flex items-center">
+        <img key={b.id} src={bg} alt="" className="absolute inset-0 h-full w-full object-cover animate-kenburns" />
+        {/* premium navy overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(115deg, oklch(0.12 0.05 263 / ${Math.min(overlay + 0.3, 0.95)}) 0%, oklch(0.16 0.06 263 / ${overlay * 0.7}) 55%, oklch(0.10 0.05 263 / ${overlay * 0.45}) 100%)`,
+          }}
+        />
+        {/* gold edge gradient */}
+        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-transparent via-gold/60 to-transparent" />
+
+        <div className="relative w-full mx-auto max-w-7xl px-6 sm:px-10 lg:px-12 py-20">
+          <div key={b.id} className="animate-fade-up max-w-3xl">
             {b.eyebrow && (
-              <p className="text-white/85 text-sm mb-3">{b.eyebrow}</p>
+              <p className="inline-flex items-center gap-3 text-gold-soft text-[11px] uppercase tracking-[0.32em] font-semibold mb-6">
+                <span className="h-px w-8 bg-gold" />
+                {b.eyebrow}
+              </p>
             )}
-            <h1 className="font-display text-white font-bold leading-[0.95] tracking-tight text-4xl sm:text-5xl lg:text-6xl xl:text-7xl uppercase max-w-2xl">
+            <h1 className="font-display text-white font-bold leading-[0.95] tracking-tight text-5xl sm:text-6xl lg:text-7xl xl:text-[80px]">
               {b.heading}
             </h1>
+            <span className="inline-block mt-7 h-1 w-24 bg-gradient-to-r from-gold to-gold-soft rounded-full shadow-gold" />
             {b.subheading && (
-              <p className="mt-5 text-white/90 text-base sm:text-lg max-w-xl">{b.subheading}</p>
+              <p className="mt-7 text-white/90 text-base sm:text-lg max-w-xl leading-relaxed font-light">{b.subheading}</p>
             )}
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-10 flex flex-wrap gap-4">
               {b.primary_cta_label && (
                 <a
                   href={b.primary_cta_url ?? "#"}
-                  className="inline-flex items-center rounded-sm bg-gold px-8 py-3 text-[12px] font-bold uppercase tracking-[0.18em] text-white hover:bg-gold-soft transition-colors"
+                  className="group relative inline-flex items-center gap-2 rounded-sm px-9 py-4 text-[12px] font-bold uppercase tracking-[0.22em] text-navy-deep overflow-hidden shadow-gold"
+                  style={{ background: "linear-gradient(135deg, oklch(0.78 0.11 78), oklch(0.66 0.13 75))" }}
                 >
-                  {b.primary_cta_label}
+                  <span className="relative z-10">{b.primary_cta_label}</span>
+                  <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-25 transition-opacity" />
                 </a>
               )}
               {b.secondary_cta_label && (
                 <a
                   href={b.secondary_cta_url ?? "#"}
-                  className="inline-flex items-center rounded-sm border border-white px-8 py-3 text-[12px] font-bold uppercase tracking-[0.18em] text-white hover:bg-white hover:text-navy-deep transition-colors"
+                  className="inline-flex items-center rounded-sm border-2 border-white/80 px-9 py-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white hover:bg-white hover:text-navy-deep transition-all"
                 >
                   {b.secondary_cta_label}
                 </a>
               )}
             </div>
           </div>
-
-          {banners.length > 1 && (
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-              {banners.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setIdx(i)}
-                  className={`h-1.5 rounded-full transition-all ${i === idx ? "w-8 bg-gold" : "w-1.5 bg-white/50"}`}
-                  aria-label={`Slide ${i + 1}`}
-                />
-              ))}
-            </div>
-          )}
         </div>
+
+        {banners.length > 1 && (
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+            {banners.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                className={`h-1.5 rounded-full transition-all ${i === idx ? "w-10 bg-gold" : "w-2 bg-white/40 hover:bg-white/70"}`}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

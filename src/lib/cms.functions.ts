@@ -6,15 +6,16 @@ import { queryOptions } from "@tanstack/react-query";
 export const getHomepageContent = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const [heroes, mission, stats, programs, resources, nav, settings, praise] = await Promise.all([
+  const [heroes, mission, programs, resources, nav, settings, praise, featuredVideos] = await Promise.all([
     supabaseAdmin.from("hero_banners").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("mission_cards").select("*").eq("is_active", true).order("display_order"),
-    supabaseAdmin.from("statistics").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("programs").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("resource_cards").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("navigation_items").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("site_settings").select("*"),
     supabaseAdmin.from("praise_reports").select("*").eq("is_active", true).order("display_order"),
+    supabaseAdmin.from("videos").select("id,slug,title,description,thumbnail_url,duration,speaker,category_id,display_order")
+      .eq("is_published", true).eq("is_featured", true).order("display_order").limit(6),
   ]);
 
   const settingsMap: Record<string, any> = {};
@@ -23,12 +24,12 @@ export const getHomepageContent = createServerFn({ method: "GET" }).handler(asyn
   return {
     heroes: heroes.data ?? [],
     mission: mission.data ?? [],
-    stats: stats.data ?? [],
     programs: programs.data ?? [],
     resources: resources.data ?? [],
     nav: nav.data ?? [],
     settings: settingsMap,
     praise: praise.data ?? [],
+    featuredVideos: featuredVideos.data ?? [],
   };
 });
 
