@@ -17,50 +17,39 @@ type Program = {
 function ProgramCard({ p }: { p: Program }) {
   const date = p.event_date ? new Date(p.event_date) : null;
   const day = date ? date.getDate().toString().padStart(2, "0") : "";
-  const mo = date
-    ? `${date.toLocaleString("en-US", { month: "short" }).toUpperCase()} ${date.getFullYear()}`
-    : "";
+  const mo = date ? `${date.toLocaleString("en-US", { month: "short" }).toUpperCase()} ${date.getFullYear()}` : "";
+  const isPast = date && date.getTime() < Date.now();
+  const status = isPast ? "Past" : "Upcoming";
 
   return (
-    <article className="bg-white shadow-card overflow-hidden flex flex-col h-full">
-      <div className="aspect-[16/10] bg-navy-deep overflow-hidden">
-        <img
-          src={p.image_url || programFallback}
-          alt={p.title}
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
+    <article className="group bg-white rounded-xl overflow-hidden flex flex-col h-full shadow-card hover:shadow-elegant hover:-translate-y-1 transition-all duration-500 border border-black/[0.04]">
+      <div className="relative aspect-[16/10] bg-navy-deep overflow-hidden">
+        <img src={p.image_url || programFallback} alt={p.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/60 to-transparent opacity-60" />
+        {p.event_type && (
+          <span className="absolute top-3 left-3 bg-gold text-white text-[9px] uppercase tracking-[0.22em] px-2.5 py-1 font-bold rounded-sm shadow-gold">{p.event_type}</span>
+        )}
+        <span className={`absolute top-3 right-3 text-[9px] uppercase tracking-[0.22em] px-2.5 py-1 font-bold rounded-sm ${isPast ? "bg-charcoal/80 text-white" : "bg-white text-navy-deep"}`}>{status}</span>
       </div>
-      <div className="grid grid-cols-[110px_1fr] flex-1">
-        <div className="bg-navy-deep text-white flex flex-col items-center justify-center px-3 py-6 text-center">
-          <div className="font-display text-3xl leading-none">{day || "—"}</div>
-          <div className="text-[9px] tracking-[0.18em] mt-1 text-white/80">{mo}</div>
+      <div className="flex-1 p-5">
+        <div className="flex items-start gap-4 mb-3">
+          <div className="shrink-0 text-center border-r border-gold/40 pr-4">
+            <div className="font-display text-3xl leading-none text-navy-deep">{day || "—"}</div>
+            <div className="text-[9px] tracking-[0.18em] mt-1 text-gold font-bold">{mo}</div>
+          </div>
+          <h3 className="font-display text-lg text-navy-deep leading-snug line-clamp-2 min-w-0 flex-1">{p.title}</h3>
         </div>
-        <div className="p-5 flex flex-col">
-          {p.event_type && (
-            <span className="inline-block self-start bg-silver/60 text-charcoal text-[10px] uppercase tracking-[0.18em] px-2 py-1 mb-2">
-              {p.event_type}
-            </span>
-          )}
-          <h3 className="font-display text-lg text-navy-deep mb-2 line-clamp-2">{p.title}</h3>
-          {p.location && (
-            <div className="flex items-center gap-1 text-xs text-charcoal/70 mb-2">
-              <MapPin className="h-3 w-3 text-gold shrink-0" />
-              <span className="truncate">{p.location}</span>
-            </div>
-          )}
-          {p.description && (
-            <p className="text-xs text-charcoal/70 leading-relaxed mb-3 line-clamp-2">{p.description}</p>
-          )}
-          {p.cta_label && (
-            <a
-              href={p.registration_url ?? "#"}
-              className="mt-auto inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.18em] text-gold hover:text-navy-deep"
-            >
-              {p.cta_label} <ChevronRight className="h-3 w-3" />
-            </a>
-          )}
-        </div>
+        {p.location && (
+          <div className="flex items-center gap-1.5 text-xs text-charcoal/70 mb-2">
+            <MapPin className="h-3.5 w-3.5 text-gold shrink-0" /><span className="truncate">{p.location}</span>
+          </div>
+        )}
+        {p.description && <p className="text-xs text-charcoal/65 leading-relaxed mb-4 line-clamp-2">{p.description}</p>}
+        {p.cta_label && (
+          <a href={p.registration_url ?? "#"} className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-navy-deep group-hover:text-gold transition-colors">
+            {p.cta_label} <ChevronRight className="h-3 w-3" />
+          </a>
+        )}
       </div>
     </article>
   );
