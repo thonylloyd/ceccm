@@ -14,8 +14,6 @@ export const Route = createFileRoute("/_authenticated/admin/livestream")({
 
 const TABS = [
   { id: "settings", label: "Settings" },
-  { id: "cta", label: "CTA Button" },
-  { id: "camera", label: "Browser Camera" },
   { id: "current", label: "Current Broadcast" },
   { id: "upcoming", label: "Upcoming" },
   { id: "replays", label: "Replays" },
@@ -40,8 +38,6 @@ function LivestreamAdmin() {
         ))}
       </div>
       {tab === "settings" && <HeroSettings />}
-      {tab === "cta" && <CtaSettings />}
-      {tab === "camera" && <BrowserCameraPanel />}
       {tab === "alert" && <AlertSettings />}
       {tab === "current" && <BroadcastList kind="live" title="Current Broadcast" hint="Toggle 'Is Live' on the broadcast you're currently airing." />}
       {tab === "upcoming" && <BroadcastList kind="upcoming" title="Upcoming Broadcasts" />}
@@ -219,6 +215,22 @@ function BroadcastRow({ row, expanded, onToggle, onSave, onDelete, saving }: any
           <div className="space-y-1.5">
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={!!l.chat_enabled} onChange={(e) => s("chat_enabled", e.target.checked)} /> Enable Chat</label>
             {l.chat_enabled && <Field label="Chat Embed URL"><Input value={l.chat_url ?? ""} onChange={(e) => s("chat_url", e.target.value)} /></Field>}
+          </div>
+          <div className="border-t border-black/5 pt-3 mt-2">
+            <div className="text-xs font-bold uppercase tracking-wider text-charcoal/60 mb-2">Access Control</div>
+            <div className="grid grid-cols-3 gap-3">
+              <Field label="Access">
+                <select value={l.access_mode ?? "free"} onChange={(e) => s("access_mode", e.target.value)} className="w-full px-3 py-2 rounded-md border border-black/10 text-sm bg-white">
+                  {["free", "password", "paid"].map((x) => <option key={x}>{x}</option>)}
+                </select>
+              </Field>
+              {l.access_mode === "password" && (
+                <Field label="Password (set to update)"><Input type="text" value={l._new_password ?? ""} onChange={(e) => s("_new_password", e.target.value)} placeholder="leave blank to keep" /></Field>
+              )}
+              {l.access_mode === "paid" && (
+                <Field label="Price (ESPEES)"><Input type="number" value={l.price_espees ?? 0} onChange={(e) => s("price_espees", Number(e.target.value))} /></Field>
+              )}
+            </div>
           </div>
           <div className="flex flex-wrap gap-4 text-sm">
             <label className="inline-flex items-center gap-2"><input type="checkbox" checked={!!l.is_live} onChange={(e) => s("is_live", e.target.checked)} /> Is Live Now</label>
