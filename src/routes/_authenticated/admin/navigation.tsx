@@ -122,3 +122,43 @@ function NavItemRow({ item, childItems, openIds, onToggle, onSave, onDelete, onA
     </Card>
   );
 }
+
+function LivestreamButtonSettings() {
+  const qc = useQueryClient();
+  const getFn = useServerFn(adminGetSetting);
+  const setFn = useServerFn(adminSetSetting);
+  const q = useQuery({ queryKey: ["setting", "livestream"], queryFn: () => getFn({ data: { key: "livestream" } }) });
+  const defaults = {
+    visible: true, label: "Watch Live", url: "/live",
+    background_color: "", text_color: "#0a1733",
+    show_pulse: true, open_new_tab: false,
+  };
+  const [val, setVal] = useState<any>(defaults);
+  useEffect(() => { if (q.data) setVal({ ...defaults, ...((q.data as any).value ?? {}) }); }, [q.data]);
+  const save = useMutation({
+    mutationFn: (value: any) => setFn({ data: { key: "livestream", value } }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["setting", "livestream"] }); qc.invalidateQueries({ queryKey: ["homepage"] }); qc.invalidateQueries({ queryKey: ["site-chrome"] }); toast.success("Saved"); },
+  });
+  return (
+    <Card>
+      <h2 className="font-display text-lg text-navy-deep mb-1">Livestream Button</h2>
+      <p className="text-xs text-charcoal/60 mb-4">Controls the live-stream call-to-action in the site header.</p>
+      <div className="space-y-3">
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={!!val.visible} onChange={(e) => setVal({ ...val, visible: e.target.checked })} /> Visible
+        </label>
+        <Field label="Label"><Input value={val.label ?? ""} onChange={(e) => setVal({ ...val, label: e.target.value })} /></Field>
+        <Field label="URL"><Input value={val.url ?? ""} onChange={(e) => setVal({ ...val, url: e.target.value })} /></Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Background (blank = gold gradient)"><Input value={val.background_color ?? ""} onChange={(e) => setVal({ ...val, background_color: e.target.value })} placeholder="#B88A1B or leave blank" /></Field>
+          <Field label="Text Color"><Input type="color" value={val.text_color ?? "#0a1733"} onChange={(e) => setVal({ ...val, text_color: e.target.value })} /></Field>
+        </div>
+        <div className="flex gap-6 text-sm">
+          <label className="inline-flex items-center gap-2"><input type="checkbox" checked={!!val.show_pulse} onChange={(e) => setVal({ ...val, show_pulse: e.target.checked })} /> Pulse Indicator</label>
+          <label className="inline-flex items-center gap-2"><input type="checkbox" checked={!!val.open_new_tab} onChange={(e) => setVal({ ...val, open_new_tab: e.target.checked })} /> Open in New Tab</label>
+        </div>
+        <Button onClick={() => save.mutate(val)} disabled={save.isPending}><Save className="h-3.5 w-3.5" /> Save</Button>
+      </div>
+    </Card>
+  );
+}
