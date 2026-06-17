@@ -169,7 +169,7 @@ function PlayerSection({ current, embedUrl, nextUpcoming }: { current: any; embe
             {current && embedUrl ? (
               <AccessGate
                 kind="broadcast"
-                key={current.id}
+                contentKey={current.id}
                 accessMode={(current.access_mode ?? "free") as any}
                 price={current.price_espees}
                 thumbnail={current.thumbnail_url}

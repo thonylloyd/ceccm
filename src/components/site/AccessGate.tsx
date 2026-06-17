@@ -14,7 +14,7 @@ import {
 type GateProps = {
   kind: "video" | "broadcast";
   /** video slug or broadcast id */
-  key: string;
+  contentKey: string;
   accessMode: AccessMode;
   price?: number | null;
   thumbnail?: string | null;
@@ -23,7 +23,7 @@ type GateProps = {
   children: React.ReactNode;
 };
 
-export function AccessGate({ kind, key: keyId, accessMode, price, thumbnail, title, children }: GateProps) {
+export function AccessGate({ kind, contentKey: keyId, accessMode, price, thumbnail, title, children }: GateProps) {
   const qc = useQueryClient();
   const needsAuth = accessMode !== "free";
   const unlockedQuery =

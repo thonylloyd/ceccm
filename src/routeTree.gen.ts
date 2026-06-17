@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as VideosSlugRouteImport } from './routes/videos.$slug'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -69,6 +70,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const VideosIndexRoute = VideosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => VideosRoute,
 } as any)
 const VideosSlugRoute = VideosSlugRouteImport.update({
   id: '/$slug',
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/videos': typeof VideosRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
+  '/videos/': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -172,8 +179,8 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/live': typeof LiveRoute
   '/programs': typeof ProgramsRoute
-  '/videos': typeof VideosRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
+  '/videos': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -198,6 +205,7 @@ export interface FileRoutesById {
   '/videos': typeof VideosRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
+  '/videos/': typeof VideosIndexRoute
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/contact': typeof AuthenticatedAdminContactRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -222,6 +230,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin'
     | '/videos/$slug'
+    | '/videos/'
     | '/admin/about'
     | '/admin/contact'
     | '/admin/homepage'
@@ -241,8 +250,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/live'
     | '/programs'
-    | '/videos'
     | '/videos/$slug'
+    | '/videos'
     | '/admin/about'
     | '/admin/contact'
     | '/admin/homepage'
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/_authenticated/admin'
     | '/videos/$slug'
+    | '/videos/'
     | '/_authenticated/admin/about'
     | '/_authenticated/admin/contact'
     | '/_authenticated/admin/homepage'
@@ -347,6 +357,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/videos/': {
+      id: '/videos/'
+      path: '/'
+      fullPath: '/videos/'
+      preLoaderRoute: typeof VideosIndexRouteImport
+      parentRoute: typeof VideosRoute
     }
     '/videos/$slug': {
       id: '/videos/$slug'
@@ -489,10 +506,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface VideosRouteChildren {
   VideosSlugRoute: typeof VideosSlugRoute
+  VideosIndexRoute: typeof VideosIndexRoute
 }
 
 const VideosRouteChildren: VideosRouteChildren = {
   VideosSlugRoute: VideosSlugRoute,
+  VideosIndexRoute: VideosIndexRoute,
 }
 
 const VideosRouteWithChildren =

@@ -90,7 +90,7 @@ function VideoDetail() {
             <div className="mb-6">
               <AccessGate
                 kind="video"
-                key={v.slug}
+                contentKey={v.slug}
                 accessMode={accessMode}
                 price={v.price_espees}
                 thumbnail={v.thumbnail_url}
