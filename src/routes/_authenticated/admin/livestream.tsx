@@ -125,10 +125,23 @@ function BroadcastList({ kind, title, hint }: { kind: "live" | "upcoming" | "rep
   const list = useServerFn(adminList);
   const upsert = useServerFn(adminUpsert);
   const del = useServerFn(adminDelete);
+  const setAccess = useServerFn(adminSetBroadcastAccess);
   const q = useQuery({ queryKey: ["a", "broadcasts"], queryFn: () => list({ data: { table: "broadcasts" } }) as any });
   const [open, setOpen] = useState<string | null>(null);
   const save = useMutation({
-    mutationFn: (row: any) => upsert({ data: { table: "broadcasts", row } }),
+    mutationFn: async (row: any) => {
+      const { _new_password, access_mode, price_espees, ...rest } = row;
+      const saved: any = await upsert({ data: { table: "broadcasts", row: rest } });
+      if (saved?.id && (access_mode || _new_password || price_espees != null)) {
+        await setAccess({ data: {
+          id: saved.id,
+          access_mode: (access_mode ?? "free") as any,
+          password: _new_password ? _new_password : undefined,
+          price_espees: price_espees ?? null,
+        }});
+      }
+      return saved;
+    },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["a", "broadcasts"] }); qc.invalidateQueries({ queryKey: ["livestream"] }); toast.success("Saved"); },
     onError: (e: any) => toast.error(e.message ?? "Save failed"),
   });
