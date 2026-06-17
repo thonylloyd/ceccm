@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -35,6 +36,11 @@ import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authentic
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
   path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgramsRoute = ProgramsRouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/live': typeof LiveRoute
   '/programs': typeof ProgramsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/live': typeof LiveRoute
   '/programs': typeof ProgramsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/videos': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/live': typeof LiveRoute
   '/programs': typeof ProgramsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/videos': typeof VideosRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/live'
     | '/programs'
+    | '/reset-password'
     | '/videos'
     | '/admin'
     | '/videos/$slug'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/live'
     | '/programs'
+    | '/reset-password'
     | '/videos/$slug'
     | '/videos'
     | '/admin/about'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/live'
     | '/programs'
+    | '/reset-password'
     | '/videos'
     | '/_authenticated/admin'
     | '/videos/$slug'
@@ -297,6 +309,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   LiveRoute: typeof LiveRoute
   ProgramsRoute: typeof ProgramsRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   VideosRoute: typeof VideosRouteWithChildren
 }
 
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/videos'
       fullPath: '/videos'
       preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/programs': {
@@ -525,6 +545,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   LiveRoute: LiveRoute,
   ProgramsRoute: ProgramsRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   VideosRoute: VideosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
