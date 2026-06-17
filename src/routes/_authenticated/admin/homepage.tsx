@@ -16,6 +16,7 @@ const TABS = [
   { id: "hero", label: "Hero" },
   { id: "mission_statement", label: "Mission Statement" },
   { id: "mission", label: "Mission Cards" },
+  { id: "impact", label: "Our Impact" },
   { id: "stats", label: "Statistics" },
   { id: "programs", label: "Programs" },
   { id: "praise", label: "Praise Reports" },
