@@ -47,7 +47,15 @@ const DEFAULTS: Block[] = [
   },
 ];
 
-export function OurImpact({ blocks = DEFAULTS }: { blocks?: Block[] }) {
+export function OurImpact({
+  blocks = DEFAULTS,
+  eyebrow = "Our Impact",
+  heading = "Perfecting the Saints for the Work of the Ministry",
+}: {
+  blocks?: Block[];
+  eyebrow?: string;
+  heading?: string;
+}) {
   return (
     <section className="relative bg-white py-24 lg:py-32 overflow-hidden">
       {/* faint watermark */}
@@ -56,9 +64,9 @@ export function OurImpact({ blocks = DEFAULTS }: { blocks?: Block[] }) {
       }} />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="text-center mb-20">
-          <p className="text-[11px] uppercase tracking-[0.32em] text-gold font-semibold mb-3">Our Impact</p>
+          <p className="text-[11px] uppercase tracking-[0.32em] text-gold font-semibold mb-3">{eyebrow}</p>
           <h2 className="font-display text-4xl sm:text-5xl text-navy-deep tracking-tight">
-            Perfecting the Saints for the Work of the Ministry
+            {heading}
           </h2>
           <span className="inline-block mt-5 h-[2px] w-16 bg-gradient-to-r from-transparent via-gold to-transparent" />
         </div>
