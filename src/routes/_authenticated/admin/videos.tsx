@@ -72,12 +72,43 @@ function useCrud(table: string, invalidates: string[] = []) {
 }
 
 function VideosList() {
+  const qc = useQueryClient();
   const listFn = useServerFn(adminList);
+  const upsertFn = useServerFn(adminUpsert);
+  const delFn = useServerFn(adminDelete);
+  const setAccessFn = useServerFn(adminSetVideoAccess);
   const catsQ = useQuery({ queryKey: ["a", "video_categories"], queryFn: () => listFn({ data: { table: "video_categories" } }) as any });
-  const { q, save, remove } = useCrud("videos", ["videos", "videos/library"]);
+  const q = useQuery({ queryKey: ["a", "videos"], queryFn: () => listFn({ data: { table: "videos" } }) as any });
   const [open, setOpen] = useState<string | null>(null);
 
   const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 80);
+
+  const save = useMutation({
+    mutationFn: async (row: any) => {
+      const { _new_password, access_mode, price_espees, ...rest } = row;
+      if (!rest.slug || rest.slug.startsWith("video-")) rest.slug = slugify(rest.title);
+      const saved: any = await upsertFn({ data: { table: "videos", row: rest } });
+      if (saved?.id && (access_mode || _new_password || price_espees != null)) {
+        await setAccessFn({ data: {
+          id: saved.id,
+          access_mode: (access_mode ?? "free") as any,
+          password: _new_password ? _new_password : undefined,
+          price_espees: price_espees ?? null,
+        }});
+      }
+      return saved;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["a", "videos"] });
+      qc.invalidateQueries({ queryKey: ["videos", "library"] });
+      toast.success("Saved");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const remove = useMutation({
+    mutationFn: (id: string) => delFn({ data: { table: "videos", id } }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["a", "videos"] }); toast.success("Deleted"); },
+  });
 
   const add = () => save.mutate({
     title: "New Video", slug: `video-${Date.now()}`, is_published: true, is_featured: false,
@@ -98,10 +129,7 @@ function VideosList() {
               cats={catsQ.data ?? []}
               expanded={open === v.id}
               onToggle={() => setOpen(open === v.id ? null : v.id)}
-              onSave={(row: any) => {
-                if (!row.slug || row.slug.startsWith("video-")) row.slug = slugify(row.title);
-                save.mutate(row);
-              }}
+              onSave={(row: any) => save.mutate(row)}
               onDelete={() => confirm("Delete?") && remove.mutate(v.id)}
             />
           ))}
