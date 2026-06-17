@@ -15,15 +15,19 @@ export const Route = createFileRoute("/reset-password")({
 function ResetPasswordPage() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+  const [hashError, setHashError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Supabase places recovery tokens in the URL hash. supabase-js parses them
-    // automatically and emits a PASSWORD_RECOVERY event.
+    if (typeof window !== "undefined" && window.location.hash) {
+      const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const err = params.get("error_description") || params.get("error");
+      if (err) setHashError(err.replace(/\+/g, " "));
+    }
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setReady(true);
+      if (event === "PASSWORD_RECOVERY") { setReady(true); setHashError(null); }
     });
     supabase.auth.getSession().then(({ data }) => { if (data.session) setReady(true); });
     return () => sub.subscription.unsubscribe();
