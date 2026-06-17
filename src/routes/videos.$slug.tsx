@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { Play, Clock, User, Share2 } from "lucide-react";
+import { Clock, User, Share2 } from "lucide-react";
 import { getVideoBySlug } from "@/lib/videos.functions";
 import { siteChromeQuery } from "@/lib/cms.functions";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { AccessGate } from "@/components/site/AccessGate";
 
 const videoQuery = (slug: string) =>
   queryOptions({ queryKey: ["video", slug], queryFn: () => getVideoBySlug({ data: { slug } }) });
@@ -61,11 +62,24 @@ function VideoDetail() {
   const v = data.video!;
   const brand = chrome.settings.brand ?? {};
   const embed = getEmbed(v);
+  const accessMode = (v.access_mode ?? "free") as any;
 
   const share = () => {
     if (navigator.share) navigator.share({ title: v.title, url: location.href }).catch(() => {});
     else { navigator.clipboard.writeText(location.href); }
   };
+
+  const Player = (
+    <div className="aspect-video bg-black overflow-hidden">
+      {embed ? (
+        <iframe src={embed} className="h-full w-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+      ) : v.video_url ? (
+        <video src={v.video_url} poster={v.thumbnail_url ?? undefined} controls className="h-full w-full" />
+      ) : v.thumbnail_url ? (
+        <img src={v.thumbnail_url} alt={v.title} className="h-full w-full object-cover" />
+      ) : null}
+    </div>
+  );
 
   return (
     <div className="bg-light min-h-screen">
@@ -73,14 +87,17 @@ function VideoDetail() {
       <main className="py-10 lg:py-14">
         <div className="mx-auto max-w-7xl px-5 lg:px-8 grid lg:grid-cols-[1fr_320px] gap-10">
           <div>
-            <div className="aspect-video bg-black overflow-hidden mb-6">
-              {embed ? (
-                <iframe src={embed} className="h-full w-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
-              ) : v.video_url ? (
-                <video src={v.video_url} poster={v.thumbnail_url ?? undefined} controls className="h-full w-full" />
-              ) : v.thumbnail_url ? (
-                <img src={v.thumbnail_url} alt={v.title} className="h-full w-full object-cover" />
-              ) : null}
+            <div className="mb-6">
+              <AccessGate
+                kind="video"
+                key={v.slug}
+                accessMode={accessMode}
+                price={v.price_espees}
+                thumbnail={v.thumbnail_url}
+                title={v.title}
+              >
+                {Player}
+              </AccessGate>
             </div>
             <h1 className="font-display text-3xl text-navy-deep mb-3">{v.title}</h1>
             <div className="flex flex-wrap gap-4 text-sm text-charcoal/60 mb-5">
