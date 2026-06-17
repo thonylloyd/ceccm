@@ -6,7 +6,7 @@ import { adminList, adminUpsert, adminDelete } from "@/lib/admin.functions";
 import { adminSetVideoAccess } from "@/lib/access.functions";
 import { PageHeader, Field, Input, Textarea, Button, Card } from "@/components/admin/ui";
 import { MediaPicker } from "@/components/admin/MediaPicker";
-import { Plus, Trash2, ChevronDown, ChevronUp, Loader2, Star } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Loader2, Star, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/videos")({
@@ -82,11 +82,20 @@ function VideosList() {
   const [open, setOpen] = useState<string | null>(null);
 
   const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 80);
+  const uniqueSlug = (base: string, id?: string) => {
+    const existing = new Set((q.data ?? []).filter((x: any) => x.id !== id).map((x: any) => x.slug));
+    const b = base || "video";
+    if (!existing.has(b)) return b;
+    let i = 2;
+    while (existing.has(`${b}-${i}`)) i++;
+    return `${b}-${i}`;
+  };
 
   const save = useMutation({
     mutationFn: async (row: any) => {
       const { _new_password, access_mode, price_espees, ...rest } = row;
       if (!rest.slug || rest.slug.startsWith("video-")) rest.slug = slugify(rest.title);
+      rest.slug = uniqueSlug(rest.slug, rest.id);
       const saved: any = await upsertFn({ data: { table: "videos", row: rest } });
       if (saved?.id && (access_mode || _new_password || price_espees != null)) {
         await setAccessFn({ data: {
@@ -153,6 +162,11 @@ function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
           <span className="font-medium text-sm text-navy-deep truncate">{local.title || "(Untitled)"}</span>
           {!local.is_published && <span className="text-[10px] uppercase text-charcoal/40">Draft</span>}
         </button>
+        {local.slug && local.is_published && (
+          <a href={`/videos/${local.slug}`} target="_blank" rel="noreferrer" title="View on site" className="px-2 py-1 text-charcoal/60 hover:text-navy-deep">
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
         <Button variant="ghost" onClick={onDelete}><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button>
       </div>
       {expanded && (
