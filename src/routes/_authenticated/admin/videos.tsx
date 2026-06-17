@@ -82,11 +82,20 @@ function VideosList() {
   const [open, setOpen] = useState<string | null>(null);
 
   const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 80);
+  const uniqueSlug = (base: string, id?: string) => {
+    const existing = new Set((q.data ?? []).filter((x: any) => x.id !== id).map((x: any) => x.slug));
+    const b = base || "video";
+    if (!existing.has(b)) return b;
+    let i = 2;
+    while (existing.has(`${b}-${i}`)) i++;
+    return `${b}-${i}`;
+  };
 
   const save = useMutation({
     mutationFn: async (row: any) => {
       const { _new_password, access_mode, price_espees, ...rest } = row;
       if (!rest.slug || rest.slug.startsWith("video-")) rest.slug = slugify(rest.title);
+      rest.slug = uniqueSlug(rest.slug, rest.id);
       const saved: any = await upsertFn({ data: { table: "videos", row: rest } });
       if (saved?.id && (access_mode || _new_password || price_espees != null)) {
         await setAccessFn({ data: {
