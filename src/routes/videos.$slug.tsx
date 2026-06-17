@@ -1,11 +1,14 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { Clock, User, Share2 } from "lucide-react";
+import { useState } from "react";
+import { Clock, User, Share2, ArrowLeft } from "lucide-react";
 import { getVideoBySlug } from "@/lib/videos.functions";
 import { siteChromeQuery } from "@/lib/cms.functions";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { AccessGate } from "@/components/site/AccessGate";
+import { ShareModal } from "@/components/site/ShareModal";
+import { VideoComments } from "@/components/site/VideoComments";
 
 const videoQuery = (slug: string) =>
   queryOptions({ queryKey: ["video", slug], queryFn: () => getVideoBySlug({ data: { slug } }) });
@@ -59,14 +62,21 @@ function VideoDetail() {
   const { slug } = Route.useParams();
   const { data } = useSuspenseQuery(videoQuery(slug));
   const { data: chrome } = useSuspenseQuery(siteChromeQuery());
+  const router = useRouter();
   const v = data.video!;
   const brand = chrome.settings.brand ?? {};
   const embed = getEmbed(v);
   const accessMode = (v.access_mode ?? "free") as any;
+  const [shareOpen, setShareOpen] = useState(false);
+  const shareUrl = typeof window !== "undefined" ? window.location.href : `https://ceccm.lovable.app/videos/${v.slug}`;
 
-  const share = () => {
-    if (navigator.share) navigator.share({ title: v.title, url: location.href }).catch(() => {});
-    else { navigator.clipboard.writeText(location.href); }
+  const goBack = () => {
+    // Prefer history back so scrollRestoration returns the user to their card.
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.history.back();
+    } else {
+      router.navigate({ to: "/videos" });
+    }
   };
 
   const Player = (
@@ -85,54 +95,66 @@ function VideoDetail() {
     <div className="bg-light min-h-screen">
       <SiteHeader nav={chrome.nav} brandName={brand.name ?? "CCM"} livestream={chrome.settings.livestream ?? {}} logoUrl={brand.logo_url} />
       <main className="py-10 lg:py-14">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8 grid lg:grid-cols-[1fr_320px] gap-10">
-          <div>
-            <div className="mb-6">
-              <AccessGate
-                kind="video"
-                contentKey={v.slug}
-                accessMode={accessMode}
-                price={v.price_espees}
-                thumbnail={v.thumbnail_url}
-                title={v.title}
-              >
-                {Player}
-              </AccessGate>
-            </div>
-            <h1 className="font-display text-3xl text-navy-deep mb-3">{v.title}</h1>
-            <div className="flex flex-wrap gap-4 text-sm text-charcoal/60 mb-5">
-              {v.speaker && <span className="flex items-center gap-1"><User className="h-4 w-4" />{v.speaker}</span>}
-              {v.duration && <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{v.duration}</span>}
-              {v.publish_date && <span>{new Date(v.publish_date).toLocaleDateString()}</span>}
-              <button onClick={share} className="flex items-center gap-1 hover:text-navy-deep"><Share2 className="h-4 w-4" />Share</button>
-            </div>
-            {v.description && <p className="text-charcoal/80 leading-relaxed whitespace-pre-line mb-6">{v.description}</p>}
-            {(v.tags ?? []).length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {(v.tags ?? []).map((t: string) => <span key={t} className="text-[11px] uppercase tracking-wider bg-white border border-black/10 px-3 py-1 rounded-full">{t}</span>)}
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <button onClick={goBack}
+            className="mb-6 inline-flex items-center gap-2 text-sm text-charcoal/70 hover:text-navy-deep font-semibold transition-colors group">
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+            Back to Video Library
+          </button>
+
+          <div className="grid lg:grid-cols-[1fr_320px] gap-10">
+            <div>
+              <div className="mb-6">
+                <AccessGate
+                  kind="video"
+                  contentKey={v.slug}
+                  accessMode={accessMode}
+                  price={v.price_espees}
+                  thumbnail={v.thumbnail_url}
+                  title={v.title}
+                >
+                  {Player}
+                </AccessGate>
               </div>
-            )}
-          </div>
-          <aside>
-            <h2 className="font-display text-lg text-navy-deep mb-4">Continue Learning</h2>
-            <div className="space-y-3">
-              {data.related.map((r: any) => (
-                <Link key={r.id} to="/videos/$slug" params={{ slug: r.slug }} className="flex gap-3 bg-white p-2 hover:shadow-card transition">
-                  <div className="aspect-video w-32 shrink-0 bg-navy-deep overflow-hidden">
-                    {r.thumbnail_url && <img src={r.thumbnail_url} alt="" className="h-full w-full object-cover" />}
-                  </div>
-                  <div className="min-w-0 py-1">
-                    <div className="text-xs font-semibold text-navy-deep line-clamp-2">{r.title}</div>
-                    {r.duration && <div className="text-[10px] text-charcoal/55 mt-1">{r.duration}</div>}
-                  </div>
-                </Link>
-              ))}
-              {!data.related.length && <p className="text-sm text-charcoal/55">No related videos.</p>}
+              <h1 className="font-display text-3xl text-navy-deep mb-3">{v.title}</h1>
+              <div className="flex flex-wrap gap-4 text-sm text-charcoal/60 mb-5">
+                {v.speaker && <span className="flex items-center gap-1"><User className="h-4 w-4" />{v.speaker}</span>}
+                {v.duration && <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{v.duration}</span>}
+                {v.publish_date && <span>{new Date(v.publish_date).toLocaleDateString()}</span>}
+                <button onClick={() => setShareOpen(true)} className="flex items-center gap-1 hover:text-navy-deep"><Share2 className="h-4 w-4" />Share</button>
+              </div>
+              {v.description && <p className="text-charcoal/80 leading-relaxed whitespace-pre-line mb-6">{v.description}</p>}
+              {(v.tags ?? []).length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {(v.tags ?? []).map((t: string) => <span key={t} className="text-[11px] uppercase tracking-wider bg-white border border-black/10 px-3 py-1 rounded-full">{t}</span>)}
+                </div>
+              )}
+
+              <VideoComments videoId={v.id} />
             </div>
-          </aside>
+            <aside>
+              <h2 className="font-display text-lg text-navy-deep mb-4">Continue Learning</h2>
+              <div className="space-y-3">
+                {data.related.map((r: any) => (
+                  <Link key={r.id} to="/videos/$slug" params={{ slug: r.slug }} className="flex gap-3 bg-white p-2 hover:shadow-card transition">
+                    <div className="aspect-video w-32 shrink-0 bg-navy-deep overflow-hidden">
+                      {r.thumbnail_url && <img src={r.thumbnail_url} alt="" className="h-full w-full object-cover" />}
+                    </div>
+                    <div className="min-w-0 py-1">
+                      <div className="text-xs font-semibold text-navy-deep line-clamp-2">{r.title}</div>
+                      {r.duration && <div className="text-[10px] text-charcoal/55 mt-1">{r.duration}</div>}
+                    </div>
+                  </Link>
+                ))}
+                {!data.related.length && <p className="text-sm text-charcoal/55">No related videos.</p>}
+              </div>
+            </aside>
+          </div>
         </div>
       </main>
       <SiteFooter brand={brand} contact={chrome.settings.contact ?? {}} footer={chrome.settings.footer ?? {}} social={chrome.settings.social ?? {}} logoUrl={brand.logo_url} />
+
+      {shareOpen && <ShareModal url={shareUrl} title={v.title} onClose={() => setShareOpen(false)} />}
     </div>
   );
 }
