@@ -64,7 +64,11 @@ function HomePage() {
           subtitle={homepageMission.subtitle ?? "Discover what drives us — the convictions and callings that shape every program, gathering and resource we build."}
           statement={homepageMission.statement ?? "Church Consolidation Mission exists to help every member become an effective and relevant part of the Church, strengthening and equipping the brethren for impactful service in the race for the last lost soul."}
         />
-        <OurImpact />
+        <OurImpact
+          eyebrow={(data.settings.homepage_impact as any)?.eyebrow}
+          heading={(data.settings.homepage_impact as any)?.heading}
+          blocks={((data.settings.homepage_impact as any)?.blocks?.length ? (data.settings.homepage_impact as any).blocks : undefined)}
+        />
         <ProgramsSection programs={data.programs} intro={homepage.programs_intro ?? "Join our global initiatives and transform lives."} />
         <FeaturedTeachings videos={(data as any).featuredVideos ?? []} />
         <PraiseReports reports={(data as any).praise ?? []} title={homepage.praise_title ?? "Praise Reports"} intro={homepage.praise_intro} />
