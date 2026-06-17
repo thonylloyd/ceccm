@@ -188,6 +188,13 @@ function VideoCard({ v, cats }: { v: any; cats: any[] }) {
         {v.duration && (
           <span className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-1 rounded">{v.duration}</span>
         )}
+        {v.access_mode && v.access_mode !== "free" && (
+          <span className="absolute top-2 left-2 bg-gold text-navy-deep text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
+            {v.access_mode === "password" ? "🔒 Password"
+              : v.access_mode === "paid" ? `★ ${v.price_espees ?? ""} ESPEES`
+              : `🔒★ Password + ${v.price_espees ?? ""} ESPEES`}
+          </span>
+        )}
       </div>
       <div className="p-4">
         {catName && <div className="text-[10px] uppercase tracking-[0.18em] text-gold font-bold mb-2">{catName}</div>}
