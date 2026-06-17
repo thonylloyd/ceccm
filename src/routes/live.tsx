@@ -5,6 +5,7 @@ import { livestreamQuery, subscribeToBroadcasts } from "@/lib/livestream.functio
 import { homepageQuery } from "@/lib/cms.functions";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { AccessGate } from "@/components/site/AccessGate";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Play, Radio, Calendar, Clock, Share2, Bell, MapPin, Search, Users, Globe2,
