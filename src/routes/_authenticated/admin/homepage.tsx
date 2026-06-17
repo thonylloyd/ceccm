@@ -111,6 +111,7 @@ function HomepageAdmin() {
           defaults={{ title: "New Mission", description: "", icon: "globe" }}
         />
       )}
+      {tab === "impact" && <ImpactEditor />}
       {tab === "stats" && (
         <SectionEditor
           title="Statistics"
