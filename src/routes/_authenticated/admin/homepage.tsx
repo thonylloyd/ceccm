@@ -182,3 +182,83 @@ function MissionStatementEditor() {
     </Card>
   );
 }
+
+const DEFAULT_IMPACT_BLOCKS = [
+  { eyebrow: "Conferences & Training", title: "Equipping the Saints Through Conferences", body: "We host transformative conferences and training programs.", image: "", bullets: ["Annual ministry summits", "Specialized training tracks", "Hands-on equipping workshops"] },
+];
+
+function ImpactEditor() {
+  const qc = useQueryClient();
+  const getFn = useServerFn(adminGetSetting);
+  const setFn = useServerFn(adminSetSetting);
+  const q = useQuery({ queryKey: ["s", "homepage_impact"], queryFn: () => getFn({ data: { key: "homepage_impact" } }) as any });
+  const [v, setV] = useState<any>({
+    eyebrow: "Our Impact",
+    heading: "Perfecting the Saints for the Work of the Ministry",
+    blocks: DEFAULT_IMPACT_BLOCKS,
+  });
+  useEffect(() => {
+    if (q.data?.value) {
+      const value = q.data.value;
+      setV({
+        eyebrow: value.eyebrow ?? "Our Impact",
+        heading: value.heading ?? "Perfecting the Saints for the Work of the Ministry",
+        blocks: Array.isArray(value.blocks) && value.blocks.length ? value.blocks : DEFAULT_IMPACT_BLOCKS,
+      });
+    }
+  }, [q.data]);
+  const m = useMutation({
+    mutationFn: () => setFn({ data: { key: "homepage_impact", value: v } }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["s", "homepage_impact"] }); qc.invalidateQueries({ queryKey: ["homepage"] }); toast.success("Saved"); },
+  });
+
+  const updateBlock = (i: number, patch: any) =>
+    setV({ ...v, blocks: v.blocks.map((b: any, j: number) => (i === j ? { ...b, ...patch } : b)) });
+  const addBlock = () => setV({ ...v, blocks: [...v.blocks, { eyebrow: "", title: "New block", body: "", image: "", bullets: [] }] });
+  const removeBlock = (i: number) => setV({ ...v, blocks: v.blocks.filter((_: any, j: number) => j !== i) });
+
+  if (q.isLoading) return <Loader2 className="h-5 w-5 animate-spin text-navy-deep" />;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <h2 className="font-display text-lg text-navy-deep mb-4">Our Impact — Section Header</h2>
+        <div className="grid gap-3">
+          <Field label="Eyebrow"><Input value={v.eyebrow ?? ""} onChange={(e) => setV({ ...v, eyebrow: e.target.value })} /></Field>
+          <Field label="Heading"><Input value={v.heading ?? ""} onChange={(e) => setV({ ...v, heading: e.target.value })} /></Field>
+        </div>
+      </Card>
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-display text-lg text-navy-deep">Impact Blocks</h3>
+          <Button onClick={addBlock}>+ Add Block</Button>
+        </div>
+        <div className="space-y-4">
+          {v.blocks.map((b: any, i: number) => (
+            <Card key={i} className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs uppercase tracking-wider text-charcoal/55">Block {i + 1}</span>
+                <Button variant="ghost" onClick={() => removeBlock(i)}>Remove</Button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Eyebrow"><Input value={b.eyebrow ?? ""} onChange={(e) => updateBlock(i, { eyebrow: e.target.value })} /></Field>
+                <Field label="Title"><Input value={b.title ?? ""} onChange={(e) => updateBlock(i, { title: e.target.value })} /></Field>
+              </div>
+              <Field label="Body"><Textarea rows={3} value={b.body ?? ""} onChange={(e) => updateBlock(i, { body: e.target.value })} /></Field>
+              <Field label="Image URL">
+                <Input value={b.image ?? ""} onChange={(e) => updateBlock(i, { image: e.target.value })} placeholder="https://..." />
+              </Field>
+              <Field label="Bullets (one per line)">
+                <Textarea rows={3} value={(b.bullets ?? []).join("\n")}
+                  onChange={(e) => updateBlock(i, { bullets: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })} />
+              </Field>
+            </Card>
+          ))}
+        </div>
+      </div>
+      <Button onClick={() => m.mutate()} disabled={m.isPending}>
+        {m.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><Save className="h-3.5 w-3.5" />Save Our Impact</>}
+      </Button>
+    </div>
+  );
+}
