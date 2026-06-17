@@ -221,13 +221,16 @@ function BroadcastRow({ row, expanded, onToggle, onSave, onDelete, saving }: any
             <div className="grid grid-cols-3 gap-3">
               <Field label="Access">
                 <select value={l.access_mode ?? "free"} onChange={(e) => s("access_mode", e.target.value)} className="w-full px-3 py-2 rounded-md border border-black/10 text-sm bg-white">
-                  {["free", "password", "paid"].map((x) => <option key={x}>{x}</option>)}
+                  <option value="free">free</option>
+                  <option value="password">password</option>
+                  <option value="paid">paid</option>
+                  <option value="password_paid">password &amp; price</option>
                 </select>
               </Field>
-              {l.access_mode === "password" && (
-                <Field label="Password (set to update)"><Input type="text" value={l._new_password ?? ""} onChange={(e) => s("_new_password", e.target.value)} placeholder="leave blank to keep" /></Field>
+              {(l.access_mode === "password" || l.access_mode === "password_paid") && (
+                <Field label="Password (blank = keep)"><Input type="text" value={l._new_password ?? ""} onChange={(e) => s("_new_password", e.target.value)} placeholder="set or update" /></Field>
               )}
-              {l.access_mode === "paid" && (
+              {(l.access_mode === "paid" || l.access_mode === "password_paid") && (
                 <Field label="Price (ESPEES)"><Input type="number" value={l.price_espees ?? 0} onChange={(e) => s("price_espees", Number(e.target.value))} /></Field>
               )}
             </div>
