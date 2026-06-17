@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { adminList, adminUpsert, adminDelete, adminGetSetting, adminSetSetting } from "@/lib/admin.functions";
+import { adminSetBroadcastAccess } from "@/lib/access.functions";
 import { Field, Input, Textarea, Button, Card } from "@/components/admin/ui";
 import { MediaPicker } from "@/components/admin/MediaPicker";
 import { Plus, Trash2, ChevronDown, ChevronUp, Loader2, Save } from "lucide-react";
@@ -124,10 +125,23 @@ function BroadcastList({ kind, title, hint }: { kind: "live" | "upcoming" | "rep
   const list = useServerFn(adminList);
   const upsert = useServerFn(adminUpsert);
   const del = useServerFn(adminDelete);
+  const setAccess = useServerFn(adminSetBroadcastAccess);
   const q = useQuery({ queryKey: ["a", "broadcasts"], queryFn: () => list({ data: { table: "broadcasts" } }) as any });
   const [open, setOpen] = useState<string | null>(null);
   const save = useMutation({
-    mutationFn: (row: any) => upsert({ data: { table: "broadcasts", row } }),
+    mutationFn: async (row: any) => {
+      const { _new_password, access_mode, price_espees, ...rest } = row;
+      const saved: any = await upsert({ data: { table: "broadcasts", row: rest } });
+      if (saved?.id && (access_mode || _new_password || price_espees != null)) {
+        await setAccess({ data: {
+          id: saved.id,
+          access_mode: (access_mode ?? "free") as any,
+          password: _new_password ? _new_password : undefined,
+          price_espees: price_espees ?? null,
+        }});
+      }
+      return saved;
+    },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["a", "broadcasts"] }); qc.invalidateQueries({ queryKey: ["livestream"] }); toast.success("Saved"); },
     onError: (e: any) => toast.error(e.message ?? "Save failed"),
   });
@@ -221,13 +235,16 @@ function BroadcastRow({ row, expanded, onToggle, onSave, onDelete, saving }: any
             <div className="grid grid-cols-3 gap-3">
               <Field label="Access">
                 <select value={l.access_mode ?? "free"} onChange={(e) => s("access_mode", e.target.value)} className="w-full px-3 py-2 rounded-md border border-black/10 text-sm bg-white">
-                  {["free", "password", "paid"].map((x) => <option key={x}>{x}</option>)}
+                  <option value="free">free</option>
+                  <option value="password">password</option>
+                  <option value="paid">paid</option>
+                  <option value="password_paid">password &amp; price</option>
                 </select>
               </Field>
-              {l.access_mode === "password" && (
-                <Field label="Password (set to update)"><Input type="text" value={l._new_password ?? ""} onChange={(e) => s("_new_password", e.target.value)} placeholder="leave blank to keep" /></Field>
+              {(l.access_mode === "password" || l.access_mode === "password_paid") && (
+                <Field label="Password (blank = keep)"><Input type="text" value={l._new_password ?? ""} onChange={(e) => s("_new_password", e.target.value)} placeholder="set or update" /></Field>
               )}
-              {l.access_mode === "paid" && (
+              {(l.access_mode === "paid" || l.access_mode === "password_paid") && (
                 <Field label="Price (ESPEES)"><Input type="number" value={l.price_espees ?? 0} onChange={(e) => s("price_espees", Number(e.target.value))} /></Field>
               )}
             </div>

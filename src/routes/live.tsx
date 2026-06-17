@@ -5,6 +5,7 @@ import { livestreamQuery, subscribeToBroadcasts } from "@/lib/livestream.functio
 import { homepageQuery } from "@/lib/cms.functions";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { AccessGate } from "@/components/site/AccessGate";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Play, Radio, Calendar, Clock, Share2, Bell, MapPin, Search, Users, Globe2,
@@ -166,13 +167,22 @@ function PlayerSection({ current, embedUrl, nextUpcoming }: { current: any; embe
         <div>
           <div className="aspect-video bg-black overflow-hidden ring-1 ring-white/10">
             {current && embedUrl ? (
-              <iframe
-                src={embedUrl}
-                className="w-full h-full"
-                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                allowFullScreen
+              <AccessGate
+                kind="broadcast"
+                key={current.id}
+                accessMode={(current.access_mode ?? "free") as any}
+                price={current.price_espees}
+                thumbnail={current.thumbnail_url}
                 title={current.title}
-              />
+              >
+                <iframe
+                  src={embedUrl}
+                  className="w-full h-full"
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowFullScreen
+                  title={current.title}
+                />
+              </AccessGate>
             ) : nextUpcoming ? (
               <Countdown event={nextUpcoming} />
             ) : (

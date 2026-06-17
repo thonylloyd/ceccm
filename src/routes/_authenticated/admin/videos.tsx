@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { adminList, adminUpsert, adminDelete } from "@/lib/admin.functions";
+import { adminSetVideoAccess } from "@/lib/access.functions";
 import { PageHeader, Field, Input, Textarea, Button, Card } from "@/components/admin/ui";
 import { MediaPicker } from "@/components/admin/MediaPicker";
 import { Plus, Trash2, ChevronDown, ChevronUp, Loader2, Star } from "lucide-react";
@@ -71,12 +72,43 @@ function useCrud(table: string, invalidates: string[] = []) {
 }
 
 function VideosList() {
+  const qc = useQueryClient();
   const listFn = useServerFn(adminList);
+  const upsertFn = useServerFn(adminUpsert);
+  const delFn = useServerFn(adminDelete);
+  const setAccessFn = useServerFn(adminSetVideoAccess);
   const catsQ = useQuery({ queryKey: ["a", "video_categories"], queryFn: () => listFn({ data: { table: "video_categories" } }) as any });
-  const { q, save, remove } = useCrud("videos", ["videos", "videos/library"]);
+  const q = useQuery({ queryKey: ["a", "videos"], queryFn: () => listFn({ data: { table: "videos" } }) as any });
   const [open, setOpen] = useState<string | null>(null);
 
   const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 80);
+
+  const save = useMutation({
+    mutationFn: async (row: any) => {
+      const { _new_password, access_mode, price_espees, ...rest } = row;
+      if (!rest.slug || rest.slug.startsWith("video-")) rest.slug = slugify(rest.title);
+      const saved: any = await upsertFn({ data: { table: "videos", row: rest } });
+      if (saved?.id && (access_mode || _new_password || price_espees != null)) {
+        await setAccessFn({ data: {
+          id: saved.id,
+          access_mode: (access_mode ?? "free") as any,
+          password: _new_password ? _new_password : undefined,
+          price_espees: price_espees ?? null,
+        }});
+      }
+      return saved;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["a", "videos"] });
+      qc.invalidateQueries({ queryKey: ["videos", "library"] });
+      toast.success("Saved");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const remove = useMutation({
+    mutationFn: (id: string) => delFn({ data: { table: "videos", id } }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["a", "videos"] }); toast.success("Deleted"); },
+  });
 
   const add = () => save.mutate({
     title: "New Video", slug: `video-${Date.now()}`, is_published: true, is_featured: false,
@@ -97,10 +129,7 @@ function VideosList() {
               cats={catsQ.data ?? []}
               expanded={open === v.id}
               onToggle={() => setOpen(open === v.id ? null : v.id)}
-              onSave={(row: any) => {
-                if (!row.slug || row.slug.startsWith("video-")) row.slug = slugify(row.title);
-                save.mutate(row);
-              }}
+              onSave={(row: any) => save.mutate(row)}
               onDelete={() => confirm("Delete?") && remove.mutate(v.id)}
             />
           ))}
@@ -166,6 +195,29 @@ function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
             <label className="inline-flex items-center gap-2 text-sm">
               <input type="checkbox" checked={!!local.is_published} onChange={(e) => set("is_published", e.target.checked)} /> Published
             </label>
+          </div>
+          <div className="border-t border-black/5 pt-3 mt-2">
+            <div className="text-xs font-bold uppercase tracking-wider text-charcoal/60 mb-2">Access Control</div>
+            <div className="grid grid-cols-3 gap-3">
+              <Field label="Access Mode">
+                <select value={local.access_mode ?? "free"} onChange={(e) => set("access_mode", e.target.value)} className="w-full px-3 py-2 rounded-md border border-black/10 text-sm bg-white">
+                  <option value="free">free</option>
+                  <option value="password">password</option>
+                  <option value="paid">paid</option>
+                  <option value="password_paid">password &amp; price</option>
+                </select>
+              </Field>
+              {(local.access_mode === "password" || local.access_mode === "password_paid") && (
+                <Field label="Password (blank = keep)">
+                  <Input type="text" value={local._new_password ?? ""} onChange={(e) => set("_new_password", e.target.value)} placeholder="set or update" />
+                </Field>
+              )}
+              {(local.access_mode === "paid" || local.access_mode === "password_paid") && (
+                <Field label="Price (ESPEES)">
+                  <Input type="number" value={local.price_espees ?? 0} onChange={(e) => set("price_espees", Number(e.target.value))} />
+                </Field>
+              )}
+            </div>
           </div>
           <Button onClick={() => onSave(local)}>Save</Button>
         </div>
