@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,9 +18,11 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+type Mode = "signin" | "signup" | "forgot";
+
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -33,16 +34,7 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  async function handleGoogle() {
-    setLoading(true);
-    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (res?.error) {
-      toast.error(res.error.message ?? "Could not sign in with Google");
-      setLoading(false);
-    }
-  }
-
-  async function handleEmail(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
@@ -51,7 +43,7 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Welcome back");
         navigate({ to: "/" });
-      } else {
+      } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email, password,
           options: {
@@ -61,6 +53,13 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Account created. Check your email to confirm.");
+      } else {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("Password reset email sent. Check your inbox.");
+        setMode("signin");
       }
     } catch (err: any) {
       toast.error(err.message ?? "Authentication failed");
@@ -68,6 +67,12 @@ function AuthPage() {
       setLoading(false);
     }
   }
+
+  const heading = mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Reset password";
+  const subheading =
+    mode === "signin" ? "Welcome back to the mission."
+    : mode === "signup" ? "Join the global CCM community."
+    : "Enter your email to receive a reset link.";
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-navy-deep">
@@ -109,31 +114,10 @@ function AuthPage() {
             <div className="font-display text-xl text-gold">CCM</div>
           </Link>
 
-          <h1 className="font-display text-4xl text-white mb-2">
-            {mode === "signin" ? "Sign in" : "Create account"}
-          </h1>
-          <p className="text-white/60 text-sm mb-8">
-            {mode === "signin" ? "Welcome back to the mission." : "Join the global CCM community."}
-          </p>
+          <h1 className="font-display text-4xl text-white mb-2">{heading}</h1>
+          <p className="text-white/60 text-sm mb-8">{subheading}</p>
 
-          <Button
-            type="button"
-            onClick={handleGoogle}
-            disabled={loading}
-            variant="outline"
-            className="w-full h-12 bg-white text-navy-deep hover:bg-white/90 border-0 font-semibold"
-          >
-            <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-            Continue with Google
-          </Button>
-
-          <div className="my-6 flex items-center gap-4">
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-[10px] uppercase tracking-[0.28em] text-white/40">or</span>
-            <div className="h-px flex-1 bg-white/10" />
-          </div>
-
-          <form onSubmit={handleEmail} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
               <div>
                 <Label htmlFor="name" className="text-white/80 text-xs uppercase tracking-[0.18em]">Full name</Label>
@@ -144,29 +128,42 @@ function AuthPage() {
               <Label htmlFor="email" className="text-white/80 text-xs uppercase tracking-[0.18em]">Email</Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-2 bg-white/5 border-white/15 text-white h-12" />
             </div>
-            <div>
-              <Label htmlFor="password" className="text-white/80 text-xs uppercase tracking-[0.18em]">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="mt-2 bg-white/5 border-white/15 text-white h-12" />
-            </div>
+            {mode !== "forgot" && (
+              <div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-white/80 text-xs uppercase tracking-[0.18em]">Password</Label>
+                  {mode === "signin" && (
+                    <button type="button" onClick={() => setMode("forgot")} className="text-xs text-gold hover:underline">Forgot?</button>
+                  )}
+                </div>
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="mt-2 bg-white/5 border-white/15 text-white h-12" />
+              </div>
+            )}
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-12 bg-gradient-to-r from-gold to-gold-soft text-navy-deep hover:shadow-lg hover:shadow-gold/40 font-semibold uppercase tracking-[0.18em] text-xs"
-            >
-              {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+            <Button type="submit" disabled={loading}
+              className="w-full h-12 bg-gradient-to-r from-gold to-gold-soft text-navy-deep hover:shadow-lg hover:shadow-gold/40 font-semibold uppercase tracking-[0.18em] text-xs">
+              {loading ? "Please wait…"
+                : mode === "signin" ? "Sign in"
+                : mode === "signup" ? "Create account"
+                : "Send reset link"}
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-white/60">
-            {mode === "signin" ? (
-              <>New to CCM?{" "}
+          <div className="mt-6 text-center text-sm text-white/60 space-y-2">
+            {mode === "signin" && (
+              <div>New to CCM?{" "}
                 <button onClick={() => setMode("signup")} className="text-gold hover:underline">Create an account</button>
-              </>
-            ) : (
-              <>Already a member?{" "}
+              </div>
+            )}
+            {mode === "signup" && (
+              <div>Already a member?{" "}
                 <button onClick={() => setMode("signin")} className="text-gold hover:underline">Sign in</button>
-              </>
+              </div>
+            )}
+            {mode === "forgot" && (
+              <div>
+                <button onClick={() => setMode("signin")} className="text-gold hover:underline">Back to sign in</button>
+              </div>
             )}
           </div>
         </div>
