@@ -196,6 +196,29 @@ function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
               <input type="checkbox" checked={!!local.is_published} onChange={(e) => set("is_published", e.target.checked)} /> Published
             </label>
           </div>
+          <div className="border-t border-black/5 pt-3 mt-2">
+            <div className="text-xs font-bold uppercase tracking-wider text-charcoal/60 mb-2">Access Control</div>
+            <div className="grid grid-cols-3 gap-3">
+              <Field label="Access Mode">
+                <select value={local.access_mode ?? "free"} onChange={(e) => set("access_mode", e.target.value)} className="w-full px-3 py-2 rounded-md border border-black/10 text-sm bg-white">
+                  <option value="free">free</option>
+                  <option value="password">password</option>
+                  <option value="paid">paid</option>
+                  <option value="password_paid">password &amp; price</option>
+                </select>
+              </Field>
+              {(local.access_mode === "password" || local.access_mode === "password_paid") && (
+                <Field label="Password (blank = keep)">
+                  <Input type="text" value={local._new_password ?? ""} onChange={(e) => set("_new_password", e.target.value)} placeholder="set or update" />
+                </Field>
+              )}
+              {(local.access_mode === "paid" || local.access_mode === "password_paid") && (
+                <Field label="Price (ESPEES)">
+                  <Input type="number" value={local.price_espees ?? 0} onChange={(e) => set("price_espees", Number(e.target.value))} />
+                </Field>
+              )}
+            </div>
+          </div>
           <Button onClick={() => onSave(local)}>Save</Button>
         </div>
       )}
