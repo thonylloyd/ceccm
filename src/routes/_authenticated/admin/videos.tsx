@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { adminList, adminUpsert, adminDelete } from "@/lib/admin.functions";
+import { adminSetVideoAccess } from "@/lib/access.functions";
 import { PageHeader, Field, Input, Textarea, Button, Card } from "@/components/admin/ui";
 import { MediaPicker } from "@/components/admin/MediaPicker";
 import { Plus, Trash2, ChevronDown, ChevronUp, Loader2, Star } from "lucide-react";
