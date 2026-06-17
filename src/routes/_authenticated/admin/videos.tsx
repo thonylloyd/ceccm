@@ -162,6 +162,11 @@ function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
           <span className="font-medium text-sm text-navy-deep truncate">{local.title || "(Untitled)"}</span>
           {!local.is_published && <span className="text-[10px] uppercase text-charcoal/40">Draft</span>}
         </button>
+        {local.slug && local.is_published && (
+          <a href={`/videos/${local.slug}`} target="_blank" rel="noreferrer" title="View on site" className="px-2 py-1 text-charcoal/60 hover:text-navy-deep">
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
         <Button variant="ghost" onClick={onDelete}><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button>
       </div>
       {expanded && (
