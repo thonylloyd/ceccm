@@ -222,8 +222,14 @@ function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
                 </select>
               </Field>
               {(local.access_mode === "password" || local.access_mode === "password_paid") && (
-                <Field label="Password (blank = keep)">
-                  <Input type="text" value={local._new_password ?? ""} onChange={(e) => set("_new_password", e.target.value)} placeholder="set or update" />
+                <Field label={local.access_password_hash ? "Password (✓ set — type to replace)" : "Password"}>
+                  <Input
+                    type="text"
+                    value={local._new_password ?? (local.access_password_hash ? "••••••••" : "")}
+                    onFocus={(e) => { if (local.access_password_hash && local._new_password == null) { set("_new_password", ""); e.target.value = ""; } }}
+                    onChange={(e) => set("_new_password", e.target.value)}
+                    placeholder={local.access_password_hash ? "Leave blank to keep existing" : "Set a password"}
+                  />
                 </Field>
               )}
               {(local.access_mode === "paid" || local.access_mode === "password_paid") && (
