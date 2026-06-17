@@ -55,7 +55,15 @@ function ResetPasswordPage() {
         <h1 className="font-display text-3xl text-white mb-2 text-center">Set a new password</h1>
         <p className="text-white/60 text-sm mb-8 text-center">Choose a strong password you'll remember.</p>
 
-        {!ready ? (
+        {hashError ? (
+          <div className="text-center space-y-4">
+            <p className="text-white/80 text-sm">{hashError}</p>
+            <p className="text-white/60 text-xs">Reset links expire after a short period. Request a new one to continue.</p>
+            <Link to="/auth" className="inline-block bg-gold text-navy-deep px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] hover:bg-gold/90">
+              Request a new reset link
+            </Link>
+          </div>
+        ) : !ready ? (
           <div className="text-center text-white/70 text-sm">
             Open this page using the link in your password reset email.
           </div>
