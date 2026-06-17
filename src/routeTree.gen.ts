@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
+import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
@@ -32,6 +33,11 @@ import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authentic
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
   path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramsRoute = ProgramsRouteImport.update({
+  id: '/programs',
+  path: '/programs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LiveRoute = LiveRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/live': typeof LiveRoute
+  '/programs': typeof ProgramsRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/live': typeof LiveRoute
+  '/programs': typeof ProgramsRoute
   '/videos': typeof VideosRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/live': typeof LiveRoute
+  '/programs': typeof ProgramsRoute
   '/videos': typeof VideosRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/videos/$slug': typeof VideosSlugRoute
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/live'
+    | '/programs'
     | '/videos'
     | '/admin'
     | '/videos/$slug'
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/live'
+    | '/programs'
     | '/videos'
     | '/videos/$slug'
     | '/admin/about'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/live'
+    | '/programs'
     | '/videos'
     | '/_authenticated/admin'
     | '/videos/$slug'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   LiveRoute: typeof LiveRoute
+  ProgramsRoute: typeof ProgramsRoute
   VideosRoute: typeof VideosRouteWithChildren
 }
 
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       path: '/videos'
       fullPath: '/videos'
       preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programs': {
+      id: '/programs'
+      path: '/programs'
+      fullPath: '/programs'
+      preLoaderRoute: typeof ProgramsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live': {
@@ -464,6 +484,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   LiveRoute: LiveRoute,
+  ProgramsRoute: ProgramsRoute,
   VideosRoute: VideosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
