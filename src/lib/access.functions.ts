@@ -100,7 +100,7 @@ export const unlockVideoWithPassword = createServerFn({ method: "POST" })
     slug: z.string().min(1).parse(d.slug),
     password: z.string().min(1).max(200).parse(d.password),
   }))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: v } = await supabaseAdmin
       .from("videos").select("id, access_password_hash, access_mode").eq("slug", data.slug).maybeSingle();
@@ -110,9 +110,7 @@ export const unlockVideoWithPassword = createServerFn({ method: "POST" })
     const hash = await sha256(data.password);
     const stored = (v as any).access_password_hash ?? "";
     if (!stored || !safeEqual(hash, stored)) throw new Error("Incorrect password");
-    await supabaseAdmin.from("video_unlocks").upsert({
-      user_id: context.userId, video_id: (v as any).id, method: "password",
-    });
+    // Session-scoped: do not persist. Client tracks in sessionStorage.
     return { ok: true };
   });
 
@@ -138,7 +136,7 @@ export const unlockBroadcastWithPassword = createServerFn({ method: "POST" })
     id: z.string().uuid().parse(d.id),
     password: z.string().min(1).max(200).parse(d.password),
   }))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: b } = await supabaseAdmin
       .from("broadcasts").select("id, access_password_hash, access_mode").eq("id", data.id).maybeSingle();
@@ -148,9 +146,7 @@ export const unlockBroadcastWithPassword = createServerFn({ method: "POST" })
     const hash = await sha256(data.password);
     const stored = (b as any).access_password_hash ?? "";
     if (!stored || !safeEqual(hash, stored)) throw new Error("Incorrect password");
-    await supabaseAdmin.from("broadcast_unlocks").upsert({
-      user_id: context.userId, broadcast_id: (b as any).id, method: "password",
-    });
+    // Session-scoped: do not persist. Client tracks in sessionStorage.
     return { ok: true };
   });
 
