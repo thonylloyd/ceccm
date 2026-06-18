@@ -9,7 +9,7 @@ export function PraiseReports({ reports, title = "Praise Reports", intro }: { re
 
   useEffect(() => {
     if (reports.length <= 1 || paused) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % reports.length), 15000);
+    const t = setInterval(() => setIdx((i) => (i + 1) % reports.length), 10000);
     return () => clearInterval(t);
   }, [reports.length, paused]);
 
@@ -38,33 +38,29 @@ export function PraiseReports({ reports, title = "Praise Reports", intro }: { re
         >
           <article
             key={r.id}
-            className="relative bg-white rounded-2xl p-8 sm:p-12 lg:p-14 shadow-elegant border border-black/[0.04] overflow-hidden min-h-[280px] sm:min-h-[260px] flex flex-col justify-between"
+            className="relative bg-white rounded-2xl p-8 sm:p-12 lg:p-14 shadow-elegant hover:shadow-2xl transition-shadow duration-500 border border-black/[0.04] overflow-hidden min-h-[280px] sm:min-h-[260px] flex flex-col justify-between text-center"
           >
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-gold via-gold-soft to-gold" />
-            <div className="absolute top-6 right-6 sm:top-8 sm:right-10 opacity-90">
-              <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-br from-gold to-gold-soft flex items-center justify-center shadow-gold">
+
+            <div className="flex flex-col items-center">
+              <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-br from-gold to-gold-soft flex items-center justify-center shadow-gold mb-5">
                 <Quote className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
               </div>
-            </div>
-
-            <div>
-              <div className="flex gap-0.5 mb-5 text-gold">
+              <div className="flex gap-0.5 mb-5 text-gold justify-center">
                 {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-gold" />)}
               </div>
-              <p className="text-charcoal/85 leading-relaxed italic text-lg sm:text-xl lg:text-2xl pr-20 sm:pr-24 max-w-3xl">
+              <p className="text-charcoal/85 leading-relaxed italic text-lg sm:text-xl lg:text-2xl max-w-3xl mx-auto">
                 "{r.quote}"
               </p>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gold/15 flex items-center gap-4">
+            <div className="mt-8 pt-6 border-t border-gold/15 flex flex-col items-center gap-2">
               <div className="h-12 w-12 rounded-full bg-navy-deep text-white font-display flex items-center justify-center text-base">
                 {(r.author || "?").charAt(0).toUpperCase()}
               </div>
-              <div className="flex-1 min-w-0">
-                {r.author && <div className="font-semibold text-navy-deep">{r.author}</div>}
-                {r.role && <div className="text-xs text-charcoal/55 mt-0.5">{r.role}</div>}
-              </div>
-              <div className="text-xs text-charcoal/45 tabular-nums">{idx + 1} / {reports.length}</div>
+              {r.author && <div className="font-semibold text-navy-deep">{r.author}</div>}
+              {r.role && <div className="text-xs text-charcoal/55">{r.role}</div>}
+              <div className="text-xs text-charcoal/45 tabular-nums mt-1">{idx + 1} / {reports.length}</div>
             </div>
           </article>
 

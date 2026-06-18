@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { ChevronRight, MapPin, Calendar as CalIcon } from "lucide-react";
 import programFallback from "@/assets/program-summit.jpg";
 
@@ -22,7 +22,7 @@ function ProgramCard({ p }: { p: Program }) {
   const status = isPast ? "Past" : "Upcoming";
 
   return (
-    <article className="group bg-white rounded-xl overflow-hidden flex flex-col h-full shadow-card hover:shadow-elegant hover:-translate-y-1 transition-all duration-500 border border-black/[0.04]">
+    <article className="group bg-white rounded-xl overflow-hidden flex flex-col h-full shadow-card hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 border border-black/[0.04]">
       <div className="relative aspect-[16/10] bg-navy-deep overflow-hidden">
         <img src={p.image_url || programFallback} alt={p.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/60 to-transparent opacity-60" />
