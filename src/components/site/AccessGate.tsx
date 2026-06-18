@@ -38,8 +38,8 @@ export function AccessGate({ kind, contentKey: keyId, accessMode, price, thumbna
 
   const unlockedQuery =
     kind === "video"
-      ? videoUnlockedQuery(keyId, needsAuth && needsPaymentMode)
-      : broadcastUnlockedQuery(keyId, needsAuth && needsPaymentMode);
+      ? videoUnlockedQuery(keyId, needsAuth)
+      : broadcastUnlockedQuery(keyId, needsAuth);
   const q = useQuery(unlockedQuery);
 
   const [pwUnlocked, setPwUnlocked] = useState<boolean>(() => readSessionUnlock(kind, keyId));
