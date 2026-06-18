@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { Lock, KeyRound, Coins, Loader2 } from "lucide-react";
+import { Lock, KeyRound, Loader2 } from "lucide-react";
+import espeesCoin from "@/assets/espees-coin.png.asset.json";
 import { toast } from "sonner";
 import {
   unlockVideoWithPassword, purchaseVideoWithEspees,
@@ -136,7 +137,7 @@ function PurchaseButton({ kind, keyId, price, onPurchased }: { kind: "video" | "
   });
   return (
     <button onClick={() => m.mutate()} disabled={m.isPending} className="w-full inline-flex items-center justify-center gap-2 bg-white text-navy-deep px-4 py-3 text-xs font-bold uppercase tracking-[0.18em] hover:bg-white/90 disabled:opacity-50">
-      {m.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><Coins className="h-3.5 w-3.5" /> Pay {price ? `${price} ESPEES` : "with ESPEES"}</>}
+      {m.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><img src={espeesCoin.url} alt="" className="h-5 w-5" /> Pay {price ? `${price} ESPEES` : "with ESPEES"}</>}
     </button>
   );
 }
