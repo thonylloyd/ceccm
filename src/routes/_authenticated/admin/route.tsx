@@ -5,7 +5,7 @@ import { getIsAdmin, bootstrapAdminIfNone } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Home, Info, Calendar, Mail, Menu as MenuIcon,
-  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio,
+  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio, Heart,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -25,6 +25,7 @@ const NAV: NavLink[] = [
   { to: "/admin/media", label: "Media Library", icon: ImageIcon },
   { to: "/admin/videos", label: "Videos", icon: Video },
   { to: "/admin/users", label: "Users", icon: Users },
+  { to: "/admin/salvation-leads", label: "Salvation Leads", icon: Heart },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
