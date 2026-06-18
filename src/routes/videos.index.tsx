@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, Play, Clock, User, ExternalLink } from "lucide-react";
+import { Search, Play, Clock, User, ExternalLink, Lock } from "lucide-react";
 import { videoLibraryQuery } from "@/lib/videos.functions";
 import { siteChromeQuery } from "@/lib/cms.functions";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import espeesCoin from "@/assets/espees-coin.png.asset.json";
 
 export const Route = createFileRoute("/videos/")({
   loader: async ({ context }) => {
@@ -189,10 +190,21 @@ function VideoCard({ v, cats }: { v: any; cats: any[] }) {
           <span className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-1 rounded">{v.duration}</span>
         )}
         {v.access_mode && v.access_mode !== "free" && (
-          <span className="absolute top-2 left-2 bg-gold text-navy-deep text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
-            {v.access_mode === "password" ? "🔒 Password"
-              : v.access_mode === "paid" ? `★ ${v.price_espees ?? ""} ESPEES`
-              : `🔒★ Password + ${v.price_espees ?? ""} ESPEES`}
+          <span
+            className="absolute top-2 left-2 bg-gold text-navy-deep px-2 py-1 rounded inline-flex items-center gap-1"
+            title={
+              v.access_mode === "password" ? "Password protected"
+                : v.access_mode === "paid" ? `Premium${v.price_espees ? ` · ${v.price_espees} ESPEES` : ""}`
+                : `Password + Premium${v.price_espees ? ` · ${v.price_espees} ESPEES` : ""}`
+            }
+            aria-label={v.access_mode}
+          >
+            {(v.access_mode === "password" || v.access_mode === "password_paid") && (
+              <Lock className="h-3 w-3" />
+            )}
+            {(v.access_mode === "paid" || v.access_mode === "password_paid") && (
+              <img src={espeesCoin.url} alt="ESPEES" className="h-4 w-4" />
+            )}
           </span>
         )}
       </div>
