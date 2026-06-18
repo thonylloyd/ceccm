@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { ChevronRight, MapPin, Calendar as CalIcon } from "lucide-react";
 import programFallback from "@/assets/program-summit.jpg";
 
@@ -22,7 +22,7 @@ function ProgramCard({ p }: { p: Program }) {
   const status = isPast ? "Past" : "Upcoming";
 
   return (
-    <article className="group bg-white rounded-xl overflow-hidden flex flex-col h-full shadow-card hover:shadow-elegant hover:-translate-y-1 transition-all duration-500 border border-black/[0.04]">
+    <article className="group bg-white rounded-xl overflow-hidden flex flex-col h-full shadow-card hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 border border-black/[0.04]">
       <div className="relative aspect-[16/10] bg-navy-deep overflow-hidden">
         <img src={p.image_url || programFallback} alt={p.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/60 to-transparent opacity-60" />
@@ -57,46 +57,13 @@ function ProgramCard({ p }: { p: Program }) {
 
 export function ProgramsSection({ programs, intro }: { programs: Program[]; intro?: string }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
-  const dragState = useRef<{ startX: number; startScroll: number; pid: number } | null>(null);
 
-  const loop = programs.length > 2 ? [...programs, ...programs] : programs;
-
-  useEffect(() => {
-    if (!programs.length) return;
+  const skip = (dir: 1 | -1) => {
     const el = scrollerRef.current;
     if (!el) return;
-    let raf: number;
-    const tick = () => {
-      if (!paused && el && !dragState.current) {
-        el.scrollLeft += 0.6;
-        if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [paused, programs.length]);
-
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    el.setPointerCapture(e.pointerId);
-    dragState.current = { startX: e.clientX, startScroll: el.scrollLeft, pid: e.pointerId };
-    setPaused(true);
-  };
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const el = scrollerRef.current;
-    if (!el || !dragState.current) return;
-    el.scrollLeft = dragState.current.startScroll - (e.clientX - dragState.current.startX);
-  };
-  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
-    const el = scrollerRef.current;
-    if (el && dragState.current && el.hasPointerCapture(dragState.current.pid)) {
-      el.releasePointerCapture(dragState.current.pid);
-    }
-    dragState.current = null;
-    setPaused(false);
+    const card = el.querySelector<HTMLDivElement>("[data-pcard]");
+    const step = card ? card.offsetWidth + 24 : el.clientWidth * 0.9;
+    el.scrollBy({ left: step * dir, behavior: "smooth" });
   };
 
   if (!programs.length) return null;
@@ -111,26 +78,29 @@ export function ProgramsSection({ programs, intro }: { programs: Program[]; intr
             </h2>
             {intro && <p className="text-sm text-charcoal/70 mt-1">{intro}</p>}
           </div>
-          <a href="/programs" className="text-sm font-semibold text-navy-deep hover:text-gold inline-flex items-center gap-1">
-            View All Programs <ChevronRight className="h-4 w-4" />
-          </a>
+          <div className="flex items-center gap-2">
+            <button onClick={() => skip(-1)} aria-label="Previous program" className="h-10 w-10 rounded-full bg-white border border-black/10 shadow-card flex items-center justify-center text-navy-deep hover:bg-navy-deep hover:text-white hover:border-navy-deep transition">
+              <ChevronRight className="h-5 w-5 rotate-180" />
+            </button>
+            <button onClick={() => skip(1)} aria-label="Next program" className="h-10 w-10 rounded-full bg-white border border-black/10 shadow-card flex items-center justify-center text-navy-deep hover:bg-navy-deep hover:text-white hover:border-navy-deep transition">
+              <ChevronRight className="h-5 w-5" />
+            </button>
+            <a href="/programs" className="ml-3 text-sm font-semibold text-navy-deep hover:text-gold inline-flex items-center gap-1">
+              View All <ChevronRight className="h-4 w-4" />
+            </a>
+          </div>
         </div>
 
         <div
           ref={scrollerRef}
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-          className="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar cursor-grab active:cursor-grabbing select-none touch-pan-y"
+          className="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory"
           style={{ scrollbarWidth: "none" }}
         >
-          {loop.map((p, i) => (
+          {programs.map((p) => (
             <div
-              key={`${p.id}-${i}`}
-              className="shrink-0 w-[calc(100%-1rem)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+              key={p.id}
+              data-pcard
+              className="shrink-0 snap-start w-[calc(100%-1rem)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
             >
               <ProgramCard p={p} />
             </div>
@@ -141,4 +111,3 @@ export function ProgramsSection({ programs, intro }: { programs: Program[]; intr
     </section>
   );
 }
-

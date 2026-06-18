@@ -1,5 +1,5 @@
 import logo from "@/assets/logo-ccm.png.asset.json";
-import kcLogo from "@/assets/kc-logo-outline.png.asset.json";
+import kcLogo from "@/assets/kingschat-icon.png.asset.json";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 export function SiteFooter({
@@ -79,14 +79,14 @@ export function SiteFooter({
                 <Phone className="h-4 w-4" />
               </a>
             )}
-            {social.website && (
-              <a href={social.website} aria-label="KingsChat" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-white/8 hover:bg-gold border border-white/10 hover:border-gold flex items-center justify-center transition-all hover:-translate-y-0.5 p-2">
-                <img src={kcLogo.url} alt="" className="h-full w-full object-contain invert" />
-              </a>
-            )}
             {(social.email || contact.email) && (
               <a href={social.email || `mailto:${contact.email}`} aria-label="Email" className="h-10 w-10 rounded-full bg-white/8 hover:bg-gold border border-white/10 hover:border-gold flex items-center justify-center transition-all hover:-translate-y-0.5">
                 <Mail className="h-4 w-4" />
+              </a>
+            )}
+            {social.website && (
+              <a href={social.website} aria-label="KingsChat" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full overflow-hidden border border-white/10 hover:border-gold flex items-center justify-center transition-all hover:-translate-y-0.5">
+                <img src={kcLogo.url} alt="" className="h-full w-full object-cover" />
               </a>
             )}
           </div>

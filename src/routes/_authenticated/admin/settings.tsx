@@ -123,6 +123,23 @@ function SettingsAdmin() {
           <Field label="Programs Section Intro"><Input value={v.programs_intro ?? ""} onChange={(e) => set({ ...v, programs_intro: e.target.value })} /></Field>
         </>
       )} />
+
+      <SettingCard skey="salvation" title="Receive Salvation Popup" render={(v, set) => (
+        <>
+          <Field label="Video URL" hint="YouTube, Vimeo, or direct video URL shown at top of the popup">
+            <Input value={v.video_url ?? ""} onChange={(e) => set({ ...v, video_url: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
+          </Field>
+          <div className="rounded-md bg-light p-3 text-xs text-charcoal/70 leading-relaxed">
+            <div className="font-semibold text-navy-deep mb-1">Open the popup anywhere</div>
+            Append <code className="px-1.5 py-0.5 rounded bg-white border border-black/10 font-mono">?salvation=1</code> to any URL.
+            Examples: <code className="font-mono">/?salvation=1</code>, <code className="font-mono">/about?salvation=1</code>.
+            Use this on any button (<code className="font-mono">&lt;a href="/?salvation=1"&gt;</code>) to open the modal.
+          </div>
+          <Field label="View Submitted Leads">
+            <a href="/admin/salvation-leads" className="inline-flex items-center text-sm text-navy-deep hover:text-gold font-semibold">Open Leads &rarr;</a>
+          </Field>
+        </>
+      )} />
     </div>
   );
 }
