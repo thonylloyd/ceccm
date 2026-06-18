@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
@@ -24,24 +24,41 @@ type GateProps = {
   children: React.ReactNode;
 };
 
+const sessionKey = (kind: string, key: string) => `pw-unlock:${kind}:${key}`;
+function readSessionUnlock(kind: string, key: string): boolean {
+  if (typeof window === "undefined") return false;
+  try { return window.sessionStorage.getItem(sessionKey(kind, key)) === "1"; } catch { return false; }
+}
+
 export function AccessGate({ kind, contentKey: keyId, accessMode, price, thumbnail, title, children }: GateProps) {
   const qc = useQueryClient();
   const needsAuth = accessMode !== "free";
+  const needsPasswordMode = accessMode === "password" || accessMode === "password_paid";
+  const needsPaymentMode = accessMode === "paid" || accessMode === "password_paid";
+
   const unlockedQuery =
     kind === "video"
-      ? videoUnlockedQuery(keyId, needsAuth)
-      : broadcastUnlockedQuery(keyId, needsAuth);
+      ? videoUnlockedQuery(keyId, needsAuth && needsPaymentMode)
+      : broadcastUnlockedQuery(keyId, needsAuth && needsPaymentMode);
   const q = useQuery(unlockedQuery);
 
+  const [pwUnlocked, setPwUnlocked] = useState<boolean>(() => readSessionUnlock(kind, keyId));
+  useEffect(() => { setPwUnlocked(readSessionUnlock(kind, keyId)); }, [kind, keyId]);
+  const markPwUnlocked = useCallback(() => {
+    try { window.sessionStorage.setItem(sessionKey(kind, keyId), "1"); } catch {}
+    setPwUnlocked(true);
+  }, [kind, keyId]);
+
   if (!needsAuth) return <>{children}</>;
-  if (q.isLoading) {
+
+  if (needsPaymentMode && q.isLoading) {
     return (
       <div className="aspect-video bg-black flex items-center justify-center text-white/60">
         <Loader2 className="h-6 w-6 animate-spin" />
       </div>
     );
   }
-  if ((q.data as any)?.unauthed) {
+  if (needsPaymentMode && (q.data as any)?.unauthed) {
     return (
       <LockedShell thumbnail={thumbnail} title={title} accessMode={accessMode} price={price}>
         <p className="text-white/75 text-sm mb-4">Sign in to unlock this content.</p>
@@ -51,24 +68,23 @@ export function AccessGate({ kind, contentKey: keyId, accessMode, price, thumbna
       </LockedShell>
     );
   }
-  if (q.data?.unlocked) return <>{children}</>;
 
-  const methods = (q.data as any)?.methods ?? [];
-  const needsPassword = (accessMode === "password" || accessMode === "password_paid") && !methods.includes("password");
-  const needsPayment = (accessMode === "paid" || accessMode === "password_paid") && !methods.includes("espees");
+  const paidSatisfied = !needsPaymentMode || ((q.data as any)?.methods ?? []).includes("espees");
+  const pwSatisfied = !needsPasswordMode || pwUnlocked;
+  if (paidSatisfied && pwSatisfied) return <>{children}</>;
 
-  const invalidate = () => {
+  const invalidatePaid = () => {
     qc.invalidateQueries({ queryKey: kind === "video" ? ["video-unlocked", keyId] : ["broadcast-unlocked", keyId] });
   };
 
   return (
     <LockedShell thumbnail={thumbnail} title={title} accessMode={accessMode} price={price}>
       <div className="space-y-4 w-full max-w-sm">
-        {needsPassword && (
-          <PasswordForm kind={kind} keyId={keyId} onUnlocked={invalidate} />
+        {needsPasswordMode && !pwSatisfied && (
+          <PasswordForm kind={kind} keyId={keyId} onUnlocked={markPwUnlocked} />
         )}
-        {needsPayment && (
-          <PurchaseButton kind={kind} keyId={keyId} price={price} onPurchased={invalidate} />
+        {needsPaymentMode && !paidSatisfied && (
+          <PurchaseButton kind={kind} keyId={keyId} price={price} onPurchased={invalidatePaid} />
         )}
         {accessMode === "password_paid" && (
           <p className="text-[11px] uppercase tracking-[0.2em] text-white/60 text-center">
