@@ -27,7 +27,7 @@ function SalvationCard({
 }) {
   const navigate = useNavigate();
   const openSalvation = () =>
-    navigate({ search: (prev: any) => ({ ...prev, salvation: "1" }) as any });
+    navigate({ to: ".", search: (prev: any) => ({ ...prev, salvation: "1" }) as any });
 
   return (
     <button onClick={openSalvation} className="group block text-left w-full">
