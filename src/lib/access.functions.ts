@@ -136,7 +136,7 @@ export const unlockBroadcastWithPassword = createServerFn({ method: "POST" })
     id: z.string().uuid().parse(d.id),
     password: z.string().min(1).max(200).parse(d.password),
   }))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: b } = await supabaseAdmin
       .from("broadcasts").select("id, access_password_hash, access_mode").eq("id", data.id).maybeSingle();
@@ -146,9 +146,7 @@ export const unlockBroadcastWithPassword = createServerFn({ method: "POST" })
     const hash = await sha256(data.password);
     const stored = (b as any).access_password_hash ?? "";
     if (!stored || !safeEqual(hash, stored)) throw new Error("Incorrect password");
-    await supabaseAdmin.from("broadcast_unlocks").upsert({
-      user_id: context.userId, broadcast_id: (b as any).id, method: "password",
-    });
+    // Session-scoped: do not persist. Client tracks in sessionStorage.
     return { ok: true };
   });
 
