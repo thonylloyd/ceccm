@@ -51,14 +51,14 @@ export function AccessGate({ kind, contentKey: keyId, accessMode, price, thumbna
 
   if (!needsAuth) return <>{children}</>;
 
-  if (needsPaymentMode && q.isLoading) {
+  if (q.isLoading) {
     return (
       <div className="aspect-video bg-black flex items-center justify-center text-white/60">
         <Loader2 className="h-6 w-6 animate-spin" />
       </div>
     );
   }
-  if (needsPaymentMode && (q.data as any)?.unauthed) {
+  if ((q.data as any)?.unauthed) {
     return (
       <LockedShell thumbnail={thumbnail} title={title} accessMode={accessMode} price={price}>
         <p className="text-white/75 text-sm mb-4">Sign in to unlock this content.</p>
