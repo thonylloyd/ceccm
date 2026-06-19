@@ -140,6 +140,31 @@ function SettingsAdmin() {
           </Field>
         </>
       )} />
+
+      <SettingCard skey="partner" title="Partner With Us Popup" render={(v, set) => (
+        <>
+          <Field label="Intro Message" hint="Shown at the top of the partner popup">
+            <Textarea rows={3} value={v.intro ?? ""} onChange={(e) => set({ ...v, intro: e.target.value })} placeholder="Join us in making the divine mandate a reality across the nations. Partner with us today." />
+          </Field>
+          <Field label="Espees Merchant Code">
+            <Input value={v.espees_merchant ?? ""} onChange={(e) => set({ ...v, espees_merchant: e.target.value })} placeholder="CECCM" />
+          </Field>
+          <Field label="Bank Account Name">
+            <Input value={v.bank_account_name ?? ""} onChange={(e) => set({ ...v, bank_account_name: e.target.value })} placeholder="CE CCM" />
+          </Field>
+          <Field label="Bank Account Number">
+            <Input value={v.bank_account_number ?? ""} onChange={(e) => set({ ...v, bank_account_number: e.target.value })} placeholder="012345678" />
+          </Field>
+          <Field label="Bank Name">
+            <Input value={v.bank_name ?? ""} onChange={(e) => set({ ...v, bank_name: e.target.value })} placeholder="Parallex" />
+          </Field>
+          <div className="rounded-md bg-light p-3 text-xs text-charcoal/70 leading-relaxed">
+            <div className="font-semibold text-navy-deep mb-1">Open the popup anywhere</div>
+            Append <code className="px-1.5 py-0.5 rounded bg-white border border-black/10 font-mono">?partner=1</code> to any URL.
+            Examples: <code className="font-mono">/?partner=1</code>, <code className="font-mono">/about?partner=1</code>.
+          </div>
+        </>
+      )} />
     </div>
   );
 }

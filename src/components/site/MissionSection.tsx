@@ -42,10 +42,11 @@ export function MissionSection({
             {cards.map((c, i) => (
               <article
                 key={c.id}
-                className="group relative bg-white rounded-xl border border-black/5 px-7 py-10 text-center hover:shadow-elegant hover:-translate-y-1 transition-all duration-500 overflow-hidden"
+                className="group relative bg-white rounded-xl border border-black/5 px-7 pt-11 pb-10 text-center shadow-[0_10px_30px_-12px_rgba(4,30,74,0.18)] hover:shadow-[0_22px_45px_-15px_rgba(184,138,27,0.38)] hover:-translate-y-1 transition-all duration-500 overflow-hidden"
                 style={{ animationDelay: `${i * 100}ms` }}
               >
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-gold-soft via-gold to-gold-soft" />
+                <div className="absolute inset-x-0 top-1.5 h-px bg-gold/30" />
                 <div className="relative mx-auto h-14 w-14 mb-6">
                   <div className="absolute inset-0 rounded-full bg-gold/10 group-hover:bg-gold/20 transition-colors" />
                   <div className="absolute inset-0 rounded-full border border-gold/30 group-hover:border-gold/60 transition-colors" />
