@@ -1,7 +1,13 @@
-import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, Handshake } from "lucide-react";
+
+
 
 export function EquipCTA() {
+  const navigate = useNavigate();
+  const openPartner = () =>
+    navigate({ to: ".", search: (prev: any) => ({ ...prev, partner: "1" }) as any });
+
   return (
     <section className="relative overflow-hidden bg-navy-deep text-white py-24 lg:py-32">
       {/* layered backdrop */}
@@ -38,6 +44,14 @@ export function EquipCTA() {
             <ArrowRight className="relative z-10 h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
             <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
           </Link>
+          <button
+            type="button"
+            onClick={openPartner}
+            className="group inline-flex items-center gap-2 px-9 py-4 text-[12px] font-bold uppercase tracking-[0.22em] text-navy-deep bg-white hover:bg-gold hover:text-navy-deep rounded-sm transition-all"
+          >
+            <Handshake className="h-3.5 w-3.5" />
+            Partner With Us
+          </button>
           <Link
             to="/contact"
             className="inline-flex items-center gap-2 px-9 py-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white border-2 border-white/30 hover:border-gold hover:text-gold rounded-sm transition-all"

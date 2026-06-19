@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { SalvationModal } from "@/components/site/SalvationModal";
+import { PartnerModal } from "@/components/site/PartnerModal";
 
 function NotFoundComponent() {
   return (
@@ -127,6 +128,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <SalvationModal />
+      <PartnerModal />
       <Toaster position="top-right" richColors />
     </QueryClientProvider>
   );
