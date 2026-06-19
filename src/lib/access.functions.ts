@@ -124,9 +124,13 @@ export const purchaseVideoWithEspees = createServerFn({ method: "POST" })
     if (!v) throw new Error("Video not found");
     const mode = ((v as any).access_mode ?? "free") as AccessMode;
     if (mode !== "paid" && mode !== "password_paid") throw new Error("Not for sale");
-    await supabaseAdmin.from("video_unlocks").upsert({
-      user_id: context.userId, video_id: (v as any).id, method: "espees",
-    });
+    const { error } = await supabaseAdmin
+      .from("video_unlocks")
+      .upsert(
+        { user_id: context.userId, video_id: (v as any).id, method: "espees" },
+        { onConflict: "user_id,video_id,method" },
+      );
+    if (error) throw new Error(error.message);
     return { ok: true };
   });
 
@@ -160,9 +164,13 @@ export const purchaseBroadcastWithEspees = createServerFn({ method: "POST" })
     if (!b) throw new Error("Broadcast not found");
     const mode = ((b as any).access_mode ?? "free") as AccessMode;
     if (mode !== "paid" && mode !== "password_paid") throw new Error("Not for sale");
-    await supabaseAdmin.from("broadcast_unlocks").upsert({
-      user_id: context.userId, broadcast_id: (b as any).id, method: "espees",
-    });
+    const { error } = await supabaseAdmin
+      .from("broadcast_unlocks")
+      .upsert(
+        { user_id: context.userId, broadcast_id: (b as any).id, method: "espees" },
+        { onConflict: "user_id,broadcast_id,method" },
+      );
+    if (error) throw new Error(error.message);
     return { ok: true };
   });
 

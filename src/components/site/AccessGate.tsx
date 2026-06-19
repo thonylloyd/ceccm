@@ -73,8 +73,14 @@ export function AccessGate({ kind, contentKey: keyId, accessMode, price, thumbna
   const pwSatisfied = !needsPasswordMode || pwUnlocked;
   if (paidSatisfied && pwSatisfied) return <>{children}</>;
 
-  const invalidatePaid = () => {
-    qc.invalidateQueries({ queryKey: kind === "video" ? ["video-unlocked", keyId] : ["broadcast-unlocked", keyId] });
+  const queryKey = kind === "video" ? ["video-unlocked", keyId] : ["broadcast-unlocked", keyId];
+  const onPurchased = () => {
+    // Optimistically mark unlocked so the player renders immediately
+    qc.setQueryData(queryKey, (prev: any) => {
+      const methods = Array.from(new Set([...(prev?.methods ?? []), "espees"]));
+      return { ...(prev ?? {}), unlocked: true, methods, unauthed: false };
+    });
+    qc.invalidateQueries({ queryKey });
   };
 
   return (
@@ -84,7 +90,7 @@ export function AccessGate({ kind, contentKey: keyId, accessMode, price, thumbna
           <PasswordForm kind={kind} keyId={keyId} onUnlocked={markPwUnlocked} />
         )}
         {needsPaymentMode && !paidSatisfied && (
-          <PurchaseButton kind={kind} keyId={keyId} price={price} onPurchased={invalidatePaid} />
+          <PurchaseButton kind={kind} keyId={keyId} price={price} onPurchased={onPurchased} />
         )}
         {accessMode === "password_paid" && (
           <p className="text-[11px] uppercase tracking-[0.2em] text-white/60 text-center">
