@@ -86,11 +86,11 @@ export const kingschatLogin = createServerFn({ method: "POST" })
       userId = created.user!.id;
     }
 
-    // 4. Upsert profile (display name + avatar)
+    // 4. Upsert profile (display name + avatar + kingschat username)
     await supabaseAdmin
       .from("profiles")
       .upsert(
-        { id: userId, email, display_name: displayName, avatar_url: avatarUrl },
+        { id: userId, email, display_name: displayName, avatar_url: avatarUrl, kingschat_username: username } as any,
         { onConflict: "id" },
       );
 
