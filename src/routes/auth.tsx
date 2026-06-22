@@ -6,7 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import logo from "@/assets/logo-ccm.png.asset.json";
+import kcIcon from "@/assets/kingschat-icon.png.asset.json";
 import hero from "@/assets/hero-cathedral.jpg";
+import { KINGSCHAT_AUTH_URL, KINGSCHAT_CLIENT_ID } from "@/lib/kingschat.functions";
+
+function startKingsChat() {
+  const redirectUri = `${window.location.origin}/auth/kingschat-callback`;
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: KINGSCHAT_CLIENT_ID,
+    redirect_uri: redirectUri,
+    scopes: "send_chat_message",
+  });
+  window.location.href = `${KINGSCHAT_AUTH_URL}?${params.toString()}`;
+}
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -148,6 +161,24 @@ function AuthPage() {
                 : "Send reset link"}
             </Button>
           </form>
+
+          {mode !== "forgot" && (
+            <>
+              <div className="my-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] text-white/40">
+                <span className="h-px flex-1 bg-white/10" />
+                or
+                <span className="h-px flex-1 bg-white/10" />
+              </div>
+              <button
+                type="button"
+                onClick={startKingsChat}
+                className="w-full h-12 flex items-center justify-center gap-3 rounded-md bg-white text-navy-deep font-semibold uppercase tracking-[0.18em] text-xs hover:bg-white/90 transition-colors"
+              >
+                <img src={kcIcon.url} alt="" className="h-5 w-5 object-contain" />
+                Continue with KingsChat
+              </button>
+            </>
+          )}
 
           <div className="mt-6 text-center text-sm text-white/60 space-y-2">
             {mode === "signin" && (
