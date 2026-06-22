@@ -92,9 +92,13 @@ function ProfilePage() {
     }
   }
 
+  const { data: chrome } = useSuspenseQuery(siteChromeQuery());
+  const nav = chrome.nav ?? [];
+  const brand = chrome.settings.brand ?? { name: "CCM" };
+
   return (
     <div className="min-h-screen flex flex-col bg-light">
-      <SiteHeader />
+      <SiteHeader nav={nav} brandName={brand.name ?? "CCM"} livestream={chrome.settings.livestream ?? {}} logoUrl={brand.logo_url} />
       <main className="flex-1 py-16">
         <div className="max-w-3xl mx-auto px-6">
           <div className="mb-10">
