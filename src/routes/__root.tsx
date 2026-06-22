@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { SalvationModal } from "@/components/site/SalvationModal";
 import { PartnerModal } from "@/components/site/PartnerModal";
+import { ProfileCompletionModal } from "@/components/site/ProfileCompletionModal";
 
 function NotFoundComponent() {
   return (
@@ -129,6 +130,7 @@ function RootComponent() {
       <Outlet />
       <SalvationModal />
       <PartnerModal />
+      <ProfileCompletionModal />
       <Toaster position="top-right" richColors />
     </QueryClientProvider>
   );

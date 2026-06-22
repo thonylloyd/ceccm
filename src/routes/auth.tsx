@@ -12,11 +12,12 @@ import { KINGSCHAT_AUTH_URL, KINGSCHAT_CLIENT_ID } from "@/lib/kingschat.functio
 
 function startKingsChat() {
   const redirectUri = `${window.location.origin}/auth/kingschat-callback`;
+  // KingsChat expects `scopes` as a JSON-encoded array string.
   const params = new URLSearchParams({
     response_type: "code",
     client_id: KINGSCHAT_CLIENT_ID,
     redirect_uri: redirectUri,
-    scopes: "send_chat_message",
+    scopes: JSON.stringify(["send_chat_message"]),
   });
   window.location.href = `${KINGSCHAT_AUTH_URL}?${params.toString()}`;
 }
