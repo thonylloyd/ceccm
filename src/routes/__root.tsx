@@ -130,6 +130,7 @@ function RootComponent() {
       <Outlet />
       <SalvationModal />
       <PartnerModal />
+      <ProfileCompletionModal />
       <Toaster position="top-right" richColors />
     </QueryClientProvider>
   );
