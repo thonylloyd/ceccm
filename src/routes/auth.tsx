@@ -162,6 +162,24 @@ function AuthPage() {
             </Button>
           </form>
 
+          {mode !== "forgot" && (
+            <>
+              <div className="my-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] text-white/40">
+                <span className="h-px flex-1 bg-white/10" />
+                or
+                <span className="h-px flex-1 bg-white/10" />
+              </div>
+              <button
+                type="button"
+                onClick={startKingsChat}
+                className="w-full h-12 flex items-center justify-center gap-3 rounded-md bg-white text-navy-deep font-semibold uppercase tracking-[0.18em] text-xs hover:bg-white/90 transition-colors"
+              >
+                <img src={kcIcon.url} alt="" className="h-5 w-5 object-contain" />
+                Continue with KingsChat
+              </button>
+            </>
+          )}
+
           <div className="mt-6 text-center text-sm text-white/60 space-y-2">
             {mode === "signin" && (
               <div>New to CCM?{" "}
