@@ -20,7 +20,6 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as VideosSlugRouteImport } from './routes/videos.$slug'
-import { Route as AuthKingschatCallbackRouteImport } from './routes/auth.kingschat-callback'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
@@ -88,11 +87,6 @@ const VideosSlugRoute = VideosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => VideosRoute,
-} as any)
-const AuthKingschatCallbackRoute = AuthKingschatCallbackRouteImport.update({
-  id: '/kingschat-callback',
-  path: '/kingschat-callback',
-  getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
@@ -171,14 +165,13 @@ const AuthenticatedAdminAboutRoute = AuthenticatedAdminAboutRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/live': typeof LiveRoute
   '/programs': typeof ProgramsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
-  '/auth/kingschat-callback': typeof AuthKingschatCallbackRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/videos/': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
@@ -197,12 +190,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/live': typeof LiveRoute
   '/programs': typeof ProgramsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/auth/kingschat-callback': typeof AuthKingschatCallbackRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/videos': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
@@ -223,14 +215,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/live': typeof LiveRoute
   '/programs': typeof ProgramsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/videos': typeof VideosRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
-  '/auth/kingschat-callback': typeof AuthKingschatCallbackRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/videos/': typeof VideosIndexRoute
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
@@ -258,7 +249,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/videos'
     | '/admin'
-    | '/auth/kingschat-callback'
     | '/videos/$slug'
     | '/videos/'
     | '/admin/about'
@@ -282,7 +272,6 @@ export interface FileRouteTypes {
     | '/live'
     | '/programs'
     | '/reset-password'
-    | '/auth/kingschat-callback'
     | '/videos/$slug'
     | '/videos'
     | '/admin/about'
@@ -309,7 +298,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/videos'
     | '/_authenticated/admin'
-    | '/auth/kingschat-callback'
     | '/videos/$slug'
     | '/videos/'
     | '/_authenticated/admin/about'
@@ -330,7 +318,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AuthRoute: typeof AuthRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   LiveRoute: typeof LiveRoute
   ProgramsRoute: typeof ProgramsRoute
@@ -416,13 +404,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos/$slug'
       preLoaderRoute: typeof VideosSlugRouteImport
       parentRoute: typeof VideosRoute
-    }
-    '/auth/kingschat-callback': {
-      id: '/auth/kingschat-callback'
-      path: '/kingschat-callback'
-      fullPath: '/auth/kingschat-callback'
-      preLoaderRoute: typeof AuthKingschatCallbackRouteImport
-      parentRoute: typeof AuthRoute
     }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
@@ -566,16 +547,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface AuthRouteChildren {
-  AuthKingschatCallbackRoute: typeof AuthKingschatCallbackRoute
-}
-
-const AuthRouteChildren: AuthRouteChildren = {
-  AuthKingschatCallbackRoute: AuthKingschatCallbackRoute,
-}
-
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
-
 interface VideosRouteChildren {
   VideosSlugRoute: typeof VideosSlugRoute
   VideosIndexRoute: typeof VideosIndexRoute
@@ -593,7 +564,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  AuthRoute: AuthRouteWithChildren,
+  AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   LiveRoute: LiveRoute,
   ProgramsRoute: ProgramsRoute,

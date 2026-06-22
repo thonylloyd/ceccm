@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,19 +9,9 @@ import { toast } from "sonner";
 import logo from "@/assets/logo-ccm.png.asset.json";
 import kcIcon from "@/assets/kingschat-icon.png.asset.json";
 import hero from "@/assets/hero-cathedral.jpg";
-import { KINGSCHAT_AUTH_URL, KINGSCHAT_CLIENT_ID } from "@/lib/kingschat.functions";
-
-function startKingsChat() {
-  const redirectUri = `${window.location.origin}/auth/kingschat-callback`;
-  // KingsChat expects `scopes` as a JSON-encoded array string.
-  const params = new URLSearchParams({
-    response_type: "code",
-    client_id: KINGSCHAT_CLIENT_ID,
-    redirect_uri: redirectUri,
-    scopes: JSON.stringify(["send_chat_message"]),
-  });
-  window.location.href = `${KINGSCHAT_AUTH_URL}?${params.toString()}`;
-}
+import { KINGSCHAT_CLIENT_ID, kingschatLogin } from "@/lib/kingschat.functions";
+// @ts-expect-error - no types shipped
+import kingsChat from "kingschat-web-sdk";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
