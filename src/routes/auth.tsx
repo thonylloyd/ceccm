@@ -39,6 +39,30 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  const kcLoginFn = useServerFn(kingschatLogin);
+  const [kcLoading, setKcLoading] = useState(false);
+
+  async function startKingsChat() {
+    setKcLoading(true);
+    try {
+      const result: any = await (kingsChat as any).login({
+        clientId: KINGSCHAT_CLIENT_ID,
+        scopes: ["send_chat_message"],
+      });
+      const accessToken = result?.accessToken || result?.access_token;
+      if (!accessToken) throw new Error("KingsChat did not return an access token");
+      const { email, hashedToken } = await kcLoginFn({ data: { accessToken } });
+      const { error } = await supabase.auth.verifyOtp({ email, token_hash: hashedToken, type: "magiclink" });
+      if (error) throw error;
+      toast.success("Signed in with KingsChat");
+      navigate({ to: "/" });
+    } catch (e: any) {
+      toast.error(e?.message || "KingsChat sign-in failed");
+    } finally {
+      setKcLoading(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
