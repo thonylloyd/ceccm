@@ -474,27 +474,42 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          church: string | null
           created_at: string
+          designation: string | null
+          designation_other: string | null
           display_name: string | null
           email: string | null
           id: string
+          kingschat_username: string | null
           updated_at: string
+          zone: string | null
         }
         Insert: {
           avatar_url?: string | null
+          church?: string | null
           created_at?: string
+          designation?: string | null
+          designation_other?: string | null
           display_name?: string | null
           email?: string | null
           id: string
+          kingschat_username?: string | null
           updated_at?: string
+          zone?: string | null
         }
         Update: {
           avatar_url?: string | null
+          church?: string | null
           created_at?: string
+          designation?: string | null
+          designation_other?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
+          kingschat_username?: string | null
           updated_at?: string
+          zone?: string | null
         }
         Relationships: []
       }
