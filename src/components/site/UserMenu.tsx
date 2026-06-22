@@ -8,6 +8,7 @@ import { toast } from "sonner";
 export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -18,10 +19,15 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
   }, []);
 
   useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
+    if (!user) { setIsAdmin(false); setProfile(null); return; }
     supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
+    supabase.from("profiles").select("display_name, avatar_url").eq("id", user.id).maybeSingle()
+      .then(({ data }) => setProfile((data as any) ?? null));
   }, [user]);
+
+  const displayName = profile?.display_name || user?.email?.split("@")[0] || "";
+  const avatarUrl = profile?.avatar_url || null;
 
   async function signOut() {
     await supabase.auth.signOut();
