@@ -41,6 +41,16 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
       <div className="border-t border-black/5 pt-4 mt-2">
         {user ? (
           <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3 pb-2">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={displayName} className="h-9 w-9 rounded-full object-cover border border-black/10" />
+              ) : (
+                <div className="h-9 w-9 rounded-full bg-navy-deep text-white flex items-center justify-center text-xs font-semibold">
+                  {displayName.slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              <div className="text-sm font-semibold text-navy-deep truncate">{displayName}</div>
+            </div>
             <Link to="/auth" className="flex items-center gap-2 text-sm text-navy-deep font-semibold"><UserCircle className="h-4 w-4" /> Profile</Link>
             {isAdmin && <Link to="/admin" className="flex items-center gap-2 text-sm text-navy-deep font-semibold"><Shield className="h-4 w-4" /> Admin</Link>}
             <button onClick={signOut} className="flex items-center gap-2 text-sm text-navy-deep font-semibold text-left"><LogOut className="h-4 w-4" /> Sign Out</button>
@@ -57,17 +67,24 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
       <button
         onClick={() => setOpen((v) => !v)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="h-10 w-10 rounded-full border border-black/10 bg-white text-navy-deep flex items-center justify-center hover:bg-navy-deep hover:text-white transition-colors"
+        className="h-10 w-10 rounded-full border border-black/10 bg-white text-navy-deep flex items-center justify-center hover:bg-navy-deep hover:text-white transition-colors overflow-hidden"
         aria-label="Account"
       >
-        <UserIcon className="h-4 w-4" />
+        {user && avatarUrl ? (
+          <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
+        ) : user ? (
+          <span className="text-xs font-semibold">{displayName.slice(0, 1).toUpperCase()}</span>
+        ) : (
+          <UserIcon className="h-4 w-4" />
+        )}
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-black/10 shadow-elegant rounded-md py-2 z-50">
+        <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-black/10 shadow-elegant rounded-md py-2 z-50">
           {user ? (
             <>
-              <div className="px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-charcoal/50 truncate border-b border-black/5">
-                {user.email}
+              <div className="px-4 py-2 border-b border-black/5">
+                <div className="text-sm font-semibold text-navy-deep truncate">{displayName}</div>
+                <div className="text-[11px] uppercase tracking-[0.18em] text-charcoal/50 truncate">{user.email}</div>
               </div>
               <Link to="/auth" className="flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><UserCircle className="h-4 w-4" /> Profile</Link>
               {isAdmin && <Link to="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><Shield className="h-4 w-4" /> Admin</Link>}
