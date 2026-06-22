@@ -2,43 +2,23 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 export const KINGSCHAT_CLIENT_ID = "376728a5-9c63-4857-b923-661ab96f160e";
-export const KINGSCHAT_AUTH_URL = "https://accounts.kingsch.at/";
-export const KINGSCHAT_TOKEN_URL = "https://connect.kingsch.at/oauth2/token";
 export const KINGSCHAT_PROFILE_URL = "https://connect.kingsch.at/developer/api/profile";
 
 /**
- * Exchanges a KingsChat OAuth `code` for an access token, fetches the user's
- * profile, provisions a Supabase user using `{username}@kingschat.online`, and
- * returns a magiclink hashed token the client uses with `verifyOtp` to sign in.
+ * Exchanges a KingsChat access token (obtained via the kingschat-web-sdk popup
+ * flow on the client) for a Supabase magiclink token. The server fetches the
+ * KC profile, provisions/updates a user as `{username}@kingschat.online`, and
+ * returns a `hashed_token` the client uses with `verifyOtp` to establish a
+ * Supabase session.
  */
 export const kingschatLogin = createServerFn({ method: "POST" })
-  .inputValidator((d: { code: string; redirectUri: string }) => ({
-    code: z.string().min(1).parse(d.code),
-    redirectUri: z.string().url().parse(d.redirectUri),
+  .inputValidator((d: { accessToken: string }) => ({
+    accessToken: z.string().min(1).parse(d.accessToken),
   }))
   .handler(async ({ data }) => {
-    // 1. Exchange code for access token
-    const tokenRes = await fetch(KINGSCHAT_TOKEN_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
-        code: data.code,
-        client_id: KINGSCHAT_CLIENT_ID,
-        redirect_uri: data.redirectUri,
-      }).toString(),
-    });
-    if (!tokenRes.ok) {
-      const text = await tokenRes.text();
-      throw new Error(`KingsChat token exchange failed (${tokenRes.status}): ${text.slice(0, 200)}`);
-    }
-    const tokenJson = (await tokenRes.json()) as { access_token?: string; accessToken?: string };
-    const accessToken = tokenJson.access_token || tokenJson.accessToken;
-    if (!accessToken) throw new Error("KingsChat token response missing access_token");
-
-    // 2. Fetch profile
+    // 1. Fetch profile with the access token returned by the SDK
     const profRes = await fetch(KINGSCHAT_PROFILE_URL, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Authorization: `Bearer ${data.accessToken}` },
     });
     if (!profRes.ok) {
       const text = await profRes.text();
@@ -65,11 +45,10 @@ export const kingschatLogin = createServerFn({ method: "POST" })
 
     const email = `${String(username).toLowerCase().replace(/[^a-z0-9._-]/g, "")}@kingschat.online`;
 
-    // 3. Find or create Supabase user (auto-confirmed)
+    // 2. Find or create Supabase user (auto-confirmed)
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let userId: string | null = null;
-    // Find by paging admin.listUsers (no direct email lookup in older types).
     {
       const { data: list, error } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
       if (error) throw error;
@@ -86,7 +65,7 @@ export const kingschatLogin = createServerFn({ method: "POST" })
       userId = created.user!.id;
     }
 
-    // 4. Upsert profile (display name + avatar + kingschat username)
+    // 3. Upsert profile
     await supabaseAdmin
       .from("profiles")
       .upsert(
@@ -94,7 +73,7 @@ export const kingschatLogin = createServerFn({ method: "POST" })
         { onConflict: "id" },
       );
 
-    // 5. Generate a magiclink and return its hashed token for client-side verifyOtp
+    // 4. Generate magiclink hashed_token for client-side verifyOtp
     const { data: link, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
       type: "magiclink",
       email,
