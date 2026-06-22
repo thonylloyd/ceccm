@@ -6,7 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import logo from "@/assets/logo-ccm.png.asset.json";
+import kcIcon from "@/assets/kingschat-icon.png.asset.json";
 import hero from "@/assets/hero-cathedral.jpg";
+import { KINGSCHAT_AUTH_URL, KINGSCHAT_CLIENT_ID } from "@/lib/kingschat.functions";
+
+function startKingsChat() {
+  const redirectUri = `${window.location.origin}/auth/kingschat-callback`;
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: KINGSCHAT_CLIENT_ID,
+    redirect_uri: redirectUri,
+    scopes: "send_chat_message",
+  });
+  window.location.href = `${KINGSCHAT_AUTH_URL}?${params.toString()}`;
+}
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
