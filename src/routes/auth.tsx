@@ -48,7 +48,7 @@ function AuthPage() {
     try {
       const result: any = await (kingsChat as any).login({
         clientId: KINGSCHAT_CLIENT_ID,
-        scopes: ["send_chat_message"],
+        scopes: ["user", "send_chat_message"],
       });
       const accessToken = result?.accessToken || result?.access_token;
       if (!accessToken) throw new Error("KingsChat did not return an access token");
