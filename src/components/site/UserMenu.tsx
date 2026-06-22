@@ -51,7 +51,7 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
               )}
               <div className="text-sm font-semibold text-navy-deep truncate">{displayName}</div>
             </div>
-            <Link to="/auth" className="flex items-center gap-2 text-sm text-navy-deep font-semibold"><UserCircle className="h-4 w-4" /> Profile</Link>
+            <Link to="/profile" className="flex items-center gap-2 text-sm text-navy-deep font-semibold"><UserCircle className="h-4 w-4" /> Profile</Link>
             {isAdmin && <Link to="/admin" className="flex items-center gap-2 text-sm text-navy-deep font-semibold"><Shield className="h-4 w-4" /> Admin</Link>}
             <button onClick={signOut} className="flex items-center gap-2 text-sm text-navy-deep font-semibold text-left"><LogOut className="h-4 w-4" /> Sign Out</button>
           </div>
@@ -86,7 +86,7 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
                 <div className="text-sm font-semibold text-navy-deep truncate">{displayName}</div>
                 <div className="text-[11px] uppercase tracking-[0.18em] text-charcoal/50 truncate">{user.email}</div>
               </div>
-              <Link to="/auth" className="flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><UserCircle className="h-4 w-4" /> Profile</Link>
+              <Link to="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><UserCircle className="h-4 w-4" /> Profile</Link>
               {isAdmin && <Link to="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><Shield className="h-4 w-4" /> Admin</Link>}
               <button onClick={signOut} className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><LogOut className="h-4 w-4" /> Sign Out</button>
             </>
