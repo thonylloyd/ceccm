@@ -10,7 +10,8 @@ import logo from "@/assets/logo-ccm.png.asset.json";
 import kcIcon from "@/assets/kingschat-icon.png.asset.json";
 import hero from "@/assets/hero-cathedral.jpg";
 import { KINGSCHAT_CLIENT_ID, kingschatLogin } from "@/lib/kingschat.functions";
-// @ts-expect-error - no types shipped
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - no types shipped
 import kingsChat from "kingschat-web-sdk";
 
 export const Route = createFileRoute("/auth")({
