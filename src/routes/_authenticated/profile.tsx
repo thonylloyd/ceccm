@@ -189,7 +189,7 @@ function ProfilePage() {
           )}
         </div>
       </main>
-      <SiteFooter />
+      <SiteFooter brand={brand} contact={chrome.settings.contact ?? {}} footer={chrome.settings.footer ?? {}} social={chrome.settings.social ?? {}} logoUrl={brand.logo_url} />
     </div>
   );
 }
