@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { Input } from "@/components/ui/input";
@@ -8,10 +9,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { siteChromeQuery } from "@/lib/cms.functions";
 
 const DESIGNATIONS = ["Pastor", "Deacon", "Deaconess", "Brother", "Sister", "Other"] as const;
 
 export const Route = createFileRoute("/_authenticated/profile")({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(siteChromeQuery());
+  },
   head: () => ({ meta: [{ title: "My Profile — CCM" }] }),
   component: ProfilePage,
 });
