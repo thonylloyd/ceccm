@@ -189,10 +189,11 @@ function AuthPage() {
               <button
                 type="button"
                 onClick={startKingsChat}
-                className="w-full h-12 flex items-center justify-center gap-3 rounded-md bg-white text-navy-deep font-semibold uppercase tracking-[0.18em] text-xs hover:bg-white/90 transition-colors"
+                disabled={kcLoading}
+                className="w-full h-12 flex items-center justify-center gap-3 rounded-md bg-white text-navy-deep font-semibold uppercase tracking-[0.18em] text-xs hover:bg-white/90 transition-colors disabled:opacity-60"
               >
                 <img src={kcIcon.url} alt="" className="h-5 w-5 object-contain" />
-                Continue with KingsChat
+                {kcLoading ? "Opening KingsChat…" : "Continue with KingsChat"}
               </button>
             </>
           )}
