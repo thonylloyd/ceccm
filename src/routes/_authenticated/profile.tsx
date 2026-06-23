@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { siteChromeQuery } from "@/lib/cms.functions";
+import { resolveAvatarUrl } from "@/lib/avatar";
 
 const DESIGNATIONS = ["Pastor", "Deacon", "Deaconess", "Brother", "Sister", "Other"] as const;
 
@@ -54,7 +55,7 @@ function ProfilePage() {
           setEmail(x.email ?? u.email ?? "");
           setChurch(x.church ?? "");
           setZone(x.zone ?? "");
-          setAvatarUrl(x.avatar_url ?? null);
+          resolveAvatarUrl(x.avatar_url).then(setAvatarUrl);
           setLoading(false);
         });
     });
@@ -103,11 +104,10 @@ function ProfilePage() {
       const path = `avatars/${user.id}/avatar-${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("media").upload(path, file, { upsert: true, contentType: file.type });
       if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from("media").getPublicUrl(path);
-      const url = pub.publicUrl;
-      const { error } = await supabase.from("profiles").upsert({ id: user.id, avatar_url: url }, { onConflict: "id" });
+      const { error } = await supabase.from("profiles").upsert({ id: user.id, avatar_url: path }, { onConflict: "id" });
       if (error) throw error;
-      setAvatarUrl(url);
+      const signed = await resolveAvatarUrl(path);
+      setAvatarUrl(signed);
       toast.success("Profile picture updated");
     } catch (err: any) {
       toast.error(err.message ?? "Could not upload picture");
