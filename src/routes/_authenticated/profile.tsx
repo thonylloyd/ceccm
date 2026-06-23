@@ -93,6 +93,32 @@ function ProfilePage() {
     }
   }
 
+  async function uploadAvatar(file: File) {
+    if (!user) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please choose an image"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setUploadingAvatar(true);
+    try {
+      const ext = (file.name.split(".").pop() || "png").toLowerCase();
+      const path = `avatars/${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("media").upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("media").getPublicUrl(path);
+      const url = pub.publicUrl;
+      const { error } = await supabase.from("profiles").upsert({ id: user.id, avatar_url: url }, { onConflict: "id" });
+      if (error) throw error;
+      setAvatarUrl(url);
+      toast.success("Profile picture updated");
+    } catch (err: any) {
+      toast.error(err.message ?? "Could not upload picture");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
+
+  const designationLabel = designation === "Other" ? designationOther : designation;
+  const esteemed = displayName ? `Esteemed ${designationLabel ? designationLabel + " " : ""}${displayName}`.trim() : "";
+
   const { data: chrome } = useSuspenseQuery(siteChromeQuery());
   const nav = chrome.nav ?? [];
   const brand = chrome.settings.brand ?? { name: "CCM" };
