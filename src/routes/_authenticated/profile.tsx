@@ -141,17 +141,30 @@ function ProfilePage() {
             <div className="text-charcoal/60 text-sm">Loading…</div>
           ) : (
             <div className="bg-white rounded-xl shadow-elegant border border-black/5 p-8">
-              <div className="flex items-center gap-4 pb-6 mb-6 border-b border-black/5">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt={displayName} className="h-16 w-16 rounded-full object-cover border border-black/10" />
-                ) : (
-                  <div className="h-16 w-16 rounded-full bg-navy-deep text-white flex items-center justify-center text-lg font-semibold">
-                    {(displayName || email).slice(0,1).toUpperCase()}
-                  </div>
-                )}
+              <div className="flex items-center gap-5 pb-6 mb-6 border-b border-black/5">
+                <div className="relative group">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt={displayName} className="h-20 w-20 rounded-full object-cover border border-black/10" />
+                  ) : (
+                    <div className="h-20 w-20 rounded-full bg-navy-deep text-white flex items-center justify-center text-xl font-semibold">
+                      {(displayName || email).slice(0,1).toUpperCase()}
+                    </div>
+                  )}
+                  <label className="absolute inset-0 rounded-full flex items-center justify-center bg-black/45 text-white text-[10px] uppercase tracking-[0.18em] font-semibold opacity-0 group-hover:opacity-100 cursor-pointer transition">
+                    {uploadingAvatar ? "Uploading…" : "Change"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingAvatar}
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadAvatar(f); e.target.value = ""; }}
+                    />
+                  </label>
+                </div>
                 <div>
-                  <div className="font-semibold text-navy-deep">{displayName || email}</div>
+                  <div className="font-semibold text-navy-deep text-lg">{esteemed || email}</div>
                   <div className="text-xs text-charcoal/60 mt-0.5">{user?.email}</div>
+                  <div className="text-[11px] text-charcoal/50 mt-1">Hover the picture to change it · JPG/PNG up to 5MB</div>
                 </div>
               </div>
 
