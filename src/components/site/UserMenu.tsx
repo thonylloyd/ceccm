@@ -8,7 +8,7 @@ import { toast } from "sonner";
 export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
+  const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null; designation: string | null; designation_other: string | null } | null>(null);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -22,11 +22,13 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
     if (!user) { setIsAdmin(false); setProfile(null); return; }
     supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
-    supabase.from("profiles").select("display_name, avatar_url").eq("id", user.id).maybeSingle()
+    supabase.from("profiles").select("display_name, avatar_url, designation, designation_other").eq("id", user.id).maybeSingle()
       .then(({ data }) => setProfile((data as any) ?? null));
   }, [user]);
 
-  const displayName = profile?.display_name || user?.email?.split("@")[0] || "";
+  const baseName = profile?.display_name || user?.email?.split("@")[0] || "";
+  const designation = profile?.designation === "Other" ? (profile?.designation_other ?? "") : (profile?.designation ?? "");
+  const displayName = baseName ? `Esteemed ${designation ? designation + " " : ""}${baseName}`.trim() : "";
   const avatarUrl = profile?.avatar_url || null;
 
   async function signOut() {
