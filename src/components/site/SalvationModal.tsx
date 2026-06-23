@@ -24,6 +24,8 @@ Kindly fill in your details below to receive your gift.
 
 God bless you.`;
 
+const GIFT_DOWNLOAD_URL = "https://kingscloud.co/api/shared_file/5RIDZA3NFSNNF5XKLD35LRLKGPOCGIEF";
+
 function toEmbed(url: string): string {
   if (!url) return "";
   try {
