@@ -55,7 +55,22 @@ export function SalvationModal() {
 
   const m = useMutation({
     mutationFn: (data: typeof form) => submit({ data }),
-    onSuccess: () => { setStage("done"); toast.success("Thank you! We'll be in touch."); },
+    onSuccess: () => {
+      setStage("done");
+      toast.success("Thank you! Your gift is downloading.");
+      try {
+        const a = document.createElement("a");
+        a.href = GIFT_DOWNLOAD_URL;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.download = "";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch {
+        window.open(GIFT_DOWNLOAD_URL, "_blank", "noopener,noreferrer");
+      }
+    },
     onError: (e: any) => toast.error(e?.message ?? "Could not submit"),
   });
 
