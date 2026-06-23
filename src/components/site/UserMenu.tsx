@@ -8,7 +8,7 @@ import { toast } from "sonner";
 export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
+  const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null; designation: string | null; designation_other: string | null } | null>(null);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -22,11 +22,13 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
     if (!user) { setIsAdmin(false); setProfile(null); return; }
     supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
-    supabase.from("profiles").select("display_name, avatar_url").eq("id", user.id).maybeSingle()
+    supabase.from("profiles").select("display_name, avatar_url, designation, designation_other").eq("id", user.id).maybeSingle()
       .then(({ data }) => setProfile((data as any) ?? null));
   }, [user]);
 
-  const displayName = profile?.display_name || user?.email?.split("@")[0] || "";
+  const baseName = profile?.display_name || user?.email?.split("@")[0] || "";
+  const designation = profile?.designation === "Other" ? (profile?.designation_other ?? "") : (profile?.designation ?? "");
+  const displayName = baseName ? `Esteemed ${designation ? designation + " " : ""}${baseName}`.trim() : "";
   const avatarUrl = profile?.avatar_url || null;
 
   async function signOut() {
@@ -46,7 +48,7 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
                 <img src={avatarUrl} alt={displayName} className="h-9 w-9 rounded-full object-cover border border-black/10" />
               ) : (
                 <div className="h-9 w-9 rounded-full bg-navy-deep text-white flex items-center justify-center text-xs font-semibold">
-                  {displayName.slice(0, 1).toUpperCase()}
+                  {baseName.slice(0, 1).toUpperCase()}
                 </div>
               )}
               <div className="text-sm font-semibold text-navy-deep truncate">{displayName}</div>
@@ -73,7 +75,7 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
         {user && avatarUrl ? (
           <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
         ) : user ? (
-          <span className="text-xs font-semibold">{displayName.slice(0, 1).toUpperCase()}</span>
+          <span className="text-xs font-semibold">{baseName.slice(0, 1).toUpperCase()}</span>
         ) : (
           <UserIcon className="h-4 w-4" />
         )}
