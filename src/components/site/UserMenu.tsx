@@ -4,6 +4,7 @@ import { User as UserIcon, LogIn, LogOut, Shield, UserCircle } from "lucide-reac
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
+import { resolveAvatarUrl } from "@/lib/avatar";
 
 export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
   const [user, setUser] = useState<User | null>(null);

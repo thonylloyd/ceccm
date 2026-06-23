@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { siteChromeQuery } from "@/lib/cms.functions";
+import { resolveAvatarUrl } from "@/lib/avatar";
 
 const DESIGNATIONS = ["Pastor", "Deacon", "Deaconess", "Brother", "Sister", "Other"] as const;
 
