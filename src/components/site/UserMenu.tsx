@@ -48,7 +48,7 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
                 <img src={avatarUrl} alt={displayName} className="h-9 w-9 rounded-full object-cover border border-black/10" />
               ) : (
                 <div className="h-9 w-9 rounded-full bg-navy-deep text-white flex items-center justify-center text-xs font-semibold">
-                  {displayName.slice(0, 1).toUpperCase()}
+                  {baseName.slice(0, 1).toUpperCase()}
                 </div>
               )}
               <div className="text-sm font-semibold text-navy-deep truncate">{displayName}</div>
@@ -75,7 +75,7 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
         {user && avatarUrl ? (
           <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
         ) : user ? (
-          <span className="text-xs font-semibold">{displayName.slice(0, 1).toUpperCase()}</span>
+          <span className="text-xs font-semibold">{baseName.slice(0, 1).toUpperCase()}</span>
         ) : (
           <UserIcon className="h-4 w-4" />
         )}
