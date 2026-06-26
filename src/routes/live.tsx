@@ -12,6 +12,14 @@ import {
   AlertTriangle, ChevronRight, Tv, Mic, Heart, Sparkles, X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HlsPlayer } from "@/components/site/HlsPlayer";
+
+function isDirectVideo(type?: string | null, url?: string | null) {
+  const t = (type || "").toLowerCase();
+  if (["hls", "m3u8", "mp4", "webm", "file", "direct", "video"].includes(t)) return true;
+  if (!url) return false;
+  return /\.(m3u8|mp4|webm|mov)(\?|$)/i.test(url);
+}
 
 export const Route = createFileRoute("/live")({
   loader: async ({ context }) => {
