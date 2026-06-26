@@ -183,13 +183,17 @@ function PlayerSection({ current, embedUrl, nextUpcoming }: { current: any; embe
                 thumbnail={current.thumbnail_url}
                 title={current.title}
               >
-                <iframe
-                  src={embedUrl}
-                  className="w-full h-full"
-                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                  allowFullScreen
-                  title={current.title}
-                />
+                {isDirectVideo(current.stream_type, current.stream_url) ? (
+                  <HlsPlayer src={current.stream_url} poster={current.thumbnail_url} title={current.title} />
+                ) : (
+                  <iframe
+                    src={embedUrl}
+                    className="w-full h-full"
+                    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                    allowFullScreen
+                    title={current.title}
+                  />
+                )}
               </AccessGate>
             ) : nextUpcoming ? (
               <Countdown event={nextUpcoming} />
