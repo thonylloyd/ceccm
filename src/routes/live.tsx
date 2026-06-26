@@ -12,6 +12,14 @@ import {
   AlertTriangle, ChevronRight, Tv, Mic, Heart, Sparkles, X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HlsPlayer } from "@/components/site/HlsPlayer";
+
+function isDirectVideo(type?: string | null, url?: string | null) {
+  const t = (type || "").toLowerCase();
+  if (["hls", "m3u8", "mp4", "webm", "file", "direct", "video"].includes(t)) return true;
+  if (!url) return false;
+  return /\.(m3u8|mp4|webm|mov)(\?|$)/i.test(url);
+}
 
 export const Route = createFileRoute("/live")({
   loader: async ({ context }) => {
@@ -175,13 +183,17 @@ function PlayerSection({ current, embedUrl, nextUpcoming }: { current: any; embe
                 thumbnail={current.thumbnail_url}
                 title={current.title}
               >
-                <iframe
-                  src={embedUrl}
-                  className="w-full h-full"
-                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                  allowFullScreen
-                  title={current.title}
-                />
+                {isDirectVideo(current.stream_type, current.stream_url) ? (
+                  <HlsPlayer src={current.stream_url} poster={current.thumbnail_url} title={current.title} />
+                ) : (
+                  <iframe
+                    src={embedUrl}
+                    className="w-full h-full"
+                    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                    allowFullScreen
+                    title={current.title}
+                  />
+                )}
               </AccessGate>
             ) : nextUpcoming ? (
               <Countdown event={nextUpcoming} />
