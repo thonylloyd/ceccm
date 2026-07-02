@@ -5,28 +5,37 @@ import { getIsAdmin, bootstrapAdminIfNone } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Home, Info, Calendar, Mail, Menu as MenuIcon,
-  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio, Heart,
+  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio, Heart, Shield,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, createContext, useContext } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
 });
 
-type NavLink = { to: string; label: string; icon: any; end?: boolean };
+type AdminSession = { isAdmin: boolean; isSuperAdmin: boolean; permissions: string[]; roles: string[]; userId: string };
+const AdminCtx = createContext<AdminSession | null>(null);
+export const useAdminSession = () => {
+  const v = useContext(AdminCtx);
+  if (!v) throw new Error("useAdminSession outside AdminLayout");
+  return v;
+};
+
+type NavLink = { to: string; label: string; icon: any; permission: string; end?: boolean; superOnly?: boolean };
 const NAV: NavLink[] = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/homepage", label: "Homepage", icon: Home },
-  { to: "/admin/about", label: "About", icon: Info },
-  { to: "/admin/programs", label: "Programs", icon: Calendar },
-  { to: "/admin/livestream", label: "Livestream", icon: Radio },
-  { to: "/admin/contact", label: "Contact", icon: Mail },
-  { to: "/admin/navigation", label: "Navigation", icon: MenuIcon },
-  { to: "/admin/media", label: "Media Library", icon: ImageIcon },
-  { to: "/admin/videos", label: "Videos", icon: Video },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/salvation-leads", label: "Salvation Leads", icon: Heart },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
+  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, permission: "dashboard", end: true },
+  { to: "/admin/homepage", label: "Homepage", icon: Home, permission: "homepage" },
+  { to: "/admin/about", label: "About", icon: Info, permission: "about" },
+  { to: "/admin/programs", label: "Programs", icon: Calendar, permission: "programs" },
+  { to: "/admin/livestream", label: "Livestream", icon: Radio, permission: "livestream" },
+  { to: "/admin/contact", label: "Contact", icon: Mail, permission: "contact" },
+  { to: "/admin/navigation", label: "Navigation", icon: MenuIcon, permission: "navigation" },
+  { to: "/admin/media", label: "Media Library", icon: ImageIcon, permission: "media" },
+  { to: "/admin/videos", label: "Videos", icon: Video, permission: "videos" },
+  { to: "/admin/users", label: "Users", icon: Users, permission: "users" },
+  { to: "/admin/salvation-leads", label: "Salvation Leads", icon: Heart, permission: "salvation_leads" },
+  { to: "/admin/settings", label: "Settings", icon: Settings, permission: "settings" },
+  { to: "/admin/permissions", label: "Permissions", icon: Shield, permission: "permissions", superOnly: true },
 ];
 
 
@@ -62,46 +71,57 @@ function AdminLayout() {
     );
   }
 
+  const session = q.data!;
+  const permSet = new Set(session.permissions);
+  const visibleNav = NAV.filter((n) => {
+    if (n.superOnly) return session.isSuperAdmin;
+    return session.isSuperAdmin || permSet.has(n.permission);
+  });
+
   return (
-    <div className="min-h-screen flex bg-light">
-      <aside className="w-64 shrink-0 bg-navy-deep text-white/85 flex flex-col">
-        <div className="px-6 py-6 border-b border-white/10">
-          <div className="font-display text-xl text-gold">CCM Admin</div>
-          <div className="text-[10px] uppercase tracking-[0.22em] text-white/50 mt-1">Content Manager</div>
-        </div>
-        <nav className="flex-1 px-3 py-4 space-y-0.5">
-          {NAV.map((item) => {
-            const active = item.end ? path === item.to : path.startsWith(item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
-                  active ? "bg-gold/15 text-gold" : "hover:bg-white/5 text-white/75"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="px-3 py-4 border-t border-white/10 space-y-1">
-          <Link to="/" className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/70 hover:bg-white/5">
-            <Home className="h-4 w-4" /> View Site
-          </Link>
-          <button
-            onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); }}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/70 hover:bg-white/5"
-          >
-            <LogOut className="h-4 w-4" /> Sign Out
-          </button>
-        </div>
-      </aside>
-      <main className="flex-1 overflow-x-hidden">
-        <Outlet />
-      </main>
-    </div>
+    <AdminCtx.Provider value={session}>
+      <div className="min-h-screen flex bg-light">
+        <aside className="w-64 shrink-0 bg-navy-deep text-white/85 flex flex-col">
+          <div className="px-6 py-6 border-b border-white/10">
+            <div className="font-display text-xl text-gold">CCM Admin</div>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/50 mt-1">
+              {session.isSuperAdmin ? "Super Admin" : "Content Manager"}
+            </div>
+          </div>
+          <nav className="flex-1 px-3 py-4 space-y-0.5">
+            {visibleNav.map((item) => {
+              const active = item.end ? path === item.to : path.startsWith(item.to);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
+                    active ? "bg-gold/15 text-gold" : "hover:bg-white/5 text-white/75"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="px-3 py-4 border-t border-white/10 space-y-1">
+            <Link to="/" className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/70 hover:bg-white/5">
+              <Home className="h-4 w-4" /> View Site
+            </Link>
+            <button
+              onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/70 hover:bg-white/5"
+            >
+              <LogOut className="h-4 w-4" /> Sign Out
+            </button>
+          </div>
+        </aside>
+        <main className="flex-1 overflow-x-hidden">
+          <Outlet />
+        </main>
+      </div>
+    </AdminCtx.Provider>
   );
 }
