@@ -10,7 +10,7 @@ export function HlsPlayer({ src, poster, title }: { src: string; poster?: string
     if (!video || !src) return;
 
     let hls: Hls | null = null;
-    let retryTimer: ReturnType<typeof window.setTimeout> | null = null;
+    let retryTimer: number | null = null;
     const isM3u8 = /\.m3u8(\?|$)/i.test(src);
     setHasError(false);
 
