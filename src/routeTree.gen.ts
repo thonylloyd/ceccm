@@ -28,6 +28,7 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminSalvationLeadsRouteImport } from './routes/_authenticated/admin/salvation-leads'
 import { Route as AuthenticatedAdminProgramsRouteImport } from './routes/_authenticated/admin/programs'
+import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
 import { Route as AuthenticatedAdminNavigationRouteImport } from './routes/_authenticated/admin/navigation'
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin/media'
 import { Route as AuthenticatedAdminLivestreamRouteImport } from './routes/_authenticated/admin/livestream'
@@ -133,6 +134,12 @@ const AuthenticatedAdminProgramsRoute =
     path: '/programs',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminPermissionsRoute =
+  AuthenticatedAdminPermissionsRouteImport.update({
+    id: '/permissions',
+    path: '/permissions',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminNavigationRoute =
   AuthenticatedAdminNavigationRouteImport.update({
     id: '/navigation',
@@ -187,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/navigation': typeof AuthenticatedAdminNavigationRoute
+  '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
   '/admin/salvation-leads': typeof AuthenticatedAdminSalvationLeadsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -211,6 +219,7 @@ export interface FileRoutesByTo {
   '/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/navigation': typeof AuthenticatedAdminNavigationRoute
+  '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
   '/admin/salvation-leads': typeof AuthenticatedAdminSalvationLeadsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -239,6 +248,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
   '/_authenticated/admin/navigation': typeof AuthenticatedAdminNavigationRoute
+  '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/admin/programs': typeof AuthenticatedAdminProgramsRoute
   '/_authenticated/admin/salvation-leads': typeof AuthenticatedAdminSalvationLeadsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/admin/livestream'
     | '/admin/media'
     | '/admin/navigation'
+    | '/admin/permissions'
     | '/admin/programs'
     | '/admin/salvation-leads'
     | '/admin/settings'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/admin/livestream'
     | '/admin/media'
     | '/admin/navigation'
+    | '/admin/permissions'
     | '/admin/programs'
     | '/admin/salvation-leads'
     | '/admin/settings'
@@ -318,6 +330,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/livestream'
     | '/_authenticated/admin/media'
     | '/_authenticated/admin/navigation'
+    | '/_authenticated/admin/permissions'
     | '/_authenticated/admin/programs'
     | '/_authenticated/admin/salvation-leads'
     | '/_authenticated/admin/settings'
@@ -473,6 +486,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminProgramsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/permissions': {
+      id: '/_authenticated/admin/permissions'
+      path: '/permissions'
+      fullPath: '/admin/permissions'
+      preLoaderRoute: typeof AuthenticatedAdminPermissionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/navigation': {
       id: '/_authenticated/admin/navigation'
       path: '/navigation'
@@ -525,6 +545,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminLivestreamRoute: typeof AuthenticatedAdminLivestreamRoute
   AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
   AuthenticatedAdminNavigationRoute: typeof AuthenticatedAdminNavigationRoute
+  AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminProgramsRoute: typeof AuthenticatedAdminProgramsRoute
   AuthenticatedAdminSalvationLeadsRoute: typeof AuthenticatedAdminSalvationLeadsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
@@ -541,6 +562,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminLivestreamRoute: AuthenticatedAdminLivestreamRoute,
     AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
     AuthenticatedAdminNavigationRoute: AuthenticatedAdminNavigationRoute,
+    AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
     AuthenticatedAdminProgramsRoute: AuthenticatedAdminProgramsRoute,
     AuthenticatedAdminSalvationLeadsRoute:
       AuthenticatedAdminSalvationLeadsRoute,

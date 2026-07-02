@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/admin/permissions")({
   component: PermissionsAdmin,
 });
 
-type Role = "admin" | "viewer";
+type Role = "super_admin" | "admin" | "viewer";
 
 function PermissionsAdmin() {
   const session = useAdminSession();
