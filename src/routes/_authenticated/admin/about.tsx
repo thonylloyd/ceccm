@@ -25,10 +25,9 @@ const TABS = [
 
 const LEADERSHIP_FIELDS: FieldDef[] = [
   { key: "name", label: "Name", type: "text" },
-  { key: "position", label: "Position / Title", type: "text" },
+  { key: "position", label: "Position / Title (multi-line allowed)", type: "textarea" },
   { key: "message", label: "Message", type: "textarea" },
   { key: "photo_url", label: "Photo", type: "image" },
-  { key: "is_featured", label: "Featured (Center Card)", type: "checkbox" },
 ];
 
 function AboutAdmin() {
