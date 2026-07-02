@@ -151,20 +151,34 @@ function AboutPage() {
                 <h2 className="font-display text-3xl text-navy-deep uppercase tracking-[0.18em] font-semibold">Leadership</h2>
                 <span className="inline-block mt-3 h-0.5 w-12 bg-gold" />
               </div>
-              <div className="grid md:grid-cols-3 gap-6 items-stretch">
+              <div className="mx-auto max-w-5xl space-y-6">
                 {leadership.slice(0, 3).map((l: any, i: number) => (
                   <article
                     key={l.id}
-                    className={`bg-white border border-gold/40 p-8 text-center transition-transform hover:-translate-y-1 ${
-                      l.is_featured || i === 1 ? "lg:-mt-6 lg:shadow-xl border-gold" : "shadow-sm"
+                    className={`relative overflow-hidden bg-white border border-gold/35 p-6 sm:p-7 shadow-card transition-transform hover:-translate-y-1 ${
+                      l.is_featured || i === 1 ? "border-gold" : ""
                     }`}
                   >
-                    <div className="aspect-square w-32 mx-auto mb-5 rounded-full bg-navy-deep overflow-hidden ring-2 ring-gold/40">
-                      {l.photo_url && <img src={l.photo_url} alt={l.name} className="h-full w-full object-cover" />}
+                    <span className="absolute inset-x-0 top-0 h-1 bg-gold" />
+                    <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start text-center sm:text-left">
+                      <div className="aspect-square w-36 shrink-0 rounded-full bg-navy-deep overflow-hidden ring-2 ring-gold/40 shadow-lg">
+                        {l.photo_url && <img src={l.photo_url} alt={l.name} className="h-full w-full object-cover" />}
+                      </div>
+                      <div className="min-w-0 flex-1 pt-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gold/25 pb-4 mb-4">
+                          <div>
+                            <h3 className="font-display text-2xl text-navy-deep">{l.name}</h3>
+                            {l.position && <div className="text-xs uppercase tracking-[0.18em] text-gold mt-1">{l.position}</div>}
+                          </div>
+                          {(l.is_featured || i === 1) && (
+                            <span className="self-center sm:self-start inline-flex bg-gold/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-navy-deep">
+                              Leadership
+                            </span>
+                          )}
+                        </div>
+                        {l.message && <p className="text-sm sm:text-base text-charcoal/75 leading-relaxed italic">&quot;{l.message}&quot;</p>}
+                      </div>
                     </div>
-                    <h3 className="font-display text-xl text-navy-deep">{l.name}</h3>
-                    {l.position && <div className="text-xs uppercase tracking-[0.18em] text-gold mt-1">{l.position}</div>}
-                    {l.message && <p className="text-sm text-charcoal/70 mt-4 leading-relaxed italic">"{l.message}"</p>}
                   </article>
                 ))}
               </div>
