@@ -5,7 +5,7 @@ import {
   listUsersWithRoles, setUserRole, createUserAccount, deleteUserAccount,
 } from "@/lib/admin.functions";
 import { PageHeader, Card, Field, Input, Button } from "@/components/admin/ui";
-import { useAdminSession } from "./route";
+import { useAdminSession } from "./admin-context";
 import { Loader2, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
