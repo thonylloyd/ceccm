@@ -7,19 +7,13 @@ import {
   LayoutDashboard, Home, Info, Calendar, Mail, Menu as MenuIcon,
   Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio, Heart, Shield,
 } from "lucide-react";
-import { useEffect, createContext, useContext } from "react";
+import { useEffect } from "react";
+import { AdminCtx } from "./admin-context";
+export { useAdminSession } from "./admin-context";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
 });
-
-type AdminSession = { isAdmin: boolean; isSuperAdmin: boolean; permissions: string[]; roles: string[]; userId: string };
-const AdminCtx = createContext<AdminSession | null>(null);
-export const useAdminSession = () => {
-  const v = useContext(AdminCtx);
-  if (!v) throw new Error("useAdminSession outside AdminLayout");
-  return v;
-};
 
 type NavLink = { to: string; label: string; icon: any; permission: string; end?: boolean; superOnly?: boolean };
 const NAV: NavLink[] = [
