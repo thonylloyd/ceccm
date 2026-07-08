@@ -2,6 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 
+const stripSensitive = (v: any) => {
+  if (!v) return v;
+  const { access_password_hash, access_password_plain, ...rest } = v;
+  return rest;
+};
+
 export const getVideoLibrary = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const [videos, cats, cta] = await Promise.all([
@@ -10,7 +16,7 @@ export const getVideoLibrary = createServerFn({ method: "GET" }).handler(async (
     supabaseAdmin.from("video_cta").select("*").eq("is_visible", true).order("display_order").limit(1).maybeSingle(),
   ]);
   return {
-    videos: videos.data ?? [],
+    videos: (videos.data ?? []).map(stripSensitive),
     categories: cats.data ?? [],
     cta: cta.data ?? null,
   };
@@ -30,5 +36,6 @@ export const getVideoBySlug = createServerFn({ method: "POST" })
       .eq("is_published", true).neq("id", video.id)
       .eq("category_id", video.category_id ?? "00000000-0000-0000-0000-000000000000")
       .limit(6);
-    return { video, related: related ?? [] };
+    return { video: stripSensitive(video), related: (related ?? []).map(stripSensitive) };
   });
+
