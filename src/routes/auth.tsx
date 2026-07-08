@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import logo from "@/assets/logo-ccm.png.asset.json";
 import kcIcon from "@/assets/kingschat-icon.png.asset.json";
 import hero from "@/assets/hero-cathedral.jpg";
@@ -31,6 +32,7 @@ function AuthPage() {
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -166,7 +168,12 @@ function AuthPage() {
                     <button type="button" onClick={() => setMode("forgot")} className="text-xs text-gold hover:underline">Forgot?</button>
                   )}
                 </div>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="mt-2 bg-white/5 border-white/15 text-white h-12" />
+                <div className="relative mt-2">
+                  <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="bg-white/5 border-white/15 text-white h-12 pr-12" />
+                  <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-gold" aria-label={showPassword ? "Hide password" : "Show password"}>
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
             )}
 
