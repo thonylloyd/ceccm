@@ -255,8 +255,8 @@ function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
                       placeholder={local.access_password_hash ? "Leave blank to keep existing" : "Set a password"}
                       className="pr-10"
                     />
-                    <button type="button" onClick={() => setShowPw((s) => !s)} className="absolute right-2 top-1/2 -translate-y-1/2 text-charcoal/50 hover:text-navy-deep" aria-label={showPw ? "Hide password" : "Show password"}>
-                      {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <button type="button" onClick={toggleReveal} disabled={revealing} className="absolute right-2 top-1/2 -translate-y-1/2 text-charcoal/50 hover:text-navy-deep disabled:opacity-50" aria-label={showPw ? "Hide password" : "Show password"}>
+                      {revealing ? <Loader2 className="h-4 w-4 animate-spin" /> : showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </Field>
