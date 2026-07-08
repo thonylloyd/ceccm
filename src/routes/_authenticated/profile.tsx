@@ -241,8 +241,9 @@ function ProfilePage() {
                   <div>
                     <Label className="text-xs uppercase tracking-[0.18em]">Please specify *</Label>
                     <Input value={designationOther} onChange={(e) => setDesignationOther(e.target.value)} required className="mt-2" />
-                  </div>
-                )}
+            </div>
+          )}
+          {!loading && user && <ChangePasswordSection />}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs uppercase tracking-[0.18em]">KingsChat ID</Label>
