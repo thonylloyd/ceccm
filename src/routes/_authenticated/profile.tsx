@@ -14,6 +14,56 @@ import { resolveAvatarUrl } from "@/lib/avatar";
 
 const DESIGNATIONS = ["Pastor", "Deacon", "Deaconess", "Brother", "Sister", "Other"] as const;
 
+function ChangePasswordSection() {
+  const [pw, setPw] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [show, setShow] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (pw.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    if (pw !== confirm) { toast.error("Passwords do not match"); return; }
+    setSaving(true);
+    const { error } = await supabase.auth.updateUser({ password: pw });
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Password updated");
+    setPw(""); setConfirm("");
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow-elegant border border-black/5 p-8 mt-6">
+      <div className="mb-4">
+        <h2 className="font-display text-2xl text-navy-deep">Change password</h2>
+        <p className="text-charcoal/60 text-xs mt-1">At least 6 characters.</p>
+      </div>
+      <form onSubmit={submit} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <Label className="text-xs uppercase tracking-[0.18em]">New password</Label>
+            <div className="relative mt-2">
+              <Input type={show ? "text" : "password"} value={pw} onChange={(e) => setPw(e.target.value)} minLength={6} required className="pr-10" />
+              <button type="button" onClick={() => setShow((v) => !v)} className="absolute right-2 top-1/2 -translate-y-1/2 text-charcoal/60 hover:text-navy-deep text-[11px] uppercase tracking-[0.15em] font-semibold">
+                {show ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs uppercase tracking-[0.18em]">Confirm password</Label>
+            <Input type={show ? "text" : "password"} value={confirm} onChange={(e) => setConfirm(e.target.value)} minLength={6} required className="mt-2" />
+          </div>
+        </div>
+        <div className="pt-2">
+          <Button type="submit" disabled={saving} className="h-11 px-8 bg-navy-deep text-white font-semibold uppercase tracking-[0.18em] text-xs">
+            {saving ? "Updating…" : "Update password"}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/_authenticated/profile")({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(siteChromeQuery());
@@ -191,8 +241,9 @@ function ProfilePage() {
                   <div>
                     <Label className="text-xs uppercase tracking-[0.18em]">Please specify *</Label>
                     <Input value={designationOther} onChange={(e) => setDesignationOther(e.target.value)} required className="mt-2" />
-                  </div>
-                )}
+            </div>
+          )}
+          {!loading && user && <ChangePasswordSection />}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs uppercase tracking-[0.18em]">KingsChat ID</Label>
