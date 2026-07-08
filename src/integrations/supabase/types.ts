@@ -898,6 +898,7 @@ export type Database = {
         Row: {
           access_mode: string
           access_password_hash: string | null
+          access_password_plain: string | null
           category_id: string | null
           created_at: string
           description: string | null
@@ -924,6 +925,7 @@ export type Database = {
         Insert: {
           access_mode?: string
           access_password_hash?: string | null
+          access_password_plain?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
@@ -950,6 +952,7 @@ export type Database = {
         Update: {
           access_mode?: string
           access_password_hash?: string | null
+          access_password_plain?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null

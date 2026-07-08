@@ -190,13 +190,29 @@ export const adminSetVideoAccess = createServerFn({ method: "POST" })
     const patch: any = { access_mode: data.access_mode, price_espees: data.price_espees ?? null };
     if (data.password !== undefined && data.password !== null && data.password !== "") {
       patch.access_password_hash = await sha256(data.password);
+      patch.access_password_plain = data.password;
     } else if (data.password === null) {
       patch.access_password_hash = null;
+      patch.access_password_plain = null;
     }
     const { error } = await supabaseAdmin.from("videos").update(patch).eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
+
+export const adminGetVideoPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => d)
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roleRows } = await supabaseAdmin
+      .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin"] as any);
+    if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
+    const { data: row } = await supabaseAdmin
+      .from("videos").select("access_password_plain").eq("id", data.id).maybeSingle();
+    return { password: (row as any)?.access_password_plain ?? null };
+  });
+
 
 export const adminSetBroadcastAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

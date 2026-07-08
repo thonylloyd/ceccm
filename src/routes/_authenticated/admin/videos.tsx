@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { adminList, adminUpsert, adminDelete } from "@/lib/admin.functions";
-import { adminSetVideoAccess } from "@/lib/access.functions";
+import { adminSetVideoAccess, adminGetVideoPassword } from "@/lib/access.functions";
 import { PageHeader, Field, Input, Textarea, Button, Card } from "@/components/admin/ui";
 import { MediaPicker } from "@/components/admin/MediaPicker";
 import { Plus, Trash2, ChevronDown, ChevronUp, Loader2, Star, ExternalLink, Eye, EyeOff } from "lucide-react";
@@ -152,7 +152,29 @@ function VideosList() {
 function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
   const [local, setLocal] = useState(v);
   const [showPw, setShowPw] = useState(false);
+  const [revealing, setRevealing] = useState(false);
+  const getPw = useServerFn(adminGetVideoPassword);
   const set = (k: string, val: any) => setLocal((s: any) => ({ ...s, [k]: val }));
+
+  const toggleReveal = async () => {
+    // If we're about to show, and no new password typed yet, and there is an existing stored hash → fetch plaintext
+    if (!showPw && local._new_password == null && local.access_password_hash && local.id) {
+      try {
+        setRevealing(true);
+        const res: any = await getPw({ data: { id: local.id } });
+        if (res?.password) {
+          set("_new_password", res.password);
+        } else {
+          toast.error("No recoverable password stored. Set a new one.");
+        }
+      } catch (e: any) {
+        toast.error(e.message ?? "Could not reveal password");
+      } finally {
+        setRevealing(false);
+      }
+    }
+    setShowPw((s) => !s);
+  };
 
   return (
     <Card className="!p-0">
@@ -233,8 +255,8 @@ function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
                       placeholder={local.access_password_hash ? "Leave blank to keep existing" : "Set a password"}
                       className="pr-10"
                     />
-                    <button type="button" onClick={() => setShowPw((s) => !s)} className="absolute right-2 top-1/2 -translate-y-1/2 text-charcoal/50 hover:text-navy-deep" aria-label={showPw ? "Hide password" : "Show password"}>
-                      {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <button type="button" onClick={toggleReveal} disabled={revealing} className="absolute right-2 top-1/2 -translate-y-1/2 text-charcoal/50 hover:text-navy-deep disabled:opacity-50" aria-label={showPw ? "Hide password" : "Show password"}>
+                      {revealing ? <Loader2 className="h-4 w-4 animate-spin" /> : showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </Field>
