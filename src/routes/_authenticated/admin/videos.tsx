@@ -224,13 +224,19 @@ function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
               </Field>
               {(local.access_mode === "password" || local.access_mode === "password_paid") && (
                 <Field label={local.access_password_hash ? "Password (✓ set — type to replace)" : "Password"}>
-                  <Input
-                    type="text"
-                    value={local._new_password ?? (local.access_password_hash ? "••••••••" : "")}
-                    onFocus={(e) => { if (local.access_password_hash && local._new_password == null) { set("_new_password", ""); e.target.value = ""; } }}
-                    onChange={(e) => set("_new_password", e.target.value)}
-                    placeholder={local.access_password_hash ? "Leave blank to keep existing" : "Set a password"}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showPw ? "text" : "password"}
+                      value={local._new_password ?? (local.access_password_hash ? "••••••••" : "")}
+                      onFocus={(e) => { if (local.access_password_hash && local._new_password == null) { set("_new_password", ""); e.target.value = ""; } }}
+                      onChange={(e) => set("_new_password", e.target.value)}
+                      placeholder={local.access_password_hash ? "Leave blank to keep existing" : "Set a password"}
+                      className="pr-10"
+                    />
+                    <button type="button" onClick={() => setShowPw((s) => !s)} className="absolute right-2 top-1/2 -translate-y-1/2 text-charcoal/50 hover:text-navy-deep" aria-label={showPw ? "Hide password" : "Show password"}>
+                      {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </Field>
               )}
               {(local.access_mode === "paid" || local.access_mode === "password_paid") && (
