@@ -22,8 +22,8 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
 
   useEffect(() => {
     if (!user) { setIsAdmin(false); setProfile(null); setAvatarUrl(null); return; }
-    supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
-      .then(({ data }) => setIsAdmin(!!data));
+    supabase.from("user_roles").select("role").eq("user_id", user.id).in("role", ["admin", "super_admin"] as any)
+      .then(({ data }) => setIsAdmin(!!(data && data.length)));
     supabase.from("profiles").select("display_name, avatar_url, designation, designation_other").eq("id", user.id).maybeSingle()
       .then(({ data }) => {
         const p = (data as any) ?? null;
