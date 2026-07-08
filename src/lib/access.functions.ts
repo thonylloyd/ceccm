@@ -206,9 +206,9 @@ export const adminSetBroadcastAccess = createServerFn({ method: "POST" })
   }) => d)
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: isAdmin } = await supabaseAdmin
-      .from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
-    if (!isAdmin) throw new Error("Forbidden");
+    const { data: roleRows } = await supabaseAdmin
+      .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin"] as any);
+    if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
     const patch: any = { access_mode: data.access_mode, price_espees: data.price_espees ?? null };
     if (data.password !== undefined && data.password !== null && data.password !== "") {
       patch.access_password_hash = await sha256(data.password);
