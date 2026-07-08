@@ -151,6 +151,7 @@ function VideosList() {
 
 function VideoEditor({ v, cats, expanded, onToggle, onSave, onDelete }: any) {
   const [local, setLocal] = useState(v);
+  const [showPw, setShowPw] = useState(false);
   const set = (k: string, val: any) => setLocal((s: any) => ({ ...s, [k]: val }));
 
   return (
