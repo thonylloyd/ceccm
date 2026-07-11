@@ -34,6 +34,7 @@ export function ProfileCompletionModal() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [zones, setZones] = useState<{ id: string; name: string }[]>([]);
 
   const [displayName, setDisplayName] = useState("");
   const [designation, setDesignation] = useState("");
@@ -46,8 +47,10 @@ export function ProfileCompletionModal() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setUser(s?.user ?? null));
+    supabase.from("zones").select("id,name").order("name").then(({ data }) => setZones((data as any) ?? []));
     return () => sub.subscription.unsubscribe();
   }, []);
+
 
   useEffect(() => {
     if (!user) { setProfile(null); setOpen(false); return; }
