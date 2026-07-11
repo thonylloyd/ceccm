@@ -161,6 +161,17 @@ export const approveReport = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
+
+    if (row?.reporter_id) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("portal_notifications").insert({
+        user_id: row.reporter_id,
+        type: "report_approved",
+        title: "Your weekly report was approved",
+        body: `Report for week starting ${row.week_start} has been approved.`,
+        link: "/portal/reports",
+      });
+    }
     return row;
   });
 
