@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listResources, logResourceView } from "@/lib/resources.functions";
-import { usePortalSession } from "./route";
+import { usePortalSession } from "./portal-context";
 import {
   FileText, Video, Link as LinkIcon, GraduationCap,
   Search, Filter, ExternalLink, Download, Loader2,

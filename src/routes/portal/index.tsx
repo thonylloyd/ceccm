@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getPortalOverview } from "@/lib/portal.functions";
-import { usePortalSession } from "./route";
+import { usePortalSession } from "./portal-context";
 import { FileText, GraduationCap, Users2, BarChart3, Building2, MapPin, ChurchIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 

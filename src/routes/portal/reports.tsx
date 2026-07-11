@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo } from "react";
-import { usePortalSession } from "./route";
+import { usePortalSession } from "./portal-context";
 import {
   listReports, saveReport, approveReport, deleteReport, getMyAssignments,
   REPORT_NUMERIC_FIELDS,
