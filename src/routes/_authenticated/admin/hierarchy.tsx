@@ -11,6 +11,7 @@ const TABS = [
   { key: "zones", label: "Zones" },
   { key: "group_churches", label: "Group Churches" },
   { key: "churches", label: "Churches" },
+  { key: "assignments", label: "Pastor Assignments" },
 ] as const;
 
 function HierarchyAdmin() {
@@ -81,6 +82,23 @@ function HierarchyAdmin() {
             { key: "description", label: "Description", type: "textarea" },
           ]}
           defaults={{ name: "New Church", is_active: true }}
+        />
+      )}
+
+      {tab === "assignments" && (
+        <SectionEditor
+          key="assignments"
+          title="Pastor Assignments"
+          table="pastor_assignments"
+          titleKey="user_id"
+          fields={[
+            { key: "user_id", label: "User ID (from Users tab)", type: "text" },
+            { key: "role", label: "Role (church_pastor / group_pastor / zonal_pastor / external_pastor)", type: "text" },
+            { key: "zone_id", label: "Zone ID (optional)", type: "text" },
+            { key: "group_church_id", label: "Group Church ID (optional)", type: "text" },
+            { key: "church_id", label: "Church ID (optional)", type: "text" },
+          ]}
+          defaults={{ role: "church_pastor" }}
         />
       )}
     </div>

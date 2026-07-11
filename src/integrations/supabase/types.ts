@@ -1105,6 +1105,142 @@ export type Database = {
           },
         ]
       }
+      weekly_reports: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          cell_attendance: number
+          cell_leaders_added: number
+          cell_leaders_total: number
+          cell_members_added: number
+          cell_members_total: number
+          church_attendance: number
+          church_id: string | null
+          client_uuid: string | null
+          created_at: string
+          discipleship_added: number
+          discipleship_total: number
+          filled_with_spirit: number
+          first_timers: number
+          foundation_school_added: number
+          foundation_school_total: number
+          group_church_id: string | null
+          id: string
+          month: number
+          new_converts: number
+          notes: string | null
+          partners: number
+          reporter_id: string
+          status: string
+          submitted_at: string | null
+          tithers: number
+          updated_at: string
+          water_baptized: number
+          week_number: number
+          week_start: string
+          workers_added: number
+          workers_total: number
+          year: number
+          zone_id: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          cell_attendance?: number
+          cell_leaders_added?: number
+          cell_leaders_total?: number
+          cell_members_added?: number
+          cell_members_total?: number
+          church_attendance?: number
+          church_id?: string | null
+          client_uuid?: string | null
+          created_at?: string
+          discipleship_added?: number
+          discipleship_total?: number
+          filled_with_spirit?: number
+          first_timers?: number
+          foundation_school_added?: number
+          foundation_school_total?: number
+          group_church_id?: string | null
+          id?: string
+          month: number
+          new_converts?: number
+          notes?: string | null
+          partners?: number
+          reporter_id: string
+          status?: string
+          submitted_at?: string | null
+          tithers?: number
+          updated_at?: string
+          water_baptized?: number
+          week_number: number
+          week_start: string
+          workers_added?: number
+          workers_total?: number
+          year: number
+          zone_id?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          cell_attendance?: number
+          cell_leaders_added?: number
+          cell_leaders_total?: number
+          cell_members_added?: number
+          cell_members_total?: number
+          church_attendance?: number
+          church_id?: string | null
+          client_uuid?: string | null
+          created_at?: string
+          discipleship_added?: number
+          discipleship_total?: number
+          filled_with_spirit?: number
+          first_timers?: number
+          foundation_school_added?: number
+          foundation_school_total?: number
+          group_church_id?: string | null
+          id?: string
+          month?: number
+          new_converts?: number
+          notes?: string | null
+          partners?: number
+          reporter_id?: string
+          status?: string
+          submitted_at?: string | null
+          tithers?: number
+          updated_at?: string
+          water_baptized?: number
+          week_number?: number
+          week_start?: string
+          workers_added?: number
+          workers_total?: number
+          year?: number
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_reports_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_reports_group_church_id_fkey"
+            columns: ["group_church_id"]
+            isOneToOne: false
+            referencedRelation: "group_churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_reports_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       zones: {
         Row: {
           created_at: string
@@ -1134,6 +1270,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_submit_report_for: {
+        Args: { _church_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_report: {
+        Args: {
+          _church_id: string
+          _group_church_id: string
+          _user_id: string
+          _zone_id: string
+        }
+        Returns: boolean
+      }
       has_permission: {
         Args: { _key: string; _user_id: string }
         Returns: boolean
