@@ -175,8 +175,21 @@ export function ProfileCompletionModal() {
             </div>
             <div>
               <Label className="text-xs uppercase tracking-[0.18em]">Zone *</Label>
-              <Input value={zone} onChange={(e) => setZone(e.target.value)} required className="mt-2" />
+              {zones.length > 0 ? (
+                <select
+                  value={zone}
+                  onChange={(e) => setZone(e.target.value)}
+                  required
+                  className="mt-2 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                >
+                  <option value="" disabled>Select a zone…</option>
+                  {zones.map((z) => <option key={z.id} value={z.name}>{z.name}</option>)}
+                </select>
+              ) : (
+                <Input value={zone} onChange={(e) => setZone(e.target.value)} required className="mt-2" placeholder="Your zone" />
+              )}
             </div>
+
           </div>
           <Button type="submit" disabled={saving} className="w-full h-11 bg-gradient-to-r from-gold to-gold-soft text-navy-deep font-semibold uppercase tracking-[0.18em] text-xs">
             {saving ? "Saving…" : "Save & continue"}
