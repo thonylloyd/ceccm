@@ -1,35 +1,64 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { Database } from "@/integrations/supabase/types";
+
+export type AppRole = Database["public"]["Enums"]["app_role"];
+
+const ALL_ROLES: AppRole[] = [
+  "site_maintenance",
+  "super_admin",
+  "admin",
+  "zonal_pastor",
+  "group_pastor",
+  "church_pastor",
+  "external_pastor",
+  "member",
+];
+
+const RoleSchema = z.enum([
+  "site_maintenance",
+  "super_admin",
+  "admin",
+  "zonal_pastor",
+  "group_pastor",
+  "church_pastor",
+  "external_pastor",
+  "member",
+]);
+
+// Roles that appear in the permissions matrix (site_maintenance always has all).
+const MATRIX_ROLES: AppRole[] = [
+  "super_admin",
+  "admin",
+  "zonal_pastor",
+  "group_pastor",
+  "church_pastor",
+  "external_pastor",
+  "member",
+];
 
 // ---------- role helpers ----------
 async function loadAdminContext(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: roleRows } = await supabaseAdmin
     .from("user_roles").select("role").eq("user_id", userId);
-  const roles = (roleRows ?? []).map((r: any) => r.role as string);
-  const isSuperAdmin = roles.includes("super_admin");
-  const isAdmin = isSuperAdmin || roles.includes("admin");
-  return { supabaseAdmin, roles, isAdmin, isSuperAdmin };
+  const roles = (roleRows ?? []).map((r: any) => r.role as AppRole);
+  const isSiteMaintenance = roles.includes("site_maintenance");
+  const isAdmin = isSiteMaintenance || roles.includes("admin") || roles.includes("super_admin");
+  return { supabaseAdmin, roles, isAdmin, isSiteMaintenance };
 }
 
-async function requireAdmin(userId: string) {
+async function requireSiteMaintenance(userId: string) {
   const ctx = await loadAdminContext(userId);
-  if (!ctx.isAdmin) throw new Error("Forbidden");
-  return ctx;
-}
-
-async function requireSuperAdmin(userId: string) {
-  const ctx = await loadAdminContext(userId);
-  if (!ctx.isSuperAdmin) throw new Error("Forbidden");
+  if (!ctx.isSiteMaintenance) throw new Error("Forbidden");
   return ctx;
 }
 
 async function requirePermission(userId: string, key: string) {
   const ctx = await loadAdminContext(userId);
-  if (ctx.isSuperAdmin) return ctx;
+  if (ctx.isSiteMaintenance) return ctx;
   if (!ctx.isAdmin) throw new Error("Forbidden");
-  // Check role_permissions for any of the user's roles
   const { data } = await ctx.supabaseAdmin
     .from("role_permissions")
     .select("permission_key")
@@ -44,9 +73,9 @@ async function requirePermission(userId: string, key: string) {
 export const getIsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin, roles, isAdmin, isSuperAdmin } = await loadAdminContext(context.userId);
+    const { supabaseAdmin, roles, isAdmin, isSiteMaintenance } = await loadAdminContext(context.userId);
     let permissions: string[] = [];
-    if (isSuperAdmin) {
+    if (isSiteMaintenance) {
       const { data } = await supabaseAdmin.from("permissions").select("key");
       permissions = (data ?? []).map((p: any) => p.key);
     } else if (isAdmin) {
@@ -54,10 +83,10 @@ export const getIsAdmin = createServerFn({ method: "GET" })
         .from("role_permissions").select("permission_key").in("role", roles as any);
       permissions = Array.from(new Set((data ?? []).map((p: any) => p.permission_key)));
     }
-    return { isAdmin, isSuperAdmin, roles, permissions, userId: context.userId };
+    return { isAdmin, isSuperAdmin: isSiteMaintenance, isSiteMaintenance, roles, permissions, userId: context.userId };
   });
 
-// Bootstrap: promote the first user to super_admin if none exists
+// Bootstrap: promote the first user to site_maintenance if none exists
 export const bootstrapAdminIfNone = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -65,11 +94,11 @@ export const bootstrapAdminIfNone = createServerFn({ method: "POST" })
     const { count } = await supabaseAdmin
       .from("user_roles")
       .select("*", { count: "exact", head: true })
-      .eq("role", "super_admin");
+      .eq("role", "site_maintenance");
     if ((count ?? 0) > 0) return { promoted: false };
     await supabaseAdmin
       .from("user_roles")
-      .insert({ user_id: context.userId, role: "super_admin" });
+      .insert({ user_id: context.userId, role: "site_maintenance" });
     return { promoted: true };
   });
 
@@ -90,9 +119,14 @@ const TableSchema = z.enum([
   "broadcast_stats",
   "praise_reports",
   "leadership",
+  "zones",
+  "group_churches",
+  "churches",
 ]);
+type ManagedTable = z.infer<typeof TableSchema>;
 
-// Map table → required permission key
+
+
 const TABLE_PERMISSION: Record<string, string> = {
   hero_banners: "homepage",
   mission_cards: "homepage",
@@ -109,6 +143,9 @@ const TABLE_PERMISSION: Record<string, string> = {
   broadcasts: "livestream",
   broadcast_channels: "livestream",
   broadcast_stats: "livestream",
+  zones: "hierarchy",
+  group_churches: "hierarchy",
+  churches: "hierarchy",
 };
 
 export const adminList = createServerFn({ method: "POST" })
@@ -214,9 +251,6 @@ export const recordMediaAsset = createServerFn({ method: "POST" })
   });
 
 // ---------- users ----------
-type AppRole = "super_admin" | "admin" | "viewer";
-const RoleSchema = z.enum(["super_admin", "admin", "viewer"]);
-
 export const listUsersWithRoles = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -225,10 +259,10 @@ export const listUsersWithRoles = createServerFn({ method: "GET" })
       supabaseAdmin.from("profiles").select("*").order("created_at", { ascending: false }),
       supabaseAdmin.from("user_roles").select("*"),
     ]);
-    const byUser: Record<string, string[]> = {};
+    const byUser: Record<string, AppRole[]> = {};
     for (const r of roles ?? []) {
       byUser[r.user_id] ||= [];
-      byUser[r.user_id].push(r.role);
+      byUser[r.user_id].push(r.role as AppRole);
     }
     return (profiles ?? []).map((p) => ({ ...p, roles: byUser[p.id] ?? [] }));
   });
@@ -241,12 +275,10 @@ export const setUserRole = createServerFn({ method: "POST" })
     grant: !!data.grant,
   }))
   .handler(async ({ data, context }) => {
-    // Only super admins can change roles
-    await requireSuperAdmin(context.userId);
+    await requireSiteMaintenance(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // Safety: don't allow removing your own super_admin
-    if (!data.grant && data.role === "super_admin" && data.user_id === context.userId) {
-      throw new Error("You cannot revoke your own super admin role.");
+    if (!data.grant && data.role === "site_maintenance" && data.user_id === context.userId) {
+      throw new Error("You cannot revoke your own Site Maintenance role.");
     }
     if (data.grant) {
       await supabaseAdmin.from("user_roles").upsert({ user_id: data.user_id, role: data.role });
@@ -265,7 +297,7 @@ export const createUserAccount = createServerFn({ method: "POST" })
     role: data.role ? RoleSchema.parse(data.role) : undefined,
   }))
   .handler(async ({ data, context }) => {
-    await requireSuperAdmin(context.userId);
+    await requireSiteMaintenance(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
@@ -275,11 +307,10 @@ export const createUserAccount = createServerFn({ method: "POST" })
     });
     if (error) throw error;
     const uid = created.user!.id;
-    // Profile is created by handle_new_user trigger; update display_name if provided
     if (data.display_name) {
       await supabaseAdmin.from("profiles").update({ display_name: data.display_name }).eq("id", uid);
     }
-    if (data.role) {
+    if (data.role && data.role !== "member") {
       await supabaseAdmin.from("user_roles").upsert({ user_id: uid, role: data.role });
     }
     return { ok: true, user_id: uid };
@@ -289,7 +320,7 @@ export const deleteUserAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { user_id: string }) => ({ user_id: z.string().uuid().parse(data.user_id) }))
   .handler(async ({ data, context }) => {
-    await requireSuperAdmin(context.userId);
+    await requireSiteMaintenance(context.userId);
     if (data.user_id === context.userId) throw new Error("You cannot delete your own account.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.user_id);
@@ -301,7 +332,7 @@ export const deleteUserAccount = createServerFn({ method: "POST" })
 export const listPermissionsMatrix = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireSuperAdmin(context.userId);
+    await requireSiteMaintenance(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: perms }, { data: rp }] = await Promise.all([
       supabaseAdmin.from("permissions").select("*").order("sort_order"),
@@ -310,7 +341,8 @@ export const listPermissionsMatrix = createServerFn({ method: "GET" })
     return {
       permissions: perms ?? [],
       role_permissions: rp ?? [],
-      roles: ["admin", "viewer"] as AppRole[], // super_admin has all implicitly
+      roles: MATRIX_ROLES,
+      all_roles: ALL_ROLES,
     };
   });
 
@@ -322,8 +354,8 @@ export const setRolePermission = createServerFn({ method: "POST" })
     grant: !!data.grant,
   }))
   .handler(async ({ data, context }) => {
-    await requireSuperAdmin(context.userId);
-    if (data.role === "super_admin") throw new Error("Super admin has all permissions by default.");
+    await requireSiteMaintenance(context.userId);
+    if (data.role === "site_maintenance") throw new Error("Site Maintenance has all permissions by default.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.grant) {
       await supabaseAdmin.from("role_permissions").upsert({ role: data.role, permission_key: data.permission_key });

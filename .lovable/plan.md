@@ -1,97 +1,90 @@
 ## Scope
 
-Big batch of changes across homepage, About page, Admin CMS, and Livestream/Videos access control. Grouped below.
+This is a very large spec — 15 modules touching auth, RBAC, a new Portal, a weekly reporting system, church hierarchy, LMS, analytics, homepage additions, and export tooling. I'll deliver in phases so each phase ships working and reviewable. Confirm the phase order below (or reorder) before I start.
 
 ---
 
-### 1. Homepage — Mission section
+## Phase 1 — Roles, Portal shell, hierarchy data model
 
-- Add admin-controlled **Mission Statement** (paragraph above the cards).
-- Switch Mission cards grid to **4 columns on desktop** (was 3): `md:grid-cols-2 lg:grid-cols-4`.
-- Source the mission statement from `site_settings` key `homepage_mission` (`{ title, statement }`).
-- Add a new admin sub-tab in **Admin → Homepage → Mission** for editing the statement.
+**Roles migration (Modules 2, 8):**
+- Rename enum: `super_admin` → `site_maintenance`, `viewer` → `super_admin`. Add new `admin` stays as-is. Add `member`, `zonal_pastor`, `group_pastor`, `church_pastor`, `external_pastor`.
+- Existing site_maintenance user preserved (was super_admin).
+- New auth signups auto-assigned `member` via `handle_new_user` trigger.
+- Update all `is_super_admin` / `is_admin` SQL helpers + RLS policies to the renamed enum.
+- Update admin sidebar labels & permissions matrix references.
 
-### 2. Homepage — Praise Reports section (new)
+**Church hierarchy tables (Module 7):**
+- `zones (name, description)`
+- `group_churches (name, zone_id)`
+- `churches (name, group_church_id)`
+- `pastor_assignments (user_id, role, zone_id?, group_church_id?, church_id?)` — drives report visibility.
+- RLS + grants + admin CRUD pages under `/admin/zones`, `/admin/group-churches`, `/admin/churches`, `/admin/assignments`.
 
-- New section between Programs and Resources displaying testimonial quotes (large quote marks, author name, role).
-- CMS-managed via new table `praise_reports` (quote, author, role, display_order, is_active).
-- New tab in **Admin → Homepage → Praise Reports** using existing `SectionEditor`.
-- Seed the three provided testimonies.
+**Portal shell (Module 1):**
+- New pathless layout `src/routes/_portal/route.tsx` gating `/portal/*` to allowed roles; unauth → `/auth`, unauthorized role → `/portal/access-denied`.
+- Portal dashboard `/portal` renders a role-specific dashboard component (stub cards for each role in Phase 1; real widgets in later phases).
+- "Portal" link added to `UserMenu` when user has portal-eligible role.
 
-### 3. About Page (`/about`)
-
-- Build complete page with sections: Hero, Who We Are (image left / text right), Leadership (3-card grid, middle elevated), Our Mission (intro + 4 cards), Why We Exist (icon grid/timeline), CTA section.
-- Add `head()` with title, description, OG, Twitter, canonical, JSON-LD Organization.
-- All content driven by `site_settings` keys + a new `leadership` table.
-- New **Admin → About** tab (rebuild existing minimal one) with sub-tabs: Hero, Who We Are, Leadership, Mission Intro, Purpose Statements, CTA, SEO.
-
-### 4. Admin — Livestream Settings: Add CTA button settings
-
-- In `admin/livestream.tsx` Settings sub-tab, add Livestream CTA fields (label, url, bg color, text color, new tab, start/end date) stored in `site_settings.livestream_cta`.
-- Surface on `/live` page hero.
-
-### 5. Admin — Livestream device camera/mic broadcasting
-
-- In **Admin → Livestream**, add "Go Live from Browser" panel using `navigator.mediaDevices.getUserMedia` to preview camera/mic.
-- Provide RTMP/stream URL fields (record only — actual streaming server is out of scope; admin can paste embed URL once broadcasting elsewhere). Set `is_live` toggle + live preview.
-- Note in UI: in-browser broadcast preview only; for distribution paste an embed URL (HLS/YouTube/etc).
-
-### 6. Auth + Paywall on Videos & Livestream
-
-- Require auth to view any video detail page (`/videos/$slug`) and the live player on `/live`.
-  - If not signed in, render Sign-in CTA instead of the player.
-- Add admin-controlled access mode per video/broadcast:
-  - `access_mode`: `free | password | paid`
-  - `password` (text, hashed server-side) and `price_espees` (numeric).
-- Schema: add columns to `videos` and `broadcasts`: `access_mode`, `access_password_hash`, `price_espees`, plus `video_unlocks(user_id, video_id)` and `broadcast_unlocks(user_id, broadcast_id)` tables to record unlocks.
-- Server functions:
-  - `unlockVideoWithPassword({slug,password})` → verifies hash, inserts unlock.
-  - `recordVideoPurchase({slug})` → placeholder marking paid (Espees integration out of scope, just mark unlocked).
-  - Same for broadcasts.
-- Gate player rendering on having an unlock row when `access_mode != free`.
-
-### 7. Admin CMS for video/broadcast access
-
-- Videos admin: add Access fields (mode, password, price ESPEES).
-- Livestream admin: same fields on broadcast editor.
+**Profile modal (Module 8):**
+- Zone dropdown sourced from `zones` table.
+- Designation adds: Church Coordinator, Group Pastor, Zonal Pastor.
 
 ---
 
-## Technical Details
+## Phase 2 — Weekly reporting system (Modules 5, 6, 14)
 
-**Migrations (single migration):**
-- `CREATE TABLE public.praise_reports (id uuid pk, quote text, author text, role text, display_order int, is_active bool, created_at, updated_at)` + grants (anon SELECT, authenticated full, service_role all) + RLS (public read active; admin manage).
-- `CREATE TABLE public.leadership (id uuid pk, name text, position text, message text, photo_url text, display_order int, is_active bool, is_featured bool, created_at, updated_at)` + grants + RLS.
-- `ALTER TABLE videos ADD COLUMN access_mode text default 'free', access_password_hash text, price_espees numeric`.
-- `ALTER TABLE broadcasts ADD COLUMN access_mode text default 'free', access_password_hash text, price_espees numeric`.
-- `CREATE TABLE video_unlocks (user_id uuid, video_id uuid, created_at, primary key(user_id, video_id))` + RLS (user can read own; service_role manage).
-- `CREATE TABLE broadcast_unlocks (...)` same.
-- Seed 3 praise reports.
-
-**Frontend:**
-- `src/components/site/PraiseReports.tsx`
-- `src/components/site/MissionSection.tsx`: add `statement` prop + 4-col grid.
-- `src/lib/cms.functions.ts`: extend `getHomepage` to return `praise_reports` + `mission_statement`.
-- `src/routes/about.tsx`: full rebuild with loader using new `getAboutPage` server fn.
-- `src/lib/about.functions.ts`: server fn returning settings + leadership rows.
-- `src/lib/access.functions.ts`: unlock functions using bcrypt-style hash (use Web Crypto SHA-256 to avoid native deps).
-- `src/routes/videos.$slug.tsx`: enforce auth + access gate. Add password prompt + unlock button.
-- `src/routes/live.tsx`: same auth/access gate around player.
-
-**Admin:**
-- `src/routes/_authenticated/admin/about.tsx`: rebuild with tabs.
-- `src/routes/_authenticated/admin/homepage.tsx`: add `mission_statement` and `praise_reports` tabs.
-- `src/routes/_authenticated/admin/livestream.tsx`: add CTA settings panel + "Browser Camera" tab using getUserMedia preview.
-- `src/routes/_authenticated/admin/videos.tsx`: add access fields.
-
-**Notes:**
-- Password verified server-side via SHA-256 (no native bcrypt — Worker compat).
-- ESPEES "purchase" is placeholder unlock (no payment integration requested).
-- About page uses head() per `head-meta` rules with canonical + og:url self-referencing `/about`.
+- `weekly_reports` table with numerical growth fields + membership effectiveness fields (added_this_week, current_total pairs) + `filled_with_spirit_added`, auto-captured week/month/year, `reporter_id`, `church_id`, `group_church_id`, `zone_id`, submission timestamp, `status` (draft/submitted/approved).
+- RLS enforcing hierarchy visibility (church pastor → own; group pastor → churches in group; zonal → group churches in zone; admin/site maintenance → all).
+- `has_permission` extended for `reports:submit|edit|view|export|delete|approve`.
+- Report submission forms on Church Pastor / Group Pastor / Zonal Pastor / External Pastor portal dashboards.
+- Edit-own-while-unapproved logic. Approval action for admin/site maintenance.
+- Export helpers (CSV first; Excel/PDF/Print in Phase 5).
 
 ---
 
-## Out of scope (will note to user)
+## Phase 3 — Resource Center / LMS (Module 9)
 
-- Real ESPEES payment processing (just unlock placeholder).
-- Real RTMP server/WebRTC distribution for browser broadcast (preview + admin embed URL only).
+- `/resource` public entry + gated per-course access.
+- Tables: `resource_categories`, `courses`, `lessons` (pdf/video/audio/slides/quiz), `quiz_questions`, `enrollments`, `lesson_progress`, `quiz_attempts`, `certificates`.
+- Reuse existing access modes (free/password/paid/password_paid) at course level.
+- Progress tracking, "Continue learning", completion, auto certificate (client-rendered PDF).
+- Admin CMS for courses/lessons/categories.
+
+---
+
+## Phase 4 — Analytics dashboard (Module 11)
+
+- `/portal/analytics` (role-gated). Charts via `recharts` (already common in shadcn ecosystem — install if missing).
+- Aggregations from `weekly_reports` grouped by week/month/quarter/year and by zone/group/church.
+- KPIs, top performers, filters, CSV export.
+
+---
+
+## Phase 5 — Polish & remaining features
+
+- **Offline reporting (Module 10):** IndexedDB queue (`idb` package), background sync on `online` event, dedupe via client-generated report UUID + unique constraint on (reporter_id, week, year, church_id).
+- **Announcements slider (Module 12):** `announcements` table (title, body_rich, image_url, priority, expires_at, is_active) + `AnnouncementsSlider` component on homepage + admin CMS.
+- **Programs calendar view (Module 13):** month calendar on `/programs` fed from existing `programs` table.
+- **Export formats (Module 14):** add xlsx (`xlsx` pkg), PDF (`jspdf` + autotable), print stylesheet.
+- **Permissions matrix expansion (Module 15):** seed all new permission keys, expose in `/admin/permissions`.
+
+---
+
+## Technical details
+
+- Migrations grouped per phase (schema + grants + RLS + policy in same migration per new public table).
+- All new server logic via `createServerFn` with `requireSupabaseAuth` + `has_permission` checks.
+- New portal routes under `src/routes/_portal/` (pathless layout, `ssr: false`, redirect to `/auth`).
+- Existing `/admin` unchanged in structure; new admin pages added for hierarchy, courses, announcements.
+- Renames update TypeScript enums via regenerated `types.ts` after migration approval.
+
+---
+
+## Confirm before I start
+
+1. **Phase order OK?** Or do you want a specific module first (e.g., reporting before LMS)?
+2. **Role rename impact:** Existing `admin` users keep the `admin` role and its current permissions — confirm.
+3. **Announcements rich text:** OK with a simple markdown/HTML textarea, or need a full WYSIWYG editor?
+4. **Certificates:** client-side PDF (name + course + date on a template) — acceptable, or need admin-designed templates?
+
+Reply "go" (with any adjustments) and I'll start Phase 1.

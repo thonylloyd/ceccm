@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const DESIGNATIONS = ["Pastor", "Deacon", "Deaconess", "Brother", "Sister", "Other"] as const;
+const DESIGNATIONS = ["Pastor", "Deacon", "Deaconess", "Brother", "Sister", "Church Coordinator", "Group Pastor", "Zonal Pastor", "Other"] as const;
 
 type Profile = {
   display_name: string | null;
@@ -34,6 +34,7 @@ export function ProfileCompletionModal() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [zones, setZones] = useState<{ id: string; name: string }[]>([]);
 
   const [displayName, setDisplayName] = useState("");
   const [designation, setDesignation] = useState("");
@@ -46,8 +47,10 @@ export function ProfileCompletionModal() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setUser(s?.user ?? null));
+    supabase.from("zones").select("id,name").order("name").then(({ data }) => setZones((data as any) ?? []));
     return () => sub.subscription.unsubscribe();
   }, []);
+
 
   useEffect(() => {
     if (!user) { setProfile(null); setOpen(false); return; }
@@ -172,8 +175,21 @@ export function ProfileCompletionModal() {
             </div>
             <div>
               <Label className="text-xs uppercase tracking-[0.18em]">Zone *</Label>
-              <Input value={zone} onChange={(e) => setZone(e.target.value)} required className="mt-2" />
+              {zones.length > 0 ? (
+                <select
+                  value={zone}
+                  onChange={(e) => setZone(e.target.value)}
+                  required
+                  className="mt-2 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                >
+                  <option value="" disabled>Select a zone…</option>
+                  {zones.map((z) => <option key={z.id} value={z.name}>{z.name}</option>)}
+                </select>
+              ) : (
+                <Input value={zone} onChange={(e) => setZone(e.target.value)} required className="mt-2" placeholder="Your zone" />
+              )}
             </div>
+
           </div>
           <Button type="submit" disabled={saving} className="w-full h-11 bg-gradient-to-r from-gold to-gold-soft text-navy-deep font-semibold uppercase tracking-[0.18em] text-xs">
             {saving ? "Saving…" : "Save & continue"}

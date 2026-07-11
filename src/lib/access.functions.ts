@@ -185,7 +185,7 @@ export const adminSetVideoAccess = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: roleRows } = await supabaseAdmin
-      .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin"] as any);
+      .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
     const patch: any = { access_mode: data.access_mode, price_espees: data.price_espees ?? null };
     if (data.password !== undefined && data.password !== null && data.password !== "") {
@@ -206,7 +206,7 @@ export const adminGetVideoPassword = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: roleRows } = await supabaseAdmin
-      .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin"] as any);
+      .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
     const { data: row } = await supabaseAdmin
       .from("videos").select("access_password_plain").eq("id", data.id).maybeSingle();
@@ -223,7 +223,7 @@ export const adminSetBroadcastAccess = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: roleRows } = await supabaseAdmin
-      .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin"] as any);
+      .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
     const patch: any = { access_mode: data.access_mode, price_espees: data.price_espees ?? null };
     if (data.password !== undefined && data.password !== null && data.password !== "") {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { User as UserIcon, LogIn, LogOut, Shield, UserCircle } from "lucide-react";
+import { User as UserIcon, LogIn, LogOut, Shield, UserCircle, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
@@ -9,7 +9,9 @@ import { resolveAvatarUrl } from "@/lib/avatar";
 export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [hasPortal, setHasPortal] = useState(false);
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null; designation: string | null; designation_other: string | null } | null>(null);
+
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -21,10 +23,15 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
   }, []);
 
   useEffect(() => {
-    if (!user) { setIsAdmin(false); setProfile(null); setAvatarUrl(null); return; }
-    supabase.from("user_roles").select("role").eq("user_id", user.id).in("role", ["admin", "super_admin"] as any)
-      .then(({ data }) => setIsAdmin(!!(data && data.length)));
+    if (!user) { setIsAdmin(false); setHasPortal(false); setProfile(null); setAvatarUrl(null); return; }
+    supabase.from("user_roles").select("role").eq("user_id", user.id)
+      .then(({ data }) => {
+        const roles = (data ?? []).map((r: any) => r.role as string);
+        setIsAdmin(roles.some((r) => ["admin", "super_admin", "site_maintenance"].includes(r)));
+        setHasPortal(roles.some((r) => ["site_maintenance", "super_admin", "admin", "zonal_pastor", "group_pastor", "church_pastor", "external_pastor"].includes(r)));
+      });
     supabase.from("profiles").select("display_name, avatar_url, designation, designation_other").eq("id", user.id).maybeSingle()
+
       .then(({ data }) => {
         const p = (data as any) ?? null;
         setProfile(p);
@@ -59,7 +66,9 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
               <div className="text-sm font-semibold text-navy-deep truncate">{displayName}</div>
             </div>
             <Link to="/profile" className="flex items-center gap-2 text-sm text-navy-deep font-semibold"><UserCircle className="h-4 w-4" /> Profile</Link>
+            {hasPortal && <Link to="/portal" className="flex items-center gap-2 text-sm text-navy-deep font-semibold"><LayoutDashboard className="h-4 w-4" /> Portal</Link>}
             {isAdmin && <Link to="/admin" className="flex items-center gap-2 text-sm text-navy-deep font-semibold"><Shield className="h-4 w-4" /> Admin</Link>}
+
             <button onClick={signOut} className="flex items-center gap-2 text-sm text-navy-deep font-semibold text-left"><LogOut className="h-4 w-4" /> Sign Out</button>
           </div>
         ) : (
@@ -94,7 +103,9 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
                 <div className="text-[11px] uppercase tracking-[0.18em] text-charcoal/50 truncate">{user.email}</div>
               </div>
               <Link to="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><UserCircle className="h-4 w-4" /> Profile</Link>
+              {hasPortal && <Link to="/portal" className="flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><LayoutDashboard className="h-4 w-4" /> Portal</Link>}
               {isAdmin && <Link to="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><Shield className="h-4 w-4" /> Admin</Link>}
+
               <button onClick={signOut} className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-navy-deep hover:bg-light"><LogOut className="h-4 w-4" /> Sign Out</button>
             </>
           ) : (

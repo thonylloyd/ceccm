@@ -5,8 +5,9 @@ import { getIsAdmin, bootstrapAdminIfNone } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Home, Info, Calendar, Mail, Menu as MenuIcon,
-  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio, Heart, Shield,
+  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio, Heart, Shield, Building2,
 } from "lucide-react";
+
 import { useEffect } from "react";
 import { AdminCtx } from "./admin-context";
 export { useAdminSession } from "./admin-context";
@@ -26,7 +27,9 @@ const NAV: NavLink[] = [
   { to: "/admin/navigation", label: "Navigation", icon: MenuIcon, permission: "navigation" },
   { to: "/admin/media", label: "Media Library", icon: ImageIcon, permission: "media" },
   { to: "/admin/videos", label: "Videos", icon: Video, permission: "videos" },
+  { to: "/admin/hierarchy", label: "Hierarchy", icon: Building2, permission: "hierarchy" },
   { to: "/admin/users", label: "Users", icon: Users, permission: "users" },
+
   { to: "/admin/salvation-leads", label: "Salvation Leads", icon: Heart, permission: "salvation_leads" },
   { to: "/admin/settings", label: "Settings", icon: Settings, permission: "settings" },
   { to: "/admin/permissions", label: "Permissions", icon: Shield, permission: "permissions", superOnly: true },
@@ -79,7 +82,7 @@ function AdminLayout() {
           <div className="px-6 py-6 border-b border-white/10">
             <div className="font-display text-xl text-gold">CCM Admin</div>
             <div className="text-[10px] uppercase tracking-[0.22em] text-white/50 mt-1">
-              {session.isSuperAdmin ? "Super Admin" : "Content Manager"}
+              {session.isSiteMaintenance ? "Site Maintenance" : "Content Manager"}
             </div>
           </div>
           <nav className="flex-1 px-3 py-4 space-y-0.5">
