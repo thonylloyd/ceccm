@@ -24,6 +24,7 @@ import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as VideosSlugRouteImport } from './routes/videos.$slug'
 import { Route as PortalResourcesRouteImport } from './routes/portal/resources'
 import { Route as PortalReportsRouteImport } from './routes/portal/reports'
+import { Route as PortalAnalyticsRouteImport } from './routes/portal/analytics'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -114,6 +115,11 @@ const PortalResourcesRoute = PortalResourcesRouteImport.update({
 const PortalReportsRoute = PortalReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
+const PortalAnalyticsRoute = PortalAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => PortalRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/videos': typeof VideosRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/reports': typeof PortalReportsRoute
   '/portal/resources': typeof PortalResourcesRoute
   '/videos/$slug': typeof VideosSlugRoute
@@ -255,6 +262,7 @@ export interface FileRoutesByTo {
   '/programs': typeof ProgramsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/reports': typeof PortalReportsRoute
   '/portal/resources': typeof PortalResourcesRoute
   '/videos/$slug': typeof VideosSlugRoute
@@ -290,6 +298,7 @@ export interface FileRoutesById {
   '/videos': typeof VideosRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/reports': typeof PortalReportsRoute
   '/portal/resources': typeof PortalResourcesRoute
   '/videos/$slug': typeof VideosSlugRoute
@@ -325,6 +334,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin'
     | '/profile'
+    | '/portal/analytics'
     | '/portal/reports'
     | '/portal/resources'
     | '/videos/$slug'
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/programs'
     | '/reset-password'
     | '/profile'
+    | '/portal/analytics'
     | '/portal/reports'
     | '/portal/resources'
     | '/videos/$slug'
@@ -389,6 +400,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/_authenticated/admin'
     | '/_authenticated/profile'
+    | '/portal/analytics'
     | '/portal/reports'
     | '/portal/resources'
     | '/videos/$slug'
@@ -529,6 +541,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/portal/reports'
       preLoaderRoute: typeof PortalReportsRouteImport
+      parentRoute: typeof PortalRouteRoute
+    }
+    '/portal/analytics': {
+      id: '/portal/analytics'
+      path: '/analytics'
+      fullPath: '/portal/analytics'
+      preLoaderRoute: typeof PortalAnalyticsRouteImport
       parentRoute: typeof PortalRouteRoute
     }
     '/_authenticated/profile': {
@@ -710,12 +729,14 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface PortalRouteRouteChildren {
+  PortalAnalyticsRoute: typeof PortalAnalyticsRoute
   PortalReportsRoute: typeof PortalReportsRoute
   PortalResourcesRoute: typeof PortalResourcesRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteRouteChildren: PortalRouteRouteChildren = {
+  PortalAnalyticsRoute: PortalAnalyticsRoute,
   PortalReportsRoute: PortalReportsRoute,
   PortalResourcesRoute: PortalResourcesRoute,
   PortalIndexRoute: PortalIndexRoute,
