@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getPortalSession } from "@/lib/portal.functions";
 import { Loader2, Home, LayoutDashboard, FileText, Users2, BarChart3, GraduationCap, LogOut } from "lucide-react";
-import { createContext, useContext } from "react";
 import { NotificationsBell } from "@/components/portal/NotificationsBell";
+import { PortalCtx, type PortalSession } from "./portal-context";
 
 export const Route = createFileRoute("/portal")({
   ssr: false,
@@ -16,27 +16,6 @@ export const Route = createFileRoute("/portal")({
   },
   component: PortalLayout,
 });
-
-export type PortalSession = {
-  userId: string;
-  roles: string[];
-  isSiteMaintenance: boolean;
-  isAdmin: boolean;
-  isPastor: boolean;
-  isExternalPastor: boolean;
-  isZonalPastor: boolean;
-  isGroupPastor: boolean;
-  isChurchPastor: boolean;
-  isMember: boolean;
-  hasPortalAccess: boolean;
-};
-
-const PortalCtx = createContext<PortalSession | null>(null);
-export const usePortalSession = () => {
-  const v = useContext(PortalCtx);
-  if (!v) throw new Error("usePortalSession outside PortalLayout");
-  return v;
-};
 
 function PortalLayout() {
   const navigate = useNavigate();
