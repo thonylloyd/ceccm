@@ -22,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as VideosSlugRouteImport } from './routes/videos.$slug'
+import { Route as PortalResourcesRouteImport } from './routes/portal/resources'
 import { Route as PortalReportsRouteImport } from './routes/portal/reports'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
@@ -30,6 +31,7 @@ import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminSalvationLeadsRouteImport } from './routes/_authenticated/admin/salvation-leads'
+import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin/resources'
 import { Route as AuthenticatedAdminProgramsRouteImport } from './routes/_authenticated/admin/programs'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
 import { Route as AuthenticatedAdminNavigationRouteImport } from './routes/_authenticated/admin/navigation'
@@ -104,6 +106,11 @@ const VideosSlugRoute = VideosSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => VideosRoute,
 } as any)
+const PortalResourcesRoute = PortalResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
 const PortalReportsRoute = PortalReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -145,6 +152,12 @@ const AuthenticatedAdminSalvationLeadsRoute =
   AuthenticatedAdminSalvationLeadsRouteImport.update({
     id: '/salvation-leads',
     path: '/salvation-leads',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminResourcesRoute =
+  AuthenticatedAdminResourcesRouteImport.update({
+    id: '/resources',
+    path: '/resources',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminProgramsRoute =
@@ -213,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/portal/reports': typeof PortalReportsRoute
+  '/portal/resources': typeof PortalResourcesRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal/': typeof PortalIndexRoute
   '/videos/': typeof VideosIndexRoute
@@ -225,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
+  '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/salvation-leads': typeof AuthenticatedAdminSalvationLeadsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -241,6 +256,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/portal/reports': typeof PortalReportsRoute
+  '/portal/resources': typeof PortalResourcesRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal': typeof PortalIndexRoute
   '/videos': typeof VideosIndexRoute
@@ -253,6 +269,7 @@ export interface FileRoutesByTo {
   '/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/programs': typeof AuthenticatedAdminProgramsRoute
+  '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/salvation-leads': typeof AuthenticatedAdminSalvationLeadsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -274,6 +291,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/portal/reports': typeof PortalReportsRoute
+  '/portal/resources': typeof PortalResourcesRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal/': typeof PortalIndexRoute
   '/videos/': typeof VideosIndexRoute
@@ -286,6 +304,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/navigation': typeof AuthenticatedAdminNavigationRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/admin/programs': typeof AuthenticatedAdminProgramsRoute
+  '/_authenticated/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/_authenticated/admin/salvation-leads': typeof AuthenticatedAdminSalvationLeadsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -307,6 +326,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/profile'
     | '/portal/reports'
+    | '/portal/resources'
     | '/videos/$slug'
     | '/portal/'
     | '/videos/'
@@ -319,6 +339,7 @@ export interface FileRouteTypes {
     | '/admin/navigation'
     | '/admin/permissions'
     | '/admin/programs'
+    | '/admin/resources'
     | '/admin/salvation-leads'
     | '/admin/settings'
     | '/admin/users'
@@ -335,6 +356,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/profile'
     | '/portal/reports'
+    | '/portal/resources'
     | '/videos/$slug'
     | '/portal'
     | '/videos'
@@ -347,6 +369,7 @@ export interface FileRouteTypes {
     | '/admin/navigation'
     | '/admin/permissions'
     | '/admin/programs'
+    | '/admin/resources'
     | '/admin/salvation-leads'
     | '/admin/settings'
     | '/admin/users'
@@ -367,6 +390,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/profile'
     | '/portal/reports'
+    | '/portal/resources'
     | '/videos/$slug'
     | '/portal/'
     | '/videos/'
@@ -379,6 +403,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/navigation'
     | '/_authenticated/admin/permissions'
     | '/_authenticated/admin/programs'
+    | '/_authenticated/admin/resources'
     | '/_authenticated/admin/salvation-leads'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/users'
@@ -492,6 +517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VideosSlugRouteImport
       parentRoute: typeof VideosRoute
     }
+    '/portal/resources': {
+      id: '/portal/resources'
+      path: '/resources'
+      fullPath: '/portal/resources'
+      preLoaderRoute: typeof PortalResourcesRouteImport
+      parentRoute: typeof PortalRouteRoute
+    }
     '/portal/reports': {
       id: '/portal/reports'
       path: '/reports'
@@ -546,6 +578,13 @@ declare module '@tanstack/react-router' {
       path: '/salvation-leads'
       fullPath: '/admin/salvation-leads'
       preLoaderRoute: typeof AuthenticatedAdminSalvationLeadsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/resources': {
+      id: '/_authenticated/admin/resources'
+      path: '/resources'
+      fullPath: '/admin/resources'
+      preLoaderRoute: typeof AuthenticatedAdminResourcesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/programs': {
@@ -624,6 +663,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminNavigationRoute: typeof AuthenticatedAdminNavigationRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminProgramsRoute: typeof AuthenticatedAdminProgramsRoute
+  AuthenticatedAdminResourcesRoute: typeof AuthenticatedAdminResourcesRoute
   AuthenticatedAdminSalvationLeadsRoute: typeof AuthenticatedAdminSalvationLeadsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -642,6 +682,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminNavigationRoute: AuthenticatedAdminNavigationRoute,
     AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
     AuthenticatedAdminProgramsRoute: AuthenticatedAdminProgramsRoute,
+    AuthenticatedAdminResourcesRoute: AuthenticatedAdminResourcesRoute,
     AuthenticatedAdminSalvationLeadsRoute:
       AuthenticatedAdminSalvationLeadsRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
@@ -670,11 +711,13 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface PortalRouteRouteChildren {
   PortalReportsRoute: typeof PortalReportsRoute
+  PortalResourcesRoute: typeof PortalResourcesRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteRouteChildren: PortalRouteRouteChildren = {
   PortalReportsRoute: PortalReportsRoute,
+  PortalResourcesRoute: PortalResourcesRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
 

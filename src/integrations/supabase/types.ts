@@ -581,6 +581,89 @@ export type Database = {
         }
         Relationships: []
       }
+      portal_resource_views: {
+        Row: {
+          id: string
+          resource_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          resource_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          resource_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_resource_views_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "portal_resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_resources: {
+        Row: {
+          audience: string
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          external_url: string | null
+          file_url: string | null
+          id: string
+          is_published: boolean
+          resource_type: string
+          sort_order: number
+          tags: string[]
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          external_url?: string | null
+          file_url?: string | null
+          id?: string
+          is_published?: boolean
+          resource_type?: string
+          sort_order?: number
+          tags?: string[]
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          external_url?: string | null
+          file_url?: string | null
+          id?: string
+          is_published?: boolean
+          resource_type?: string
+          sort_order?: number
+          tags?: string[]
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       praise_reports: {
         Row: {
           author: string | null
