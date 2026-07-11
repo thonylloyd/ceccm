@@ -171,7 +171,7 @@ function ReportsPage() {
               <div className="font-medium">{r.churches?.name ?? "—"}</div>
               <div className="text-xs text-charcoal/60">{r.zones?.name ?? ""}</div>
             </div>
-            <div className="col-span-2 text-xs">{r.profiles?.display_name ?? "—"}</div>
+            <div className="col-span-2 text-xs">{(r as any).profiles?.display_name ?? "—"}</div>
             <div className="col-span-2 text-xs">
               +{r.new_converts} conv · {r.church_attendance} att
             </div>
