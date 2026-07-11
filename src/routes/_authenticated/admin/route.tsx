@@ -79,7 +79,7 @@ function AdminLayout() {
           <div className="px-6 py-6 border-b border-white/10">
             <div className="font-display text-xl text-gold">CCM Admin</div>
             <div className="text-[10px] uppercase tracking-[0.22em] text-white/50 mt-1">
-              {session.isSuperAdmin ? "Super Admin" : "Content Manager"}
+              {session.isSiteMaintenance ? "Site Maintenance" : "Content Manager"}
             </div>
           </div>
           <nav className="flex-1 px-3 py-4 space-y-0.5">
