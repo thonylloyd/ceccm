@@ -122,6 +122,7 @@ const TableSchema = z.enum([
   "zones",
   "group_churches",
   "churches",
+  "pastor_assignments",
 ]);
 type ManagedTable = z.infer<typeof TableSchema>;
 
