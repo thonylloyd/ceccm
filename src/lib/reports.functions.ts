@@ -128,6 +128,22 @@ export const saveReport = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
+
+    if (data.status === "submitted") {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: admins } = await supabaseAdmin
+        .from("user_roles")
+        .select("user_id")
+        .in("role", ["admin", "site_maintenance", "super_admin"]);
+      const notifs = (admins ?? []).map((a: any) => ({
+        user_id: a.user_id,
+        type: "report_submitted",
+        title: "New weekly report submitted",
+        body: "A pastor submitted a weekly report for review.",
+        link: "/portal/reports",
+      }));
+      if (notifs.length) await supabaseAdmin.from("portal_notifications").insert(notifs);
+    }
     return row;
   });
 
