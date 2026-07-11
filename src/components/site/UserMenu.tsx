@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { User as UserIcon, LogIn, LogOut, Shield, UserCircle } from "lucide-react";
+import { User as UserIcon, LogIn, LogOut, Shield, UserCircle, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
