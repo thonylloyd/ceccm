@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getPortalSession } from "@/lib/portal.functions";
 import { Loader2, Home, LayoutDashboard, FileText, Users2, BarChart3, GraduationCap, LogOut } from "lucide-react";
 import { createContext, useContext } from "react";
+import { NotificationsBell } from "@/components/portal/NotificationsBell";
 
 export const Route = createFileRoute("/portal")({
   ssr: false,
