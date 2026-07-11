@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getPortalSession } from "@/lib/portal.functions";
 import { Loader2, Home, LayoutDashboard, FileText, Users2, BarChart3, GraduationCap, LogOut } from "lucide-react";
 import { createContext, useContext } from "react";
+import { NotificationsBell } from "@/components/portal/NotificationsBell";
 
 export const Route = createFileRoute("/portal")({
   ssr: false,
@@ -77,11 +78,14 @@ function PortalLayout() {
     <PortalCtx.Provider value={s}>
       <div className="min-h-screen flex bg-light">
         <aside className="w-64 shrink-0 bg-navy-deep text-white/85 flex flex-col">
-          <div className="px-6 py-6 border-b border-white/10">
-            <div className="font-display text-xl text-gold">CCM Portal</div>
-            <div className="text-[10px] uppercase tracking-[0.22em] text-white/50 mt-1">
-              {roleLabel(s)}
+          <div className="px-6 py-6 border-b border-white/10 flex items-start justify-between gap-2">
+            <div>
+              <div className="font-display text-xl text-gold">CCM Portal</div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/50 mt-1">
+                {roleLabel(s)}
+              </div>
             </div>
+            <NotificationsBell />
           </div>
           <nav className="flex-1 px-3 py-4 space-y-0.5">
             {nav.filter((n) => n.show).map((item) => {
