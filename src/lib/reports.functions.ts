@@ -55,7 +55,7 @@ export const listReports = createServerFn({ method: "GET" })
     const { supabase } = context;
     let q = supabase
       .from("weekly_reports")
-      .select("*, churches(name), group_churches(name), zones(name), profiles!weekly_reports_reporter_id_fkey(display_name, designation)")
+      .select("*, churches(name), group_churches(name), zones(name)")
       .order("week_start", { ascending: false })
       .limit(data.limit ?? 100);
     if (data.status) q = q.eq("status", data.status);

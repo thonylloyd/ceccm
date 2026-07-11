@@ -22,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as VideosSlugRouteImport } from './routes/videos.$slug'
+import { Route as PortalReportsRouteImport } from './routes/portal/reports'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -102,6 +103,11 @@ const VideosSlugRoute = VideosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => VideosRoute,
+} as any)
+const PortalReportsRoute = PortalReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => PortalRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
@@ -206,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/videos': typeof VideosRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/portal/reports': typeof PortalReportsRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal/': typeof PortalIndexRoute
   '/videos/': typeof VideosIndexRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
   '/programs': typeof ProgramsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/portal/reports': typeof PortalReportsRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal': typeof PortalIndexRoute
   '/videos': typeof VideosIndexRoute
@@ -265,6 +273,7 @@ export interface FileRoutesById {
   '/videos': typeof VideosRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/portal/reports': typeof PortalReportsRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal/': typeof PortalIndexRoute
   '/videos/': typeof VideosIndexRoute
@@ -297,6 +306,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin'
     | '/profile'
+    | '/portal/reports'
     | '/videos/$slug'
     | '/portal/'
     | '/videos/'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/programs'
     | '/reset-password'
     | '/profile'
+    | '/portal/reports'
     | '/videos/$slug'
     | '/portal'
     | '/videos'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/_authenticated/admin'
     | '/_authenticated/profile'
+    | '/portal/reports'
     | '/videos/$slug'
     | '/portal/'
     | '/videos/'
@@ -479,6 +491,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos/$slug'
       preLoaderRoute: typeof VideosSlugRouteImport
       parentRoute: typeof VideosRoute
+    }
+    '/portal/reports': {
+      id: '/portal/reports'
+      path: '/reports'
+      fullPath: '/portal/reports'
+      preLoaderRoute: typeof PortalReportsRouteImport
+      parentRoute: typeof PortalRouteRoute
     }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
@@ -650,10 +669,12 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface PortalRouteRouteChildren {
+  PortalReportsRoute: typeof PortalReportsRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteRouteChildren: PortalRouteRouteChildren = {
+  PortalReportsRoute: PortalReportsRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
 
