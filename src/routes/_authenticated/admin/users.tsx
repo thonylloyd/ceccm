@@ -44,11 +44,12 @@ function UsersAdmin() {
   });
 
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", display_name: "", role: "viewer" as Role });
+  const [form, setForm] = useState({ email: "", password: "", display_name: "", role: "member" as Role });
 
   const roles: Role[] = session.isSuperAdmin
-    ? ["super_admin", "admin", "viewer"]
-    : ["admin", "viewer"];
+    ? ["site_maintenance", "super_admin", "admin", "zonal_pastor", "group_pastor", "church_pastor", "external_pastor", "member"]
+    : ["admin", "member"];
+
 
   return (
     <div className="p-8 max-w-5xl">
