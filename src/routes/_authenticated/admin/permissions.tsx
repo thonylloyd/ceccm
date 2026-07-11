@@ -1,18 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listPermissionsMatrix, setRolePermission } from "@/lib/admin.functions";
+import { listPermissionsMatrix, setRolePermission, type AppRole } from "@/lib/admin.functions";
 import { PageHeader, Card } from "@/components/admin/ui";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import { useAdminSession } from "./route";
+import { useAdminSession } from "./admin-context";
 
 export const Route = createFileRoute("/_authenticated/admin/permissions")({
   component: PermissionsAdmin,
 });
 
-type Role = "super_admin" | "admin" | "viewer";
+type Role = AppRole;
+
 
 function PermissionsAdmin() {
   const session = useAdminSession();
