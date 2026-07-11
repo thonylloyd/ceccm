@@ -108,7 +108,7 @@ function ReportsPage() {
         JSON.stringify(r.churches?.name ?? ""),
         JSON.stringify(r.group_churches?.name ?? ""),
         JSON.stringify(r.zones?.name ?? ""),
-        JSON.stringify(r.profiles?.display_name ?? ""),
+        JSON.stringify((r as any).profiles?.display_name ?? ""),
         ...REPORT_NUMERIC_FIELDS.map((k) => (r as any)[k] ?? 0),
       ];
       lines.push(line.join(","));
