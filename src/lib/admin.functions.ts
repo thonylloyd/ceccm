@@ -122,6 +122,7 @@ const TableSchema = z.enum([
   "zones",
   "group_churches",
   "churches",
+  "pastor_assignments",
 ]);
 type ManagedTable = z.infer<typeof TableSchema>;
 
@@ -146,6 +147,7 @@ const TABLE_PERMISSION: Record<string, string> = {
   zones: "hierarchy",
   group_churches: "hierarchy",
   churches: "hierarchy",
+  pastor_assignments: "hierarchy",
 };
 
 export const adminList = createServerFn({ method: "POST" })

@@ -238,22 +238,34 @@ export type Database = {
       churches: {
         Row: {
           created_at: string
+          description: string | null
+          display_order: number
           group_church_id: string | null
           id: string
+          is_active: boolean
+          location: string | null
           name: string
           updated_at: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
+          display_order?: number
           group_church_id?: string | null
           id?: string
+          is_active?: boolean
+          location?: string | null
           name: string
           updated_at?: string
         }
         Update: {
           created_at?: string
+          description?: string | null
+          display_order?: number
           group_church_id?: string | null
           id?: string
+          is_active?: boolean
+          location?: string | null
           name?: string
           updated_at?: string
         }
@@ -270,21 +282,30 @@ export type Database = {
       group_churches: {
         Row: {
           created_at: string
+          description: string | null
+          display_order: number
           id: string
+          is_active: boolean
           name: string
           updated_at: string
           zone_id: string | null
         }
         Insert: {
           created_at?: string
+          description?: string | null
+          display_order?: number
           id?: string
+          is_active?: boolean
           name: string
           updated_at?: string
           zone_id?: string | null
         }
         Update: {
           created_at?: string
+          description?: string | null
+          display_order?: number
           id?: string
+          is_active?: boolean
           name?: string
           updated_at?: string
           zone_id?: string | null
@@ -506,8 +527,10 @@ export type Database = {
         Row: {
           church_id: string | null
           created_at: string
+          display_order: number
           group_church_id: string | null
           id: string
+          is_active: boolean
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
           user_id: string
@@ -516,8 +539,10 @@ export type Database = {
         Insert: {
           church_id?: string | null
           created_at?: string
+          display_order?: number
           group_church_id?: string | null
           id?: string
+          is_active?: boolean
           role: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id: string
@@ -526,8 +551,10 @@ export type Database = {
         Update: {
           church_id?: string | null
           created_at?: string
+          display_order?: number
           group_church_id?: string | null
           id?: string
+          is_active?: boolean
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id?: string
@@ -1361,21 +1388,27 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          display_order: number
           id: string
+          is_active: boolean
           name: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           description?: string | null
+          display_order?: number
           id?: string
+          is_active?: boolean
           name: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           description?: string | null
+          display_order?: number
           id?: string
+          is_active?: boolean
           name?: string
           updated_at?: string
         }
