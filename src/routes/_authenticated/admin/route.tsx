@@ -5,8 +5,9 @@ import { getIsAdmin, bootstrapAdminIfNone } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Home, Info, Calendar, Mail, Menu as MenuIcon,
-  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio, Heart, Shield,
+  Image as ImageIcon, Users, Settings, LogOut, Loader2, Video, Radio, Heart, Shield, Building2,
 } from "lucide-react";
+
 import { useEffect } from "react";
 import { AdminCtx } from "./admin-context";
 export { useAdminSession } from "./admin-context";

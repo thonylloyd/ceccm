@@ -35,6 +35,7 @@ import { Route as AuthenticatedAdminNavigationRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin/media'
 import { Route as AuthenticatedAdminLivestreamRouteImport } from './routes/_authenticated/admin/livestream'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
+import { Route as AuthenticatedAdminHierarchyRouteImport } from './routes/_authenticated/admin/hierarchy'
 import { Route as AuthenticatedAdminContactRouteImport } from './routes/_authenticated/admin/contact'
 import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin/about'
 
@@ -175,6 +176,12 @@ const AuthenticatedAdminHomepageRoute =
     path: '/homepage',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminHierarchyRoute =
+  AuthenticatedAdminHierarchyRouteImport.update({
+    id: '/hierarchy',
+    path: '/hierarchy',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminContactRoute =
   AuthenticatedAdminContactRouteImport.update({
     id: '/contact',
@@ -204,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/videos/': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
+  '/admin/hierarchy': typeof AuthenticatedAdminHierarchyRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
@@ -230,6 +238,7 @@ export interface FileRoutesByTo {
   '/videos': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
+  '/admin/hierarchy': typeof AuthenticatedAdminHierarchyRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
@@ -261,6 +270,7 @@ export interface FileRoutesById {
   '/videos/': typeof VideosIndexRoute
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/contact': typeof AuthenticatedAdminContactRoute
+  '/_authenticated/admin/hierarchy': typeof AuthenticatedAdminHierarchyRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/_authenticated/admin/livestream': typeof AuthenticatedAdminLivestreamRoute
   '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/videos/'
     | '/admin/about'
     | '/admin/contact'
+    | '/admin/hierarchy'
     | '/admin/homepage'
     | '/admin/livestream'
     | '/admin/media'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin/about'
     | '/admin/contact'
+    | '/admin/hierarchy'
     | '/admin/homepage'
     | '/admin/livestream'
     | '/admin/media'
@@ -348,6 +360,7 @@ export interface FileRouteTypes {
     | '/videos/'
     | '/_authenticated/admin/about'
     | '/_authenticated/admin/contact'
+    | '/_authenticated/admin/hierarchy'
     | '/_authenticated/admin/homepage'
     | '/_authenticated/admin/livestream'
     | '/_authenticated/admin/media'
@@ -558,6 +571,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminHomepageRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/hierarchy': {
+      id: '/_authenticated/admin/hierarchy'
+      path: '/hierarchy'
+      fullPath: '/admin/hierarchy'
+      preLoaderRoute: typeof AuthenticatedAdminHierarchyRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/contact': {
       id: '/_authenticated/admin/contact'
       path: '/contact'
@@ -578,6 +598,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAboutRoute: typeof AuthenticatedAdminAboutRoute
   AuthenticatedAdminContactRoute: typeof AuthenticatedAdminContactRoute
+  AuthenticatedAdminHierarchyRoute: typeof AuthenticatedAdminHierarchyRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
   AuthenticatedAdminLivestreamRoute: typeof AuthenticatedAdminLivestreamRoute
   AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
@@ -595,6 +616,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminAboutRoute: AuthenticatedAdminAboutRoute,
     AuthenticatedAdminContactRoute: AuthenticatedAdminContactRoute,
+    AuthenticatedAdminHierarchyRoute: AuthenticatedAdminHierarchyRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
     AuthenticatedAdminLivestreamRoute: AuthenticatedAdminLivestreamRoute,
     AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
