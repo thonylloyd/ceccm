@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   listUsersWithRoles, setUserRole, createUserAccount, deleteUserAccount,
+  type AppRole,
 } from "@/lib/admin.functions";
 import { PageHeader, Card, Field, Input, Button } from "@/components/admin/ui";
 import { useAdminSession } from "./admin-context";
@@ -14,7 +15,8 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
   component: UsersAdmin,
 });
 
-type Role = "super_admin" | "admin" | "viewer";
+type Role = AppRole;
+
 
 function UsersAdmin() {
   const session = useAdminSession();
