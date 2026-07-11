@@ -9,7 +9,9 @@ import { resolveAvatarUrl } from "@/lib/avatar";
 export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [hasPortal, setHasPortal] = useState(false);
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null; designation: string | null; designation_other: string | null } | null>(null);
+
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
