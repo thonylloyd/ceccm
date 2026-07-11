@@ -23,10 +23,15 @@ export function UserMenu({ variant = "desktop" }: { variant?: "desktop" | "mobil
   }, []);
 
   useEffect(() => {
-    if (!user) { setIsAdmin(false); setProfile(null); setAvatarUrl(null); return; }
-    supabase.from("user_roles").select("role").eq("user_id", user.id).in("role", ["admin", "super_admin", "site_maintenance"] as any)
-      .then(({ data }) => setIsAdmin(!!(data && data.length)));
+    if (!user) { setIsAdmin(false); setHasPortal(false); setProfile(null); setAvatarUrl(null); return; }
+    supabase.from("user_roles").select("role").eq("user_id", user.id)
+      .then(({ data }) => {
+        const roles = (data ?? []).map((r: any) => r.role as string);
+        setIsAdmin(roles.some((r) => ["admin", "super_admin", "site_maintenance"].includes(r)));
+        setHasPortal(roles.some((r) => ["site_maintenance", "super_admin", "admin", "zonal_pastor", "group_pastor", "church_pastor", "external_pastor"].includes(r)));
+      });
     supabase.from("profiles").select("display_name, avatar_url, designation, designation_other").eq("id", user.id).maybeSingle()
+
       .then(({ data }) => {
         const p = (data as any) ?? null;
         setProfile(p);
