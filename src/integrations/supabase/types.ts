@@ -235,6 +235,70 @@ export type Database = {
         }
         Relationships: []
       }
+      churches: {
+        Row: {
+          created_at: string
+          group_church_id: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          group_church_id?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          group_church_id?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "churches_group_church_id_fkey"
+            columns: ["group_church_id"]
+            isOneToOne: false
+            referencedRelation: "group_churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_churches: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          zone_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          zone_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_churches_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hero_banners: {
         Row: {
           background_image_url: string | null
@@ -434,6 +498,61 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "navigation_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pastor_assignments: {
+        Row: {
+          church_id: string | null
+          created_at: string
+          group_church_id: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+          zone_id: string | null
+        }
+        Insert: {
+          church_id?: string | null
+          created_at?: string
+          group_church_id?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+          zone_id?: string | null
+        }
+        Update: {
+          church_id?: string | null
+          created_at?: string
+          group_church_id?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pastor_assignments_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastor_assignments_group_church_id_fkey"
+            columns: ["group_church_id"]
+            isOneToOne: false
+            referencedRelation: "group_churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastor_assignments_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "zones"
             referencedColumns: ["id"]
           },
         ]
@@ -986,6 +1105,30 @@ export type Database = {
           },
         ]
       }
+      zones: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -995,6 +1138,7 @@ export type Database = {
         Args: { _key: string; _user_id: string }
         Returns: boolean
       }
+      has_portal_access: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
