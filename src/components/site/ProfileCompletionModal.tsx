@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const DESIGNATIONS = ["Pastor", "Deacon", "Deaconess", "Brother", "Sister", "Other"] as const;
+const DESIGNATIONS = ["Pastor", "Deacon", "Deaconess", "Brother", "Sister", "Church Coordinator", "Group Pastor", "Zonal Pastor", "Other"] as const;
 
 type Profile = {
   display_name: string | null;
