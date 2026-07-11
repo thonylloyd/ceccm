@@ -11,6 +11,7 @@ const TABS = [
   { key: "zones", label: "Zones" },
   { key: "group_churches", label: "Group Churches" },
   { key: "churches", label: "Churches" },
+  { key: "assignments", label: "Pastor Assignments" },
 ] as const;
 
 function HierarchyAdmin() {
