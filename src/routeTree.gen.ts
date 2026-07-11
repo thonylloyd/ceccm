@@ -22,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as VideosSlugRouteImport } from './routes/videos.$slug'
+import { Route as PortalTeamRouteImport } from './routes/portal/team'
 import { Route as PortalResourcesRouteImport } from './routes/portal/resources'
 import { Route as PortalReportsRouteImport } from './routes/portal/reports'
 import { Route as PortalAnalyticsRouteImport } from './routes/portal/analytics'
@@ -106,6 +107,11 @@ const VideosSlugRoute = VideosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => VideosRoute,
+} as any)
+const PortalTeamRoute = PortalTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => PortalRouteRoute,
 } as any)
 const PortalResourcesRoute = PortalResourcesRouteImport.update({
   id: '/resources',
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/reports': typeof PortalReportsRoute
   '/portal/resources': typeof PortalResourcesRoute
+  '/portal/team': typeof PortalTeamRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal/': typeof PortalIndexRoute
   '/videos/': typeof VideosIndexRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/reports': typeof PortalReportsRoute
   '/portal/resources': typeof PortalResourcesRoute
+  '/portal/team': typeof PortalTeamRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal': typeof PortalIndexRoute
   '/videos': typeof VideosIndexRoute
@@ -301,6 +309,7 @@ export interface FileRoutesById {
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/reports': typeof PortalReportsRoute
   '/portal/resources': typeof PortalResourcesRoute
+  '/portal/team': typeof PortalTeamRoute
   '/videos/$slug': typeof VideosSlugRoute
   '/portal/': typeof PortalIndexRoute
   '/videos/': typeof VideosIndexRoute
@@ -337,6 +346,7 @@ export interface FileRouteTypes {
     | '/portal/analytics'
     | '/portal/reports'
     | '/portal/resources'
+    | '/portal/team'
     | '/videos/$slug'
     | '/portal/'
     | '/videos/'
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/portal/analytics'
     | '/portal/reports'
     | '/portal/resources'
+    | '/portal/team'
     | '/videos/$slug'
     | '/portal'
     | '/videos'
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/portal/analytics'
     | '/portal/reports'
     | '/portal/resources'
+    | '/portal/team'
     | '/videos/$slug'
     | '/portal/'
     | '/videos/'
@@ -528,6 +540,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos/$slug'
       preLoaderRoute: typeof VideosSlugRouteImport
       parentRoute: typeof VideosRoute
+    }
+    '/portal/team': {
+      id: '/portal/team'
+      path: '/team'
+      fullPath: '/portal/team'
+      preLoaderRoute: typeof PortalTeamRouteImport
+      parentRoute: typeof PortalRouteRoute
     }
     '/portal/resources': {
       id: '/portal/resources'
@@ -732,6 +751,7 @@ interface PortalRouteRouteChildren {
   PortalAnalyticsRoute: typeof PortalAnalyticsRoute
   PortalReportsRoute: typeof PortalReportsRoute
   PortalResourcesRoute: typeof PortalResourcesRoute
+  PortalTeamRoute: typeof PortalTeamRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
@@ -739,6 +759,7 @@ const PortalRouteRouteChildren: PortalRouteRouteChildren = {
   PortalAnalyticsRoute: PortalAnalyticsRoute,
   PortalReportsRoute: PortalReportsRoute,
   PortalResourcesRoute: PortalResourcesRoute,
+  PortalTeamRoute: PortalTeamRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
 
