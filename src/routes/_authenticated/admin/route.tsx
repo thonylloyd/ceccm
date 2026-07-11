@@ -27,7 +27,9 @@ const NAV: NavLink[] = [
   { to: "/admin/navigation", label: "Navigation", icon: MenuIcon, permission: "navigation" },
   { to: "/admin/media", label: "Media Library", icon: ImageIcon, permission: "media" },
   { to: "/admin/videos", label: "Videos", icon: Video, permission: "videos" },
+  { to: "/admin/hierarchy", label: "Hierarchy", icon: Building2, permission: "hierarchy" },
   { to: "/admin/users", label: "Users", icon: Users, permission: "users" },
+
   { to: "/admin/salvation-leads", label: "Salvation Leads", icon: Heart, permission: "salvation_leads" },
   { to: "/admin/settings", label: "Settings", icon: Settings, permission: "settings" },
   { to: "/admin/permissions", label: "Permissions", icon: Shield, permission: "permissions", superOnly: true },
