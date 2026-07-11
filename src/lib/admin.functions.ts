@@ -119,10 +119,9 @@ const TableSchema = z.enum([
   "broadcast_stats",
   "praise_reports",
   "leadership",
-  "zones",
-  "group_churches",
-  "churches",
 ]);
+type ManagedTable = z.infer<typeof TableSchema>;
+
 
 const TABLE_PERMISSION: Record<string, string> = {
   hero_banners: "homepage",
