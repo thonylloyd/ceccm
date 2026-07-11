@@ -6,7 +6,7 @@ import { usePortalSession } from "./route";
 import { FileText, GraduationCap, Users2, BarChart3, Building2, MapPin, ChurchIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_portal/")({
+export const Route = createFileRoute("/portal/")({
   component: PortalDashboard,
 });
 

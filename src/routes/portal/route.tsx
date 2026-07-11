@@ -6,7 +6,7 @@ import { getPortalSession } from "@/lib/portal.functions";
 import { Loader2, Home, LayoutDashboard, FileText, Users2, BarChart3, GraduationCap, LogOut } from "lucide-react";
 import { createContext, useContext } from "react";
 
-export const Route = createFileRoute("/_portal")({
+export const Route = createFileRoute("/portal")({
   ssr: false,
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();

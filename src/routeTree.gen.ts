@@ -16,9 +16,11 @@ import { Route as LiveRouteImport } from './routes/live'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as PortalRouteRouteImport } from './routes/portal/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
+import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as VideosSlugRouteImport } from './routes/videos.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
@@ -71,6 +73,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalRouteRoute = PortalRouteRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -84,6 +91,11 @@ const VideosIndexRoute = VideosIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => VideosRoute,
+} as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRouteRoute,
 } as any)
 const VideosSlugRoute = VideosSlugRouteImport.update({
   id: '/$slug',
@@ -177,6 +189,7 @@ const AuthenticatedAdminAboutRoute = AuthenticatedAdminAboutRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/portal': typeof PortalRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -187,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/videos/$slug': typeof VideosSlugRoute
+  '/portal/': typeof PortalIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
@@ -212,6 +226,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/videos/$slug': typeof VideosSlugRoute
+  '/portal': typeof PortalIndexRoute
   '/videos': typeof VideosIndexRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/contact': typeof AuthenticatedAdminContactRoute
@@ -231,6 +246,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/portal': typeof PortalRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -241,6 +257,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/videos/$slug': typeof VideosSlugRoute
+  '/portal/': typeof PortalIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/contact': typeof AuthenticatedAdminContactRoute
@@ -260,6 +277,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/portal'
     | '/about'
     | '/auth'
     | '/contact'
@@ -270,6 +288,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/profile'
     | '/videos/$slug'
+    | '/portal/'
     | '/videos/'
     | '/admin/about'
     | '/admin/contact'
@@ -295,6 +314,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/profile'
     | '/videos/$slug'
+    | '/portal'
     | '/videos'
     | '/admin/about'
     | '/admin/contact'
@@ -313,6 +333,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/portal'
     | '/about'
     | '/auth'
     | '/contact'
@@ -323,6 +344,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/profile'
     | '/videos/$slug'
+    | '/portal/'
     | '/videos/'
     | '/_authenticated/admin/about'
     | '/_authenticated/admin/contact'
@@ -342,6 +364,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  PortalRouteRoute: typeof PortalRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
@@ -402,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -422,6 +452,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos/'
       preLoaderRoute: typeof VideosIndexRouteImport
       parentRoute: typeof VideosRoute
+    }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRouteRoute
     }
     '/videos/$slug': {
       id: '/videos/$slug'
@@ -590,6 +627,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface PortalRouteRouteChildren {
+  PortalIndexRoute: typeof PortalIndexRoute
+}
+
+const PortalRouteRouteChildren: PortalRouteRouteChildren = {
+  PortalIndexRoute: PortalIndexRoute,
+}
+
+const PortalRouteRouteWithChildren = PortalRouteRoute._addFileChildren(
+  PortalRouteRouteChildren,
+)
+
 interface VideosRouteChildren {
   VideosSlugRoute: typeof VideosSlugRoute
   VideosIndexRoute: typeof VideosIndexRoute
@@ -606,6 +655,7 @@ const VideosRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  PortalRouteRoute: PortalRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
