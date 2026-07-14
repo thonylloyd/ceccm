@@ -35,7 +35,7 @@ export function SiteFooter({
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-12">
         <div className="md:col-span-4">
           <div className="flex items-center gap-3 mb-5">
-            <img src={logoUrl || logo.url} alt={brand.name} className="h-14 w-14 object-contain" />
+            <img src={logo.url} alt={brand.name} className="h-14 w-14 object-contain" />
             <div>
               <div className="font-display text-white text-base leading-tight">{brand.name ?? "Church Consolidation Mission"}</div>
               {brand.tagline && <div className="text-xs text-white/55 mt-1">{brand.tagline}</div>}
