@@ -73,18 +73,36 @@ async function requirePermission(userId: string, key: string) {
 export const getIsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin, roles, isAdmin, isSiteMaintenance } = await loadAdminContext(context.userId);
+    // Use the RLS-scoped client (works anywhere, no service-role key required):
+    // users can always read their own roles, and permissions/role_permissions
+    // are readable by authenticated users.
+    const db = context.supabase;
+    const { data: roleRows } = await db
+      .from("user_roles").select("role").eq("user_id", context.userId);
+    const roles = (roleRows ?? []).map((r: any) => r.role as AppRole);
+    const isSiteMaintenance = roles.includes("site_maintenance");
+    const isAdmin = isSiteMaintenance || roles.includes("admin") || roles.includes("super_admin");
+
     let permissions: string[] = [];
     if (isSiteMaintenance) {
-      const { data } = await supabaseAdmin.from("permissions").select("key");
+      const { data } = await db.from("permissions").select("key");
       permissions = (data ?? []).map((p: any) => p.key);
     } else if (isAdmin) {
-      const { data } = await supabaseAdmin
+      const { data } = await db
         .from("role_permissions").select("permission_key").in("role", roles as any);
       permissions = Array.from(new Set((data ?? []).map((p: any) => p.permission_key)));
     }
-    return { isAdmin, isSuperAdmin: isSiteMaintenance, isSiteMaintenance, roles, permissions, userId: context.userId };
+    return {
+      isAdmin,
+      isSuperAdmin: isSiteMaintenance,
+      isSiteMaintenance,
+      roles,
+      permissions,
+      userId: context.userId,
+      email: (context.claims as any)?.email ?? null,
+    };
   });
+
 
 // Bootstrap: promote the first user to site_maintenance if none exists
 export const bootstrapAdminIfNone = createServerFn({ method: "POST" })

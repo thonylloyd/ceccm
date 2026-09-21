@@ -7,6 +7,8 @@ export type AdminSession = {
   permissions: string[];
   roles: string[];
   userId: string;
+  email?: string | null;
+
 };
 
 export const AdminCtx = createContext<AdminSession | null>(null);
