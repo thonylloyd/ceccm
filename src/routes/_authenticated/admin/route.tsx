@@ -64,10 +64,15 @@ function AdminLayout() {
         <div className="max-w-md text-center">
           <h1 className="font-display text-2xl text-navy-deep mb-2">Access restricted</h1>
           <p className="text-sm text-charcoal/70">Your account does not have admin privileges.</p>
+          <p className="text-xs text-charcoal/50 mt-3">
+            Signed in as {(q.data as any).email ?? q.data.userId}
+            {q.data.roles.length ? ` · roles: ${q.data.roles.join(", ")}` : " · no roles assigned"}
+          </p>
         </div>
       </div>
     );
   }
+
 
   const session = q.data!;
   const permSet = new Set(session.permissions);
