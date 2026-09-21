@@ -1,5 +1,11 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": ".vercel/output",
-  "framework": null
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/__l5e/assets-v1/:path*",
+      "destination": "https://ceccm.lovable.app/__l5e/assets-v1/:path*"
+    }
+  ]
 }
