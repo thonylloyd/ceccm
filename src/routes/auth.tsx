@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
-import logo from "@/assets/logo-ccm.png.asset.json";
-import kcIcon from "@/assets/kingschat-icon.png.asset.json";
+import logo from "@/assets/ccm-logo.png";
 import hero from "@/assets/hero-cathedral.jpg";
 import { KINGSCHAT_CLIENT_ID, kingschatLogin } from "@/lib/kingschat.functions";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -113,7 +112,7 @@ function AuthPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-navy-deep/80 via-navy/60 to-navy-deep/95" />
         <div className="relative h-full flex flex-col justify-between p-12 text-white">
           <Link to="/" className="flex items-center gap-3">
-            <img src={logo.url} alt="CCM" className="h-14 w-14 object-contain drop-shadow-[0_0_18px_rgba(184,138,27,0.4)]" />
+            <img src={logo} alt="CCM" className="h-14 w-14 object-contain drop-shadow-[0_0_18px_rgba(184,138,27,0.4)]" />
             <div>
               <div className="font-display text-2xl text-gold">CCM</div>
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/70">Church Consolidation Mission</div>
@@ -142,7 +141,7 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           <Link to="/" className="lg:hidden flex items-center gap-3 mb-10 justify-center">
-            <img src={logo.url} alt="CCM" className="h-12 w-12 object-contain" />
+            <img src={logo} alt="CCM" className="h-12 w-12 object-contain" />
             <div className="font-display text-xl text-gold">CCM</div>
           </Link>
 
@@ -199,7 +198,7 @@ function AuthPage() {
                 disabled={kcLoading}
                 className="w-full h-12 flex items-center justify-center gap-3 rounded-md bg-white text-navy-deep font-semibold uppercase tracking-[0.18em] text-xs hover:bg-white/90 transition-colors disabled:opacity-60"
               >
-                <img src={kcIcon.url} alt="" className="h-5 w-5 object-contain" />
+                <img src="/kingschat-icon.png" alt="" className="h-5 w-5 object-contain" />
                 {kcLoading ? "Opening KingsChat…" : "Continue with KingsChat"}
               </button>
             </>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import logo from "@/assets/logo-ccm.png.asset.json";
+import logo from "@/assets/ccm-logo.png";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [{ title: "Reset Password — CCM" }, { name: "description", content: "Set a new password for your CCM account." }] }),
@@ -49,7 +49,7 @@ function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-navy-deep px-4">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center gap-3 mb-8 justify-center">
-          <img src={logo.url} alt="CCM" className="h-12 w-12 object-contain" />
+          <img src={logo} alt="CCM" className="h-12 w-12 object-contain" />
           <div className="font-display text-xl text-gold">CCM</div>
         </Link>
         <h1 className="font-display text-3xl text-white mb-2 text-center">Set a new password</h1>
