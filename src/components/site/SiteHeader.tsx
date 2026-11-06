@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Menu, X, Radio } from "lucide-react";
-import logo from "@/assets/logo-ccm.png.asset.json";
+import logo from "@/assets/ccm-logo.png";
 import { UserMenu } from "@/components/site/UserMenu";
 
 type NavItem = { id: string; label: string; url: string; is_external: boolean };
@@ -66,7 +66,7 @@ export function SiteHeader({
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8 flex items-center justify-between h-20 gap-3">
         <Link to="/" className="flex items-center gap-2.5 shrink-0 min-w-0">
-          <img src={logo.url} alt={brandName} className="h-11 w-11 sm:h-12 sm:w-12 object-contain shrink-0" />
+          <img src={logo} alt={brandName} className="h-11 w-11 sm:h-12 sm:w-12 object-contain shrink-0" />
           <div className={`transition-all duration-300 ${showBrandTitle ? "opacity-100 max-w-[160px]" : "opacity-0 max-w-0 overflow-hidden"}`}>
             {brandTitle}
           </div>
