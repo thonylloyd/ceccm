@@ -124,12 +124,7 @@ export const purchaseVideoWithEspees = createServerFn({ method: "POST" })
     if (!v) throw new Error("Video not found");
     const mode = ((v as any).access_mode ?? "free") as AccessMode;
     if (mode !== "paid" && mode !== "password_paid") throw new Error("Not for sale");
-    const { error } = await supabaseAdmin
-      .from("video_unlocks")
-      .upsert(
-        { user_id: context.userId, video_id: (v as any).id, method: "espees" },
-        { onConflict: "user_id,video_id,method" },
-      );
+    const { error } = await context.supabase.rpc("record_video_espees_unlock", { _video_id: (v as any).id });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -164,12 +159,7 @@ export const purchaseBroadcastWithEspees = createServerFn({ method: "POST" })
     if (!b) throw new Error("Broadcast not found");
     const mode = ((b as any).access_mode ?? "free") as AccessMode;
     if (mode !== "paid" && mode !== "password_paid") throw new Error("Not for sale");
-    const { error } = await supabaseAdmin
-      .from("broadcast_unlocks")
-      .upsert(
-        { user_id: context.userId, broadcast_id: (b as any).id, method: "espees" },
-        { onConflict: "user_id,broadcast_id,method" },
-      );
+    const { error } = await context.supabase.rpc("record_broadcast_espees_unlock", { _broadcast_id: (b as any).id });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -188,15 +178,15 @@ export const adminSetVideoAccess = createServerFn({ method: "POST" })
       .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
     const patch: any = { access_mode: data.access_mode, price_espees: data.price_espees ?? null };
-    if (data.password !== undefined && data.password !== null && data.password !== "") {
-      patch.access_password_hash = await sha256(data.password);
-      patch.access_password_plain = data.password;
-    } else if (data.password === null) {
-      patch.access_password_hash = null;
-      patch.access_password_plain = null;
-    }
     const { error } = await supabaseAdmin.from("videos").update(patch).eq("id", data.id);
     if (error) throw error;
+    if (data.password !== undefined && data.password !== null && data.password !== "") {
+      const { error: pe } = await context.supabase.rpc("admin_set_content_password", { _kind: "video", _id: data.id, _hash: await sha256(data.password), _plain: data.password });
+      if (pe) throw pe;
+    } else if (data.password === null) {
+      const { error: pe } = await context.supabase.rpc("admin_set_content_password", { _kind: "video", _id: data.id, _hash: null as any, _plain: null as any });
+      if (pe) throw pe;
+    }
     return { ok: true };
   });
 
@@ -208,9 +198,9 @@ export const adminGetVideoPassword = createServerFn({ method: "POST" })
     const { data: roleRows } = await supabaseAdmin
       .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
-    const { data: row } = await supabaseAdmin
-      .from("videos").select("access_password_plain").eq("id", data.id).maybeSingle();
-    return { password: (row as any)?.access_password_plain ?? null };
+    const { data: pw, error } = await context.supabase.rpc("admin_get_video_password", { _id: data.id });
+    if (error) throw error;
+    return { password: (pw as string | null) ?? null };
   });
 
 
@@ -226,13 +216,15 @@ export const adminSetBroadcastAccess = createServerFn({ method: "POST" })
       .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
     const patch: any = { access_mode: data.access_mode, price_espees: data.price_espees ?? null };
-    if (data.password !== undefined && data.password !== null && data.password !== "") {
-      patch.access_password_hash = await sha256(data.password);
-    } else if (data.password === null) {
-      patch.access_password_hash = null;
-    }
     const { error } = await supabaseAdmin.from("broadcasts").update(patch).eq("id", data.id);
     if (error) throw error;
+    if (data.password !== undefined && data.password !== null && data.password !== "") {
+      const { error: pe } = await context.supabase.rpc("admin_set_content_password", { _kind: "broadcast", _id: data.id, _hash: await sha256(data.password), _plain: null as any });
+      if (pe) throw pe;
+    } else if (data.password === null) {
+      const { error: pe } = await context.supabase.rpc("admin_set_content_password", { _kind: "broadcast", _id: data.id, _hash: null as any, _plain: null as any });
+      if (pe) throw pe;
+    }
     return { ok: true };
   });
 
