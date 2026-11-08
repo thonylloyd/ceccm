@@ -1419,6 +1419,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_video_password: { Args: { _id: string }; Returns: string }
+      admin_set_content_password: {
+        Args: { _hash: string; _id: string; _kind: string; _plain: string }
+        Returns: undefined
+      }
       can_submit_report_for: {
         Args: { _church_id: string; _user_id: string }
         Returns: boolean
@@ -1446,6 +1451,27 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      notify_admins_report_submitted: { Args: never; Returns: undefined }
+      notify_report_approved: {
+        Args: { _report_id: string }
+        Returns: undefined
+      }
+      record_broadcast_espees_unlock: {
+        Args: { _broadcast_id: string }
+        Returns: undefined
+      }
+      record_video_espees_unlock: {
+        Args: { _video_id: string }
+        Returns: undefined
+      }
+      verify_broadcast_password: {
+        Args: { _hash: string; _id: string }
+        Returns: boolean
+      }
+      verify_video_password: {
+        Args: { _hash: string; _slug: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
