@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
 
 export const getAboutPage = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
   const [leadership, settings] = await Promise.all([
     supabaseAdmin.from("leadership").select("*").eq("is_active", true).order("display_order"),
     supabaseAdmin.from("site_settings").select("*").in("key", [

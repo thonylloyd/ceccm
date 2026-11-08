@@ -39,8 +39,9 @@ const MATRIX_ROLES: AppRole[] = [
 ];
 
 // ---------- role helpers ----------
-async function loadAdminContext(userId: string) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+async function loadAdminContext(context: { userId: string; supabase: any }) {
+  const userId = context.userId;
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context.supabase);
   const { data: roleRows } = await supabaseAdmin
     .from("user_roles").select("role").eq("user_id", userId);
   const roles = (roleRows ?? []).map((r: any) => r.role as AppRole);
@@ -49,14 +50,14 @@ async function loadAdminContext(userId: string) {
   return { supabaseAdmin, roles, isAdmin, isSiteMaintenance };
 }
 
-async function requireSiteMaintenance(userId: string) {
-  const ctx = await loadAdminContext(userId);
+async function requireSiteMaintenance(context: { userId: string; supabase: any }) {
+  const ctx = await loadAdminContext(context);
   if (!ctx.isSiteMaintenance) throw new Error("Forbidden");
   return ctx;
 }
 
-async function requirePermission(userId: string, key: string) {
-  const ctx = await loadAdminContext(userId);
+async function requirePermission(context: { userId: string; supabase: any }, key: string) {
+  const ctx = await loadAdminContext(context);
   if (ctx.isSiteMaintenance) return ctx;
   if (!ctx.isAdmin) throw new Error("Forbidden");
   const { data } = await ctx.supabaseAdmin
@@ -108,7 +109,7 @@ export const getIsAdmin = createServerFn({ method: "GET" })
 export const bootstrapAdminIfNone = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { count } = await supabaseAdmin
       .from("user_roles")
       .select("*", { count: "exact", head: true })
@@ -172,7 +173,7 @@ export const adminList = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { table: string }) => ({ table: TableSchema.parse(data.table) }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, TABLE_PERMISSION[data.table] ?? "dashboard");
+    const { supabaseAdmin } = await requirePermission(context, TABLE_PERMISSION[data.table] ?? "dashboard");
     const orderCol = data.table === "media_assets" ? "created_at" : "display_order";
     const { data: rows, error } = await supabaseAdmin
       .from(data.table).select("*").order(orderCol, { ascending: data.table !== "media_assets" });
@@ -186,7 +187,7 @@ export const adminUpsert = createServerFn({ method: "POST" })
     table: TableSchema.parse(data.table), row: data.row,
   }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, TABLE_PERMISSION[data.table] ?? "dashboard");
+    const { supabaseAdmin } = await requirePermission(context, TABLE_PERMISSION[data.table] ?? "dashboard");
     const { data: row, error } = await supabaseAdmin
       .from(data.table).upsert(data.row).select().single();
     if (error) throw error;
@@ -199,7 +200,7 @@ export const adminDelete = createServerFn({ method: "POST" })
     table: TableSchema.parse(data.table), id: z.string().uuid().parse(data.id),
   }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, TABLE_PERMISSION[data.table] ?? "dashboard");
+    const { supabaseAdmin } = await requirePermission(context, TABLE_PERMISSION[data.table] ?? "dashboard");
     const { error } = await supabaseAdmin.from(data.table).delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
@@ -211,7 +212,7 @@ export const adminReorder = createServerFn({ method: "POST" })
     table: TableSchema.parse(data.table), ids: z.array(z.string().uuid()).parse(data.ids),
   }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, TABLE_PERMISSION[data.table] ?? "dashboard");
+    const { supabaseAdmin } = await requirePermission(context, TABLE_PERMISSION[data.table] ?? "dashboard");
     await Promise.all(
       data.ids.map((id, i) =>
         (supabaseAdmin.from(data.table) as any).update({ display_order: i }).eq("id", id),
@@ -225,7 +226,7 @@ export const adminGetSetting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { key: string }) => ({ key: z.string().max(64).parse(data.key) }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, "settings");
+    const { supabaseAdmin } = await requirePermission(context, "settings");
     const { data: row } = await supabaseAdmin.from("site_settings").select("*").eq("key", data.key).maybeSingle();
     return row;
   });
@@ -236,7 +237,7 @@ export const adminSetSetting = createServerFn({ method: "POST" })
     key: z.string().max(64).parse(data.key), value: data.value,
   }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, "settings");
+    const { supabaseAdmin } = await requirePermission(context, "settings");
     const { data: row, error } = await supabaseAdmin
       .from("site_settings").upsert({ key: data.key, value: data.value }).select().single();
     if (error) throw error;
@@ -248,7 +249,7 @@ export const createMediaSignedUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { path: string }) => ({ path: z.string().min(1).max(512).parse(data.path) }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, "media");
+    const { supabaseAdmin } = await requirePermission(context, "media");
     const { data: signed, error } = await supabaseAdmin.storage
       .from("media").createSignedUrl(data.path, 60 * 60 * 24 * 365 * 10);
     if (error) throw error;
@@ -262,7 +263,7 @@ export const recordMediaAsset = createServerFn({ method: "POST" })
     mime_type?: string; size_bytes?: number; folder?: string;
   }) => data)
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, "media");
+    const { supabaseAdmin } = await requirePermission(context, "media");
     const { data: row, error } = await supabaseAdmin.from("media_assets").insert({
       ...data, uploaded_by: context.userId,
     }).select().single();
@@ -274,7 +275,7 @@ export const recordMediaAsset = createServerFn({ method: "POST" })
 export const listUsersWithRoles = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await requirePermission(context.userId, "users");
+    const { supabaseAdmin } = await requirePermission(context, "users");
     const [{ data: profiles }, { data: roles }] = await Promise.all([
       supabaseAdmin.from("profiles").select("*").order("created_at", { ascending: false }),
       supabaseAdmin.from("user_roles").select("*"),
@@ -295,8 +296,8 @@ export const setUserRole = createServerFn({ method: "POST" })
     grant: !!data.grant,
   }))
   .handler(async ({ data, context }) => {
-    await requireSiteMaintenance(context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await requireSiteMaintenance(context);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     if (!data.grant && data.role === "site_maintenance" && data.user_id === context.userId) {
       throw new Error("You cannot revoke your own Site Maintenance role.");
     }
@@ -317,8 +318,8 @@ export const createUserAccount = createServerFn({ method: "POST" })
     role: data.role ? RoleSchema.parse(data.role) : undefined,
   }))
   .handler(async ({ data, context }) => {
-    await requireSiteMaintenance(context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await requireSiteMaintenance(context);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
       password: data.password,
@@ -340,9 +341,9 @@ export const deleteUserAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { user_id: string }) => ({ user_id: z.string().uuid().parse(data.user_id) }))
   .handler(async ({ data, context }) => {
-    await requireSiteMaintenance(context.userId);
+    await requireSiteMaintenance(context);
     if (data.user_id === context.userId) throw new Error("You cannot delete your own account.");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.user_id);
     if (error) throw error;
     return { ok: true };
@@ -352,8 +353,8 @@ export const deleteUserAccount = createServerFn({ method: "POST" })
 export const listPermissionsMatrix = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireSiteMaintenance(context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await requireSiteMaintenance(context);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const [{ data: perms }, { data: rp }] = await Promise.all([
       supabaseAdmin.from("permissions").select("*").order("sort_order"),
       supabaseAdmin.from("role_permissions").select("*"),
@@ -374,9 +375,9 @@ export const setRolePermission = createServerFn({ method: "POST" })
     grant: !!data.grant,
   }))
   .handler(async ({ data, context }) => {
-    await requireSiteMaintenance(context.userId);
+    await requireSiteMaintenance(context);
     if (data.role === "site_maintenance") throw new Error("Site Maintenance has all permissions by default.");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     if (data.grant) {
       await supabaseAdmin.from("role_permissions").upsert({ role: data.role, permission_key: data.permission_key });
     } else {

@@ -4,7 +4,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 
 export const getSalvationSettings = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
   const { data } = await supabaseAdmin.from("site_settings").select("value").eq("key", "salvation").maybeSingle();
   return (data?.value as any) ?? { video_url: "", enabled: true };
 });
@@ -25,7 +25,7 @@ const LeadSchema = z.object({
 export const submitSalvationLead = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => LeadSchema.parse(data))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { error } = await supabaseAdmin.from("salvation_leads").insert({
       name: data.name,
       email: data.email,
@@ -38,7 +38,7 @@ export const submitSalvationLead = createServerFn({ method: "POST" })
 export const adminListSalvationLeads = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const r = await supabaseAdmin.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
     if (!r.data) throw new Error("Forbidden");
     const { data, error } = await supabaseAdmin.from("salvation_leads").select("*").order("created_at", { ascending: false });
@@ -50,7 +50,7 @@ export const adminDeleteSalvationLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { id: string }) => ({ id: z.string().uuid().parse(data.id) }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const r = await supabaseAdmin.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
     if (!r.data) throw new Error("Forbidden");
     const { error } = await supabaseAdmin.from("salvation_leads").delete().eq("id", data.id);

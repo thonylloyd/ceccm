@@ -39,7 +39,7 @@ export const Route = createFileRoute("/live")({
   }),
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center bg-light p-6 text-center">
-      <div><h1 className="font-display text-2xl text-navy-deep">Unable to load livestream</h1><p className="text-sm text-charcoal/70 mt-2">{error.message}</p></div>
+      <div><h1 className="font-display text-2xl text-navy-deep">Unable to load livestream</h1><p className="text-sm text-charcoal/70 mt-2">{(error as Error)?.message}</p></div>
     </div>
   ),
   notFoundComponent: () => <div>Not found</div>,

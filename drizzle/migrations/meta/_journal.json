@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794152642653,
+      "tag": "0000_vercel_rls_rpcs",
+      "breakpoints": true
+    }
+  ]
+}

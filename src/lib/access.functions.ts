@@ -31,7 +31,7 @@ function isUnlocked(mode: AccessMode, methods: string[]) {
 export const getVideoAccessMeta = createServerFn({ method: "POST" })
   .inputValidator((d: { slug: string }) => ({ slug: z.string().min(1).parse(d.slug) }))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: v } = await supabaseAdmin
       .from("videos").select("id, access_mode, price_espees").eq("slug", data.slug).maybeSingle();
     if (!v) return { id: null as string | null, accessMode: "free" as AccessMode, price: null as number | null };
@@ -45,7 +45,7 @@ export const getVideoAccessMeta = createServerFn({ method: "POST" })
 export const getBroadcastAccessMeta = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => ({ id: z.string().uuid().parse(d.id) }))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: b } = await supabaseAdmin
       .from("broadcasts").select("id, access_mode, price_espees").eq("id", data.id).maybeSingle();
     if (!b) return { id: null as string | null, accessMode: "free" as AccessMode, price: null as number | null };
@@ -62,7 +62,7 @@ export const checkVideoUnlocked = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { slug: string }) => ({ slug: z.string().min(1).parse(d.slug) }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { data: v } = await supabaseAdmin
       .from("videos").select("id, access_mode").eq("slug", data.slug).maybeSingle();
     if (!v) return { unlocked: false, methods: [] as string[] };
@@ -79,7 +79,7 @@ export const checkBroadcastUnlocked = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => ({ id: z.string().uuid().parse(d.id) }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { data: b } = await supabaseAdmin
       .from("broadcasts").select("id, access_mode").eq("id", data.id).maybeSingle();
     if (!b) return { unlocked: false, methods: [] as string[] };
@@ -101,15 +101,15 @@ export const unlockVideoWithPassword = createServerFn({ method: "POST" })
     password: z.string().min(1).max(200).parse(d.password),
   }))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: v } = await supabaseAdmin
-      .from("videos").select("id, access_password_hash, access_mode").eq("slug", data.slug).maybeSingle();
+      .from("videos").select("id, access_mode").eq("slug", data.slug).maybeSingle();
     if (!v) throw new Error("Video not found");
     const mode = ((v as any).access_mode ?? "free") as AccessMode;
     if (mode !== "password" && mode !== "password_paid") throw new Error("Password not required");
     const hash = await sha256(data.password);
-    const stored = (v as any).access_password_hash ?? "";
-    if (!stored || !safeEqual(hash, stored)) throw new Error("Incorrect password");
+    const { data: ok } = await supabaseAdmin.rpc("verify_video_password", { _slug: data.slug, _hash: hash });
+    if (!ok) throw new Error("Incorrect password");
     // Session-scoped: do not persist. Client tracks in sessionStorage.
     return { ok: true };
   });
@@ -118,18 +118,13 @@ export const purchaseVideoWithEspees = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { slug: string }) => ({ slug: z.string().min(1).parse(d.slug) }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { data: v } = await supabaseAdmin
       .from("videos").select("id, access_mode").eq("slug", data.slug).maybeSingle();
     if (!v) throw new Error("Video not found");
     const mode = ((v as any).access_mode ?? "free") as AccessMode;
     if (mode !== "paid" && mode !== "password_paid") throw new Error("Not for sale");
-    const { error } = await supabaseAdmin
-      .from("video_unlocks")
-      .upsert(
-        { user_id: context.userId, video_id: (v as any).id, method: "espees" },
-        { onConflict: "user_id,video_id,method" },
-      );
+    const { error } = await context.supabase.rpc("record_video_espees_unlock", { _video_id: (v as any).id });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -141,15 +136,15 @@ export const unlockBroadcastWithPassword = createServerFn({ method: "POST" })
     password: z.string().min(1).max(200).parse(d.password),
   }))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: b } = await supabaseAdmin
-      .from("broadcasts").select("id, access_password_hash, access_mode").eq("id", data.id).maybeSingle();
+      .from("broadcasts").select("id, access_mode").eq("id", data.id).maybeSingle();
     if (!b) throw new Error("Broadcast not found");
     const mode = ((b as any).access_mode ?? "free") as AccessMode;
     if (mode !== "password" && mode !== "password_paid") throw new Error("Password not required");
     const hash = await sha256(data.password);
-    const stored = (b as any).access_password_hash ?? "";
-    if (!stored || !safeEqual(hash, stored)) throw new Error("Incorrect password");
+    const { data: ok } = await supabaseAdmin.rpc("verify_broadcast_password", { _id: data.id, _hash: hash });
+    if (!ok) throw new Error("Incorrect password");
     // Session-scoped: do not persist. Client tracks in sessionStorage.
     return { ok: true };
   });
@@ -158,18 +153,13 @@ export const purchaseBroadcastWithEspees = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => ({ id: z.string().uuid().parse(d.id) }))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { data: b } = await supabaseAdmin
       .from("broadcasts").select("id, access_mode").eq("id", data.id).maybeSingle();
     if (!b) throw new Error("Broadcast not found");
     const mode = ((b as any).access_mode ?? "free") as AccessMode;
     if (mode !== "paid" && mode !== "password_paid") throw new Error("Not for sale");
-    const { error } = await supabaseAdmin
-      .from("broadcast_unlocks")
-      .upsert(
-        { user_id: context.userId, broadcast_id: (b as any).id, method: "espees" },
-        { onConflict: "user_id,broadcast_id,method" },
-      );
+    const { error } = await context.supabase.rpc("record_broadcast_espees_unlock", { _broadcast_id: (b as any).id });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -183,20 +173,20 @@ export const adminSetVideoAccess = createServerFn({ method: "POST" })
     password?: string | null; price_espees?: number | null;
   }) => d)
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { data: roleRows } = await supabaseAdmin
       .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
     const patch: any = { access_mode: data.access_mode, price_espees: data.price_espees ?? null };
-    if (data.password !== undefined && data.password !== null && data.password !== "") {
-      patch.access_password_hash = await sha256(data.password);
-      patch.access_password_plain = data.password;
-    } else if (data.password === null) {
-      patch.access_password_hash = null;
-      patch.access_password_plain = null;
-    }
     const { error } = await supabaseAdmin.from("videos").update(patch).eq("id", data.id);
     if (error) throw error;
+    if (data.password !== undefined && data.password !== null && data.password !== "") {
+      const { error: pe } = await context.supabase.rpc("admin_set_content_password", { _kind: "video", _id: data.id, _hash: await sha256(data.password), _plain: data.password });
+      if (pe) throw pe;
+    } else if (data.password === null) {
+      const { error: pe } = await context.supabase.rpc("admin_set_content_password", { _kind: "video", _id: data.id, _hash: null as any, _plain: null as any });
+      if (pe) throw pe;
+    }
     return { ok: true };
   });
 
@@ -204,13 +194,13 @@ export const adminGetVideoPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { data: roleRows } = await supabaseAdmin
       .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
-    const { data: row } = await supabaseAdmin
-      .from("videos").select("access_password_plain").eq("id", data.id).maybeSingle();
-    return { password: (row as any)?.access_password_plain ?? null };
+    const { data: pw, error } = await context.supabase.rpc("admin_get_video_password", { _id: data.id });
+    if (error) throw error;
+    return { password: (pw as string | null) ?? null };
   });
 
 
@@ -221,18 +211,20 @@ export const adminSetBroadcastAccess = createServerFn({ method: "POST" })
     password?: string | null; price_espees?: number | null;
   }) => d)
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
     const { data: roleRows } = await supabaseAdmin
       .from("user_roles").select("role").eq("user_id", context.userId).in("role", ["admin", "super_admin", "site_maintenance"] as any);
     if (!roleRows || roleRows.length === 0) throw new Error("Forbidden");
     const patch: any = { access_mode: data.access_mode, price_espees: data.price_espees ?? null };
-    if (data.password !== undefined && data.password !== null && data.password !== "") {
-      patch.access_password_hash = await sha256(data.password);
-    } else if (data.password === null) {
-      patch.access_password_hash = null;
-    }
     const { error } = await supabaseAdmin.from("broadcasts").update(patch).eq("id", data.id);
     if (error) throw error;
+    if (data.password !== undefined && data.password !== null && data.password !== "") {
+      const { error: pe } = await context.supabase.rpc("admin_set_content_password", { _kind: "broadcast", _id: data.id, _hash: await sha256(data.password), _plain: null as any });
+      if (pe) throw pe;
+    } else if (data.password === null) {
+      const { error: pe } = await context.supabase.rpc("admin_set_content_password", { _kind: "broadcast", _id: data.id, _hash: null as any, _plain: null as any });
+      if (pe) throw pe;
+    }
     return { ok: true };
   });
 
