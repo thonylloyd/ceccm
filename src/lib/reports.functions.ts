@@ -130,7 +130,7 @@ export const saveReport = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     if (data.status === "submitted") {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
       const { data: admins } = await supabaseAdmin
         .from("user_roles")
         .select("user_id")
@@ -163,7 +163,7 @@ export const approveReport = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     if (row?.reporter_id) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
       await supabaseAdmin.from("portal_notifications").insert({
         user_id: row.reporter_id,
         type: "report_approved",

@@ -19,7 +19,7 @@ const DEFAULTS: PartnerSettings = {
 };
 
 export const getPartnerSettings = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
   const { data } = await supabaseAdmin
     .from("site_settings")
     .select("value")
