@@ -4,7 +4,7 @@ import { queryOptions } from "@tanstack/react-query";
 // Public read of all homepage content via admin client (bypasses RLS for SSR;
 // only safe fields are returned and tables already allow public SELECT).
 export const getHomepageContent = createServerFn({ method: "GET" }).handler(async () => {
-  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
 
   const [heroes, mission, programs, resources, nav, settings, praise, featuredVideos] = await Promise.all([
     supabaseAdmin.from("hero_banners").select("*").eq("is_active", true).order("display_order"),
@@ -41,7 +41,7 @@ export const homepageQuery = () =>
   });
 
 export const getSiteChrome = createServerFn({ method: "GET" }).handler(async () => {
-  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
   const [nav, settings] = await Promise.all([
     supabaseAdmin.from("navigation_items").select("*").is("parent_id", null).eq("is_active", true).order("display_order"),
     supabaseAdmin.from("site_settings").select("*"),

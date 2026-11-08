@@ -46,7 +46,7 @@ export const kingschatLogin = createServerFn({ method: "POST" })
     const email = `${String(username).toLowerCase().replace(/[^a-z0-9._-]/g, "")}@kingschat.online`;
 
     // 2. Find or create Supabase user (auto-confirmed)
-    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
 
     let userId: string | null = null;
     {

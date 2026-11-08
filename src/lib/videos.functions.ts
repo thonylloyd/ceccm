@@ -9,7 +9,7 @@ const stripSensitive = (v: any) => {
 };
 
 export const getVideoLibrary = createServerFn({ method: "GET" }).handler(async () => {
-  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
   const [videos, cats, cta] = await Promise.all([
     supabaseAdmin.from("videos").select("*").eq("is_published", true).order("display_order").order("publish_date", { ascending: false }),
     supabaseAdmin.from("video_categories").select("*").order("display_order"),
@@ -28,7 +28,7 @@ export const videoLibraryQuery = () =>
 export const getVideoBySlug = createServerFn({ method: "POST" })
   .inputValidator((d: { slug: string }) => ({ slug: z.string().min(1).parse(d.slug) }))
   .handler(async ({ data }) => {
-    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: video } = await supabaseAdmin.from("videos").select("*").eq("slug", data.slug).eq("is_published", true).maybeSingle();
     if (!video) return { video: null, related: [] };
     const { data: related } = await supabaseAdmin

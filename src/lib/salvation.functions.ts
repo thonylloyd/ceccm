@@ -4,7 +4,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 
 export const getSalvationSettings = createServerFn({ method: "GET" }).handler(async () => {
-  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
   const { data } = await supabaseAdmin.from("site_settings").select("value").eq("key", "salvation").maybeSingle();
   return (data?.value as any) ?? { video_url: "", enabled: true };
 });
@@ -25,7 +25,7 @@ const LeadSchema = z.object({
 export const submitSalvationLead = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => LeadSchema.parse(data))
   .handler(async ({ data }) => {
-    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { error } = await supabaseAdmin.from("salvation_leads").insert({
       name: data.name,
       email: data.email,

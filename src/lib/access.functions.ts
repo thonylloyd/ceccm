@@ -31,7 +31,7 @@ function isUnlocked(mode: AccessMode, methods: string[]) {
 export const getVideoAccessMeta = createServerFn({ method: "POST" })
   .inputValidator((d: { slug: string }) => ({ slug: z.string().min(1).parse(d.slug) }))
   .handler(async ({ data }) => {
-    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: v } = await supabaseAdmin
       .from("videos").select("id, access_mode, price_espees").eq("slug", data.slug).maybeSingle();
     if (!v) return { id: null as string | null, accessMode: "free" as AccessMode, price: null as number | null };
@@ -45,7 +45,7 @@ export const getVideoAccessMeta = createServerFn({ method: "POST" })
 export const getBroadcastAccessMeta = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => ({ id: z.string().uuid().parse(d.id) }))
   .handler(async ({ data }) => {
-    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: b } = await supabaseAdmin
       .from("broadcasts").select("id, access_mode, price_espees").eq("id", data.id).maybeSingle();
     if (!b) return { id: null as string | null, accessMode: "free" as AccessMode, price: null as number | null };
@@ -101,15 +101,15 @@ export const unlockVideoWithPassword = createServerFn({ method: "POST" })
     password: z.string().min(1).max(200).parse(d.password),
   }))
   .handler(async ({ data }) => {
-    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: v } = await supabaseAdmin
-      .from("videos").select("id, access_password_hash, access_mode").eq("slug", data.slug).maybeSingle();
+      .from("videos").select("id, access_mode").eq("slug", data.slug).maybeSingle();
     if (!v) throw new Error("Video not found");
     const mode = ((v as any).access_mode ?? "free") as AccessMode;
     if (mode !== "password" && mode !== "password_paid") throw new Error("Password not required");
     const hash = await sha256(data.password);
-    const stored = (v as any).access_password_hash ?? "";
-    if (!stored || !safeEqual(hash, stored)) throw new Error("Incorrect password");
+    const { data: ok } = await supabaseAdmin.rpc("verify_video_password", { _slug: data.slug, _hash: hash });
+    if (!ok) throw new Error("Incorrect password");
     // Session-scoped: do not persist. Client tracks in sessionStorage.
     return { ok: true };
   });
@@ -141,15 +141,15 @@ export const unlockBroadcastWithPassword = createServerFn({ method: "POST" })
     password: z.string().min(1).max(200).parse(d.password),
   }))
   .handler(async ({ data }) => {
-    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { data: b } = await supabaseAdmin
-      .from("broadcasts").select("id, access_password_hash, access_mode").eq("id", data.id).maybeSingle();
+      .from("broadcasts").select("id, access_mode").eq("id", data.id).maybeSingle();
     if (!b) throw new Error("Broadcast not found");
     const mode = ((b as any).access_mode ?? "free") as AccessMode;
     if (mode !== "password" && mode !== "password_paid") throw new Error("Password not required");
     const hash = await sha256(data.password);
-    const stored = (b as any).access_password_hash ?? "";
-    if (!stored || !safeEqual(hash, stored)) throw new Error("Incorrect password");
+    const { data: ok } = await supabaseAdmin.rpc("verify_broadcast_password", { _id: data.id, _hash: hash });
+    if (!ok) throw new Error("Incorrect password");
     // Session-scoped: do not persist. Client tracks in sessionStorage.
     return { ok: true };
   });

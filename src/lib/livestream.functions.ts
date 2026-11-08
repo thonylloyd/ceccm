@@ -3,7 +3,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 
 export const getLivestreamPage = createServerFn({ method: "GET" }).handler(async () => {
-  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+  const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
   const [broadcasts, channels, stats, settings] = await Promise.all([
     supabaseAdmin.from("broadcasts").select("*").eq("is_published", true).order("display_order"),
     supabaseAdmin.from("broadcast_channels").select("*").eq("is_published", true).order("display_order"),
@@ -61,7 +61,7 @@ export const subscribeToBroadcasts = createServerFn({ method: "POST" })
     }).parse(data),
   )
   .handler(async ({ data }) => {
-    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb(context?.supabase);
+    const supabaseAdmin = await (await import("@/lib/db.server")).serverDb();
     const { error } = await supabaseAdmin.from("broadcast_subscribers").insert(data);
     if (error) throw error;
     return { ok: true };
