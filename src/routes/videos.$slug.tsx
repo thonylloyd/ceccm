@@ -41,7 +41,7 @@ export const Route = createFileRoute("/videos/$slug")({
       }] : [],
     };
   },
-  errorComponent: ({ error }) => <div className="p-10 text-center">{error.message}</div>,
+  errorComponent: ({ error }) => <div className="p-10 text-center">{(error as Error)?.message}</div>,
   notFoundComponent: () => <div className="p-10 text-center">Video not found</div>,
   component: VideoDetail,
 });

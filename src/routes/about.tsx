@@ -38,7 +38,7 @@ export const Route = createFileRoute("/about")({
   }),
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
-      <p className="text-sm text-charcoal/70">{error.message}</p>
+      <p className="text-sm text-charcoal/70">{(error as Error)?.message}</p>
     </div>
   ),
   notFoundComponent: () => <div>Not found</div>,

@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
     <div className="min-h-screen flex items-center justify-center bg-light p-6">
       <div className="text-center">
         <h1 className="font-display text-3xl text-navy-deep mb-2">Something went wrong</h1>
-        <p className="text-charcoal/70 text-sm">{error.message}</p>
+        <p className="text-charcoal/70 text-sm">{(error as Error)?.message}</p>
       </div>
     </div>
   ),

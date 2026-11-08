@@ -20,7 +20,7 @@ export const Route = createFileRoute("/programs")({
     ],
     links: [{ rel: "canonical", href: "https://ceccm.lovable.app/programs" }],
   }),
-  errorComponent: ({ error }) => <div className="p-10 text-center">{error.message}</div>,
+  errorComponent: ({ error }) => <div className="p-10 text-center">{(error as Error)?.message}</div>,
   notFoundComponent: () => <div>Not found</div>,
   component: ProgramsPage,
 });
